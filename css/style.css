@@ -1353,11 +1353,13 @@ section .all-heroes-title::before {
   background: rgba(255, 255, 255, .08);
   border: 1px solid var(--glass-border);
   color: #fff;
+  font-family: inherit;
   font-size: .85rem;
   font-weight: 700;
   padding: .65rem 1.2rem;
   border-radius: 50px;
   text-decoration: none;
+  cursor: pointer;
   transition: all .2s ease;
   white-space: nowrap;
 }
