@@ -1,0 +1,16 @@
+# OS and temporary files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+.DS_Store
+
+# Temporary outputs
+edge_out.txt
+edge_dump.html
+screenshot.png
+test_eval.html
+test_heroes.html
+check_img.ps1
+test_dom.ps1
+screenshot.ps1

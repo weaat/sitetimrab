@@ -1,0 +1,18 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+  <script>
+    window.onerror = function(msg, url, line, col, err) {
+      document.body.innerHTML += '<div id="err">' + msg + ' at ' + url + ':' + line + ':' + col + '</div>';
+    };
+  </script>
+  <script src="js/heroes_data.js"></script>
+  <script src="js/script.js"></script>
+</head>
+<body>
+  <div id="grid-str"></div>
+  <div id="grid-agi"></div>
+  <div id="grid-int"></div>
+  <div id="grid-all"></div>
+</body>
+</html>

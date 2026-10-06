@@ -1,0 +1,1044 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DotaArena 2026 — Практика 07: CSS Grid</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+
+  <style>
+    /* =============================================
+       RESET & BASE
+       ============================================= */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --bg-primary:   #0d0d0f;
+      --bg-secondary: #111114;
+      --bg-glass:     rgba(255, 255, 255, 0.04);
+      --bg-glass-hover: rgba(255, 255, 255, 0.08);
+      --accent:       #dc2626;
+      --accent-light: #ef4444;
+      --accent-glow:  rgba(220, 38, 38, 0.35);
+      --text-primary: #f1f5f9;
+      --text-muted:   #94a3b8;
+      --text-faint:   #475569;
+      --border:       rgba(255, 255, 255, 0.08);
+      --border-accent: rgba(220, 38, 38, 0.4);
+      --blur:         blur(16px);
+      --radius:       14px;
+      --gap-lg:       1.5rem;
+      --gap-md:       1.25rem;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      line-height: 1.6;
+      min-height: 100vh;
+      /* Subtle noise texture via radial gradients */
+      background-image:
+        radial-gradient(ellipse 80% 50% at 50% -10%, rgba(220, 38, 38, 0.12) 0%, transparent 70%),
+        radial-gradient(ellipse 50% 40% at 90% 80%, rgba(220, 38, 38, 0.06) 0%, transparent 60%);
+    }
+
+    img { display: block; max-width: 100%; }
+    a   { color: inherit; text-decoration: none; }
+
+    /* =============================================
+       TYPOGRAPHY HELPERS
+       ============================================= */
+    .section-title {
+      font-size: clamp(1.4rem, 3vw, 2rem);
+      font-weight: 800;
+      letter-spacing: -0.5px;
+      margin-bottom: 0.4rem;
+    }
+
+    .section-subtitle {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      margin-bottom: 2.5rem;
+    }
+
+    .accent { color: var(--accent); }
+
+    .badge {
+      display: inline-block;
+      background: var(--accent-glow);
+      color: var(--accent-light);
+      border: 1px solid var(--border-accent);
+      border-radius: 999px;
+      padding: 0.25rem 0.75rem;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      margin-bottom: 0.75rem;
+    }
+
+    /* =============================================
+       GLASSMORPHISM CARD BASE
+       ============================================= */
+    .glass-card {
+      background: var(--bg-glass);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      backdrop-filter: var(--blur);
+      -webkit-backdrop-filter: var(--blur);
+      transition: background 0.25s, border-color 0.25s, transform 0.25s, box-shadow 0.25s;
+    }
+
+    .glass-card:hover {
+      background: var(--bg-glass-hover);
+      border-color: var(--border-accent);
+      transform: translateY(-4px);
+      box-shadow: 0 12px 40px rgba(220, 38, 38, 0.18);
+    }
+
+    /* =============================================
+       WRAPPER
+       ============================================= */
+    .wrapper {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 0 1.5rem;
+    }
+
+    /* =============================================
+       HEADER
+       ============================================= */
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(13, 13, 15, 0.85);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .header-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 1.5rem;
+      max-width: 1280px;
+      margin: 0 auto;
+    }
+
+    .logo {
+      font-size: 1.25rem;
+      font-weight: 900;
+      letter-spacing: -0.5px;
+    }
+
+    .logo span { color: var(--accent); }
+
+    /* =============================================
+       NAVIGATION — CSS GRID
+       Grid даёт равномерное распределение пунктов
+       без необходимости задавать flex-wrap вручную.
+       auto-fit + minmax позволяет сетке сжиматься
+       до одной колонки на мобильных автоматически.
+       ============================================= */
+    .site-nav {
+      /* Grid: равные колонки для пунктов меню.
+         Flexbox здесь менее предпочтителен, т.к.
+         нам важна строгая равная ширина всех ячеек. */
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      gap: 0.25rem;
+      list-style: none;
+    }
+
+    .site-nav a {
+      display: block;
+      padding: 0.45rem 0.75rem;
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      border-radius: 8px;
+      text-align: center;
+      transition: color 0.2s, background 0.2s;
+    }
+
+    .site-nav a:hover,
+    .site-nav a.active {
+      color: var(--text-primary);
+      background: var(--bg-glass);
+    }
+
+    /* =============================================
+       HERO SECTION
+       ============================================= */
+    .hero-section {
+      padding: 6rem 1.5rem 5rem;
+      text-align: center;
+      max-width: 1280px;
+      margin: 0 auto;
+    }
+
+    .hero-section h1 {
+      font-size: clamp(2rem, 5vw, 3.5rem);
+      font-weight: 900;
+      letter-spacing: -1.5px;
+      line-height: 1.15;
+      margin-bottom: 1.25rem;
+    }
+
+    .hero-section p {
+      font-size: clamp(0.95rem, 1.8vw, 1.15rem);
+      color: var(--text-muted);
+      max-width: 640px;
+      margin: 0 auto 2.5rem;
+    }
+
+    /* =============================================
+       STATISTICS BLOCK — CSS GRID
+       Grid template columns: repeat(4, 1fr) — строго
+       4 равные колонки. Flexbox не даёт гарантии
+       точного количества колонок без media-запросов.
+       Grid позволяет задать это явно одной строкой.
+       ============================================= */
+    .stats-section {
+      padding: 3rem 1.5rem;
+      max-width: 1280px;
+      margin: 0 auto;
+    }
+
+    .stats-grid {
+      /* Grid: ровно 4 блока в ряд — явное управление структурой.
+         Flexbox дал бы разную ширину если содержимое различается. */
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
+      align-items: stretch; /* все карточки одинаковой высоты */
+    }
+
+    .stat-card {
+      padding: 2rem 1.5rem;
+      text-align: center;
+    }
+
+    .stat-card__value {
+      font-size: 2.5rem;
+      font-weight: 900;
+      color: var(--accent-light);
+      line-height: 1;
+      margin-bottom: 0.5rem;
+      letter-spacing: -1px;
+    }
+
+    .stat-card__label {
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+    }
+
+    /* =============================================
+       TEAMS SECTION — CSS GRID
+       repeat(auto-fit, minmax(260px, 1fr)) —
+       сетка сама определяет число колонок исходя
+       из доступной ширины. Это точное требование
+       задания. Flexbox мог бы дать похожий результат,
+       но не гарантирует растяжение последней строки.
+       ============================================= */
+    .teams-section {
+      padding: 4rem 1.5rem;
+      max-width: 1280px;
+      margin: 0 auto;
+    }
+
+    .teams-grid {
+      /* Grid предпочтительнее Flexbox здесь, потому что:
+         1. auto-fit растягивает карточки до 1fr без orphan-проблем
+         2. align-items:stretch выравнивает высоту без JS
+         3. gap работает строго в обоих направлениях */
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+      gap: var(--gap-lg); /* 1.5rem */
+      align-items: stretch;
+      /* justify-items намеренно не задан —
+         пусть студент увидит разницу с justify-content */
+    }
+
+    .team-card {
+      padding: 1.75rem 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .team-card__logo {
+      width: 56px;
+      height: 56px;
+      border-radius: 12px;
+      background: var(--accent-glow);
+      border: 1px solid var(--border-accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.5rem;
+    }
+
+    .team-card__name {
+      font-size: 1.1rem;
+      font-weight: 700;
+    }
+
+    .team-card__region {
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.8px;
+    }
+
+    .team-card__meta {
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+      margin-top: auto;
+    }
+
+    .meta-pill {
+      background: rgba(255,255,255,0.06);
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      padding: 0.2rem 0.7rem;
+      font-size: 0.75rem;
+      color: var(--text-muted);
+    }
+
+    .meta-pill--accent {
+      background: var(--accent-glow);
+      border-color: var(--border-accent);
+      color: var(--accent-light);
+    }
+
+    /* =============================================
+       HEROES SECTION — CSS GRID
+       repeat(auto-fit, minmax(220px, 1fr)) — меньший
+       minmax т.к. карточки героев компактнее команд.
+       .hero-card--featured занимает 2 колонки (span 2).
+       Это невозможно реализовать чисто на Flexbox
+       без дополнительной обёртки или JS.
+       ============================================= */
+    .heroes-section {
+      padding: 4rem 1.5rem;
+      max-width: 1280px;
+      margin: 0 auto;
+    }
+
+    .heroes-grid {
+      /* Grid: позволяет одному элементу занимать span 2
+         без нарушения потока остальных карточек.
+         Flexbox не поддерживает span нативно. */
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: var(--gap-md); /* 1.25rem */
+      align-items: stretch;
+      /* justify-items не задан намеренно */
+    }
+
+    /* Карточка-акцент занимает 2 колонки на широком экране */
+    .hero-card--featured {
+      grid-column: span 2;
+    }
+
+    .hero-card {
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .hero-card--featured {
+      /* Горизонтальный макет для широкой карточки */
+      flex-direction: row;
+      align-items: center;
+      gap: 1.5rem;
+      background: linear-gradient(135deg, rgba(220, 38, 38, 0.12), rgba(255,255,255,0.04));
+      border-color: var(--border-accent);
+    }
+
+    .hero-card__avatar {
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--bg-glass-hover);
+      border: 2px solid var(--border);
+      flex-shrink: 0;
+    }
+
+    .hero-card__avatar img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .hero-card--featured .hero-card__avatar {
+      width: 80px;
+      height: 80px;
+      border-color: var(--accent);
+      background: var(--accent-glow);
+    }
+
+    .hero-card__info { flex: 1; min-width: 0; }
+
+    .hero-card__name {
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 0.25rem;
+    }
+
+    .hero-card--featured .hero-card__name {
+      font-size: 1.25rem;
+    }
+
+    .hero-card__role {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.7px;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+
+    .hero-card__stats {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .hero-stat {
+      font-size: 0.72rem;
+      padding: 0.18rem 0.55rem;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      color: var(--text-muted);
+    }
+
+    .featured-badge {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      background: var(--accent);
+      color: white;
+      font-size: 0.65rem;
+      font-weight: 800;
+      letter-spacing: 1px;
+      text-transform: uppercase;
+      padding: 0.2rem 0.6rem;
+      border-radius: 999px;
+    }
+
+    /* =============================================
+       COMPARISON ARTICLE — Grid vs Flexbox
+       ============================================= */
+    .comparison-section {
+      padding: 4rem 1.5rem 5rem;
+      max-width: 1280px;
+      margin: 0 auto;
+    }
+
+    .comparison-article {
+      background: var(--bg-glass);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      backdrop-filter: var(--blur);
+      -webkit-backdrop-filter: var(--blur);
+      padding: 2.5rem;
+    }
+
+    .comparison-article h2 {
+      font-size: 1.5rem;
+      font-weight: 800;
+      margin-bottom: 0.5rem;
+    }
+
+    .comparison-article p {
+      color: var(--text-muted);
+      margin-bottom: 2rem;
+      font-size: 0.9rem;
+    }
+
+    .comparison-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.875rem;
+    }
+
+    .comparison-table th,
+    .comparison-table td {
+      padding: 0.85rem 1rem;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .comparison-table th {
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--text-muted);
+      background: rgba(255,255,255,0.03);
+    }
+
+    .comparison-table th:first-child { border-radius: 8px 0 0 0; }
+    .comparison-table th:last-child  { border-radius: 0 8px 0 0; }
+
+    .comparison-table td:first-child { color: var(--accent-light); font-weight: 600; }
+
+    .comparison-table td.grid-col  { color: var(--text-primary); }
+    .comparison-table td.flex-col  { color: var(--text-muted); }
+
+    .comparison-table tr:last-child td { border-bottom: none; }
+    .comparison-table tr:hover td { background: rgba(255,255,255,0.02); }
+
+    .comparison-table .check  { color: #22c55e; font-weight: 700; }
+    .comparison-table .cross  { color: var(--accent); font-weight: 700; }
+
+    /* =============================================
+       FOOTER
+       ============================================= */
+    .site-footer {
+      border-top: 1px solid var(--border);
+      padding: 2rem 1.5rem;
+      text-align: center;
+      color: var(--text-faint);
+      font-size: 0.8rem;
+    }
+
+    .site-footer strong { color: var(--accent); }
+
+    /* =============================================
+       SECTION DIVIDER
+       ============================================= */
+    .section-divider {
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--border), transparent);
+      margin: 0 1.5rem;
+      max-width: 1280px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    /* =============================================
+       RESPONSIVE — АДАПТАЦИЯ
+       ============================================= */
+
+    /* Планшет */
+    @media (max-width: 1024px) {
+      .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
+    /* Мобильный */
+    @media (max-width: 768px) {
+      .header-inner {
+        flex-direction: column;
+        gap: 1rem;
+      }
+
+      .site-nav {
+        /* На мобильных все пункты меню в одну колонку */
+        grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      }
+
+      .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      /* Карточка-акцент возвращается к одной колонке */
+      .hero-card--featured {
+        grid-column: span 1;
+        flex-direction: column;
+      }
+
+      .hero-card--featured .hero-card__avatar {
+        width: 64px;
+        height: 64px;
+      }
+
+      .hero-card--featured .hero-card__name {
+        font-size: 1rem;
+      }
+
+      .comparison-table th,
+      .comparison-table td {
+        padding: 0.65rem 0.6rem;
+        font-size: 0.8rem;
+      }
+    }
+
+    /* Очень маленький экран */
+    @media (max-width: 480px) {
+      .stats-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+
+      .hero-section h1 {
+        font-size: 1.8rem;
+      }
+
+      .comparison-article {
+        padding: 1.5rem 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- =============================================
+       HEADER + NAVIGATION (CSS Grid)
+       ============================================= -->
+  <header class="site-header">
+    <div class="header-inner">
+      <div class="logo">Dota<span>Arena</span> <span style="color:var(--text-muted);font-weight:400">2026</span></div>
+
+      <!-- NAV: display:grid, repeat(auto-fit, minmax(120px,1fr))
+           Демонстрация Grid для навигации — каждый пункт
+           занимает равную долю доступного пространства. -->
+      <nav>
+        <ul class="site-nav">
+          <li><a href="#teams"   class="active">Команды</a></li>
+          <li><a href="#heroes">Герои</a></li>
+          <li><a href="#stats">Статистика</a></li>
+          <li><a href="#comparison">Grid vs Flex</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <!-- =============================================
+       HERO / INTRO
+       ============================================= -->
+  <section class="hero-section">
+    <div class="badge">Практика 07</div>
+    <h1>DotaArena 2026 —<br /><span class="accent">CSS Grid</span></h1>
+    <p>
+      Переверстка секций карточек с Flexbox на CSS Grid.
+      Демонстрация возможностей двумерной сетки:
+      <code>auto-fit</code>, <code>minmax</code>, <code>span</code> и <code>align-items: stretch</code>.
+    </p>
+  </section>
+
+  <div class="section-divider"></div>
+
+  <!-- =============================================
+       STATISTICS BLOCK — CSS GRID
+       grid-template-columns: repeat(4, 1fr)
+       ============================================= -->
+  <section class="stats-section" id="stats">
+    <div class="wrapper">
+      <div class="badge">Статистика турнира</div>
+      <h2 class="section-title">Цифры сезона</h2>
+      <p class="section-subtitle">
+        Grid: <code>repeat(4, 1fr)</code> — четыре строго равные колонки
+      </p>
+
+      <!-- GRID: repeat(4,1fr) — явное задание количества колонок.
+           Flexbox без media-запросов не может гарантировать
+           ровно 4 блока в ряд независимо от контента. -->
+      <div class="stats-grid">
+
+        <div class="stat-card glass-card">
+          <div class="stat-card__value">32</div>
+          <div class="stat-card__label">Команды</div>
+        </div>
+
+        <div class="stat-card glass-card">
+          <div class="stat-card__value">124</div>
+          <div class="stat-card__label">Матча</div>
+        </div>
+
+        <div class="stat-card glass-card">
+          <div class="stat-card__value">4.2M</div>
+          <div class="stat-card__label">$ Призовых</div>
+        </div>
+
+        <div class="stat-card glass-card">
+          <div class="stat-card__value">18</div>
+          <div class="stat-card__label">Стран</div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <div class="section-divider"></div>
+
+  <!-- =============================================
+       TEAMS SECTION — CSS GRID
+       repeat(auto-fit, minmax(260px, 1fr)), gap: 1.5rem
+       ============================================= -->
+  <section class="teams-section" id="teams">
+    <div class="wrapper">
+      <div class="badge">Участники</div>
+      <h2 class="section-title">Команды турнира</h2>
+      <p class="section-subtitle">
+        Grid: <code>repeat(auto-fit, minmax(260px, 1fr))</code> · gap: 1.5rem · align-items: stretch
+      </p>
+
+      <!-- GRID: auto-fit + minmax(260px,1fr).
+           Каждая карточка занимает минимум 260px
+           или растягивается на всю доступную долю.
+           align-items:stretch — все карточки одной высоты в ряду.
+           justify-items намеренно не задан. -->
+      <div class="teams-grid">
+
+        <article class="team-card glass-card">
+          <div class="team-card__logo">🛡️</div>
+          <div>
+            <div class="team-card__name">Team Spirit</div>
+            <div class="team-card__region">🇷🇺 Eastern Europe</div>
+          </div>
+          <p style="font-size:0.85rem;color:var(--text-muted)">
+            Действующие чемпионы The International. Непредсказуемый стиль игры и сильная командная синергия.
+          </p>
+          <div class="team-card__meta">
+            <span class="meta-pill meta-pill--accent">Чемпион</span>
+            <span class="meta-pill">W/L 38–12</span>
+            <span class="meta-pill">Рейтинг #1</span>
+          </div>
+        </article>
+
+        <article class="team-card glass-card">
+          <div class="team-card__logo">🐉</div>
+          <div>
+            <div class="team-card__name">Tundra Esports</div>
+            <div class="team-card__region">🇬🇧 Western Europe</div>
+          </div>
+          <p style="font-size:0.85rem;color:var(--text-muted)">
+            Доминирующий состав с превосходным пониманием драфта и чёткой ролевой дисциплиной.
+          </p>
+          <div class="team-card__meta">
+            <span class="meta-pill">W/L 34–16</span>
+            <span class="meta-pill">Рейтинг #2</span>
+          </div>
+        </article>
+
+        <article class="team-card glass-card">
+          <div class="team-card__logo">⚡</div>
+          <div>
+            <div class="team-card__name">Gaimin Gladiators</div>
+            <div class="team-card__region">🇩🇪 Western Europe</div>
+          </div>
+          <p style="font-size:0.85rem;color:var(--text-muted)">
+            Агрессивный early-game стиль. Известны молниеносными ротациями по карте.
+          </p>
+          <div class="team-card__meta">
+            <span class="meta-pill">W/L 30–20</span>
+            <span class="meta-pill">Рейтинг #3</span>
+          </div>
+        </article>
+
+        <article class="team-card glass-card">
+          <div class="team-card__logo">🔥</div>
+          <div>
+            <div class="team-card__name">Team Liquid</div>
+            <div class="team-card__region">🇳🇱 Western Europe</div>
+          </div>
+          <p style="font-size:0.85rem;color:var(--text-muted)">
+            Опытная организация с богатой историей побед на крупных ивентах.
+          </p>
+          <div class="team-card__meta">
+            <span class="meta-pill">W/L 28–22</span>
+            <span class="meta-pill">Рейтинг #4</span>
+          </div>
+        </article>
+
+        <article class="team-card glass-card">
+          <div class="team-card__logo">🌊</div>
+          <div>
+            <div class="team-card__name">PSG.LGD</div>
+            <div class="team-card__region">🇨🇳 China</div>
+          </div>
+          <p style="font-size:0.85rem;color:var(--text-muted)">
+            Легендарный китайский состав с идеальной координацией и стратегическим мышлением.
+          </p>
+          <div class="team-card__meta">
+            <span class="meta-pill">W/L 32–18</span>
+            <span class="meta-pill">Рейтинг #5</span>
+          </div>
+        </article>
+
+        <article class="team-card glass-card">
+          <div class="team-card__logo">🎯</div>
+          <div>
+            <div class="team-card__name">OG</div>
+            <div class="team-card__region">🇪🇺 Europe</div>
+          </div>
+          <p style="font-size:0.85rem;color:var(--text-muted)">
+            Двукратные чемпионы TI. Легенды с уникальным креативным подходом к игре.
+          </p>
+          <div class="team-card__meta">
+            <span class="meta-pill meta-pill--accent">Легенда</span>
+            <span class="meta-pill">W/L 26–24</span>
+            <span class="meta-pill">Рейтинг #6</span>
+          </div>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <div class="section-divider"></div>
+
+  <!-- =============================================
+       HEROES SECTION — CSS GRID
+       repeat(auto-fit, minmax(220px, 1fr)), gap: 1.25rem
+       Одна карточка .hero-card--featured: grid-column: span 2
+       ============================================= -->
+  <section class="heroes-section" id="heroes">
+    <div class="wrapper">
+      <div class="badge">Мета-герои</div>
+      <h2 class="section-title">Герои сезона</h2>
+      <p class="section-subtitle">
+        Grid: <code>repeat(auto-fit, minmax(220px, 1fr))</code> · gap: 1.25rem ·
+        <code>.hero-card--featured { grid-column: span 2; }</code>
+      </p>
+
+      <!-- GRID: auto-fit минимум 220px.
+           Карточка с .hero-card--featured занимает 2 колонки.
+           Это невозможно чисто на Flexbox — нужен именно Grid.
+           align-items:stretch — все карточки одной высоты в ряду.
+           justify-items не задан намеренно. -->
+      <div class="heroes-grid">
+
+        <!-- FEATURED CARD — grid-column: span 2 -->
+        <article class="hero-card hero-card--featured glass-card">
+          <div class="featured-badge">⭐ Featured</div>
+          <div class="hero-card__avatar">
+            <img src="../../images/invoker.png" alt="Invoker — верховный магистр десяти заклинаний">
+          </div>
+          <div class="hero-card__info">
+            <div class="hero-card__name">Invoker</div>
+            <div class="hero-card__role">Carry · Mid Lane</div>
+            <p style="font-size:0.82rem;color:var(--text-muted);margin-bottom:0.5rem">
+              Самый высокий скилл-кэп в игре. Мастер комбинаций заклинаний. Доминирует в текущей мете.
+            </p>
+            <div class="hero-card__stats">
+              <span class="hero-stat">Win Rate 54.2%</span>
+              <span class="hero-stat">Pick Rate 38.1%</span>
+              <span class="hero-stat">KDA 4.8</span>
+              <span class="hero-stat">GPM 720</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="hero-card glass-card">
+          <div class="hero-card__avatar">
+            <img src="../../images/pudge.png" alt="Pudge — культовый мясник с крюком Meat Hook">
+          </div>
+          <div class="hero-card__info">
+            <div class="hero-card__name">Pudge</div>
+            <div class="hero-card__role">Support · Roamer</div>
+            <div class="hero-card__stats">
+              <span class="hero-stat">Win 48.7%</span>
+              <span class="hero-stat">Pick 44%</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="hero-card glass-card">
+          <div class="hero-card__avatar">
+            <img src="../../images/antimage.png" alt="Anti-Mage — истребитель магии и заклинателей">
+          </div>
+          <div class="hero-card__info">
+            <div class="hero-card__name">Anti-Mage</div>
+            <div class="hero-card__role">Carry · Safe Lane</div>
+            <div class="hero-card__stats">
+              <span class="hero-stat">Win 51.3%</span>
+              <span class="hero-stat">Pick 29%</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="hero-card glass-card">
+          <div class="hero-card__avatar">
+            <img src="../../images/storm_spirit.png" alt="Storm Spirit — повелитель бури и молний">
+          </div>
+          <div class="hero-card__info">
+            <div class="hero-card__name">Storm Spirit</div>
+            <div class="hero-card__role">Mid · Initiator</div>
+            <div class="hero-card__stats">
+              <span class="hero-stat">Win 52.1%</span>
+              <span class="hero-stat">Pick 26%</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="hero-card glass-card">
+          <div class="hero-card__avatar">
+            <img src="../../images/hoodwink.png" alt="Hoodwink — хитрая белка-охотница">
+          </div>
+          <div class="hero-card__info">
+            <div class="hero-card__name">Hoodwink</div>
+            <div class="hero-card__role">Support · Roamer</div>
+            <div class="hero-card__stats">
+              <span class="hero-stat">Win 50.4%</span>
+              <span class="hero-stat">Pick 35%</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="hero-card glass-card">
+          <div class="hero-card__avatar">
+            <img src="../../images/shadow_fiend.png" alt="Shadow Fiend — собиратель душ Nevermore">
+          </div>
+          <div class="hero-card__info">
+            <div class="hero-card__name">Shadow Fiend</div>
+            <div class="hero-card__role">Mid · Carry</div>
+            <div class="hero-card__stats">
+              <span class="hero-stat">Win 55.8%</span>
+              <span class="hero-stat">Pick 18%</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="hero-card glass-card">
+          <div class="hero-card__avatar">
+            <img src="../../images/juggernaut.png" alt="Juggernaut — мастер клинка с маской Юрнеро">
+          </div>
+          <div class="hero-card__info">
+            <div class="hero-card__name">Juggernaut</div>
+            <div class="hero-card__role">Carry · Safe Lane</div>
+            <div class="hero-card__stats">
+              <span class="hero-stat">Win 51.9%</span>
+              <span class="hero-stat">Pick 32%</span>
+            </div>
+          </div>
+        </article>
+
+        <article class="hero-card glass-card">
+          <div class="hero-card__avatar">
+            <img src="../../images/lina.png" alt="Lina — огненная чародейка с Laguna Blade">
+          </div>
+          <div class="hero-card__info">
+            <div class="hero-card__name">Lina</div>
+            <div class="hero-card__role">Mid · Nuker</div>
+            <div class="hero-card__stats">
+              <span class="hero-stat">Win 49.9%</span>
+              <span class="hero-stat">Pick 22%</span>
+            </div>
+          </div>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <div class="section-divider"></div>
+
+  <!-- =============================================
+       COMPARISON ARTICLE — Grid vs Flexbox
+       ============================================= -->
+  <section class="comparison-section" id="comparison">
+    <div class="wrapper">
+      <div class="badge">Теория</div>
+      <h2 class="section-title">Grid <span class="accent">vs</span> Flexbox</h2>
+      <p class="section-subtitle">Три ключевых различия применительно к этому сайту</p>
+
+      <article class="comparison-article">
+        <h2>Сравнение технологий вёрстки</h2>
+        <p>
+          На примере DotaArena 2026 — конкретные случаи, когда Grid выигрывает у Flexbox.
+        </p>
+
+        <div style="overflow-x:auto;">
+          <table class="comparison-table">
+            <thead>
+              <tr>
+                <th>Случай на сайте</th>
+                <th>CSS Grid ✅</th>
+                <th>Flexbox ⚠️</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Блок статистики (4 равных столбца)</td>
+                <td class="grid-col">
+                  <span class="check">✓</span>
+                  <code>repeat(4, 1fr)</code> — явно задаёт ровно 4 колонки.
+                  Ширина не зависит от содержимого ячеек.
+                </td>
+                <td class="flex-col">
+                  <span class="cross">✗</span>
+                  Без <code>flex-basis</code> и <code>flex-shrink:0</code>
+                  карточки могут стать разной ширины из-за разного текста.
+                </td>
+              </tr>
+              <tr>
+                <td>Карточка-акцент героя (занимает 2 колонки)</td>
+                <td class="grid-col">
+                  <span class="check">✓</span>
+                  <code>grid-column: span 2</code> — нативно растягивает
+                  один элемент на 2 ячейки без дополнительных обёрток.
+                </td>
+                <td class="flex-col">
+                  <span class="cross">✗</span>
+                  Невозможно без обёртки-строки или JS-расчёта ширины.
+                  Нарушает плоскую структуру HTML.
+                </td>
+              </tr>
+              <tr>
+                <td>Выравнивание карточек по высоте в ряду</td>
+                <td class="grid-col">
+                  <span class="check">✓</span>
+                  <code>align-items: stretch</code> на grid-контейнере
+                  автоматически выравнивает все ячейки строки по
+                  высоте самой высокой.
+                </td>
+                <td class="flex-col">
+                  <span class="cross">✗</span>
+                  Работает только в одной строке. При <code>flex-wrap: wrap</code>
+                  каждая строка выравнивается независимо и последняя
+                  строка может выглядеть иначе.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </article>
+    </div>
+  </section>
+
+  <!-- =============================================
+       FOOTER
+       ============================================= -->
+  <footer class="site-footer">
+    <p>
+      <strong>DotaArena 2026</strong> · Практика 07 — CSS Grid ·
+      Web-разработка, семестр 1
+    </p>
+    <p style="margin-top:0.4rem">
+      Grid-свойства: <code>display:grid</code> · <code>auto-fit</code> ·
+      <code>minmax</code> · <code>span</code> · <code>align-items:stretch</code>
+    </p>
+  </footer>
+
+</body>
+</html>

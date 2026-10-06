@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Все герои Dota 2 — Официальный ростер DotaArena 2026</title>
+  <meta name="description" content="Полная турнирная база персонажей Dota 2: 127 героев по категориям Сила, Ловкость, Интеллект и Универсальные. Досье, характеристики и интересные факты.">
+
+  <!-- Шрифты Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <!-- Стили проекта -->
+  <link rel="stylesheet" href="css/style.css">
+  <style>
+    /* Дополнительные стили полноэкранной вкладки героев */
+    .heroes-page-main {
+      padding: 2.5rem 1.5rem 5rem;
+      max-width: 1440px;
+      margin: 0 auto;
+    }
+    .heroes-hero-banner {
+      background: linear-gradient(180deg, rgba(20, 20, 36, .85) 0%, rgba(10, 10, 18, .95) 100%);
+      border: 1px solid var(--glass-border);
+      border-radius: 20px;
+      padding: 2.5rem 2rem;
+      margin-bottom: 2rem;
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+      box-shadow: 0 25px 60px rgba(0, 0, 0, .7);
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+    .heroes-hero-banner__top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      gap: 1.5rem;
+      flex-wrap: wrap;
+    }
+    .heroes-hero-banner__titles h1 {
+      font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 900;
+      letter-spacing: -.02em;
+      margin: 0 0 .5rem;
+      background: linear-gradient(135deg, #fff 30%, #f87171 70%, #ef4444 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+    .heroes-hero-banner__titles p {
+      color: var(--text-muted);
+      font-size: 1.05rem;
+      max-width: 720px;
+      margin: 0;
+    }
+    .heroes-hero-banner__actions {
+      display: flex;
+      gap: .75rem;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+    .heroes-pills {
+      display: flex;
+      gap: .75rem;
+      flex-wrap: wrap;
+      margin-top: .5rem;
+    }
+    .heroes-pill {
+      background: rgba(255, 255, 255, .05);
+      border: 1px solid rgba(255, 255, 255, .1);
+      padding: .4rem 1rem;
+      border-radius: 50px;
+      font-size: .85rem;
+      font-weight: 700;
+      display: inline-flex;
+      align-items: center;
+      gap: .5rem;
+      cursor: pointer;
+      transition: all .2s ease;
+      color: var(--text);
+    }
+    .heroes-pill:hover, .heroes-pill.active {
+      background: rgba(220, 38, 38, .2);
+      border-color: var(--accent);
+      color: #fff;
+      transform: translateY(-2px);
+    }
+    .heroes-pill--str.active { background: rgba(239, 68, 68, .25); border-color: #ef4444; }
+    .heroes-pill--agi.active { background: rgba(34, 197, 94, .25); border-color: #22c55e; }
+    .heroes-pill--int.active { background: rgba(59, 130, 246, .25); border-color: #3b82f6; }
+    .heroes-pill--all.active { background: rgba(168, 85, 247, .25); border-color: #a855f7; }
+
+    .heroes-search-bar {
+      display: flex;
+      gap: 1rem;
+      width: 100%;
+      flex-wrap: wrap;
+    }
+    .heroes-search-input-wrap {
+      flex: 1;
+      min-width: 280px;
+      position: relative;
+    }
+    .heroes-search-input-wrap input {
+      width: 100%;
+      height: 48px;
+      background: rgba(0, 0, 0, .45);
+      border: 1.5px solid rgba(255, 255, 255, .15);
+      border-radius: 12px;
+      padding: 0 1rem 0 3rem;
+      color: #fff;
+      font-size: 1rem;
+      font-family: inherit;
+      transition: border-color .2s ease, box-shadow .2s ease;
+    }
+    .heroes-search-input-wrap input:focus {
+      outline: none;
+      border-color: var(--accent);
+      box-shadow: 0 0 15px var(--accent-glow);
+    }
+    .heroes-search-input-wrap svg {
+      position: absolute;
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-muted);
+      pointer-events: none;
+    }
+    .heroes-attack-filters {
+      display: flex;
+      gap: .5rem;
+    }
+    .heroes-filter-btn {
+      background: rgba(255, 255, 255, .05);
+      border: 1px solid rgba(255, 255, 255, .1);
+      border-radius: 10px;
+      color: var(--text-muted);
+      padding: 0 1rem;
+      height: 48px;
+      font-size: .88rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all .2s ease;
+    }
+    .heroes-filter-btn:hover, .heroes-filter-btn.active {
+      background: rgba(255, 255, 255, .15);
+      color: #fff;
+      border-color: rgba(255, 255, 255, .3);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ============================================================
+       HEADER & NAVIGATION
+       ============================================================ -->
+  <header>
+    <div class="header-inner">
+      <div class="logo">
+        <a href="index.html" style="text-decoration:none; color:inherit;">
+          <img src="images/dota2_logo.png" alt="Логотип DotaArena 2026" class="logo__img">
+          <span class="logo__text">DotaArena <strong>2026</strong></span>
+        </a>
+      </div>
+      <p class="tagline">Официальный ростер персонажей Dota 2</p>
+    </div>
+  </header>
+
+  <nav>
+    <ul>
+      <li><a href="index.html#about">О турнире</a></li>
+      <li><a href="index.html#heroes">Трио турнира</a></li>
+      <li><a href="heroes.html" class="active">Все герои</a></li>
+      <li><a href="index.html#live">Live</a></li>
+      <li><a href="index.html#teams">Команды</a></li>
+      <li><a href="index.html#bracket">Сетка</a></li>
+      <li><a href="index.html#rules">Правила</a></li>
+      <li><a href="index.html#news">Новости</a></li>
+      <li><a href="index.html#contacts">Контакты</a></li>
+      <li><a href="index.html#registration" class="nav-cta">Регистрация</a></li>
+    </ul>
+
+    <div class="nav-tools">
+      <button type="button" id="theme-toggle" class="theme-toggle"
+              aria-label="Переключить тему" title="Переключить тему">
+        <svg class="theme-svg theme-svg--moon" id="theme-svg-moon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+        </svg>
+        <svg class="theme-svg theme-svg--sun" id="theme-svg-sun" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none;">
+          <circle cx="12" cy="12" r="5"></circle>
+          <line x1="12" y1="1" x2="12" y2="3"></line>
+          <line x1="12" y1="21" x2="12" y2="23"></line>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+          <line x1="1" y1="12" x2="3" y2="12"></line>
+          <line x1="21" y1="12" x2="23" y2="12"></line>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+        </svg>
+      </button>
+
+      <!-- Заметная крупная кнопка Telegram -->
+      <a href="https://t.me/dotaarena2026" target="_blank" rel="noopener"
+         class="nav-tg-pill" aria-label="Telegram-канал турнира" title="Telegram-канал турнира">
+        <svg class="nav-tg-pill__svg" viewBox="0 0 24 24" width="26" height="26" fill="currentColor">
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 0 0-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.75-.55 2.92-1.27 4.86-2.11 5.83-2.52 2.77-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .38z"/>
+        </svg>
+        <span class="nav-tg-pill__label">Telegram-канал</span>
+      </a>
+    </div>
+  </nav>
+
+  <main class="heroes-page-main">
+
+    <!-- Верхний баннер вкладки героев -->
+    <section class="heroes-hero-banner">
+      <div class="heroes-hero-banner__top">
+        <div class="heroes-hero-banner__titles">
+          <h1>Все герои Dota 2</h1>
+          <p>
+            Интерактивный экран выбора персонажей в стиле Dota 2 со всеми 127 героями.
+            Нажмите на карточку любого героя, чтобы открыть подробное досье с полноростовой версией,
+            характеристиками, ролью и интересными фактами.
+          </p>
+        </div>
+        <div class="heroes-hero-banner__actions">
+          <a href="index.html#heroes" class="btn-secondary">← Трио турнира</a>
+          <a href="index.html#registration" class="btn-primary">Подать заявку</a>
+        </div>
+      </div>
+
+      <!-- Поиск и фильтры -->
+      <div class="heroes-search-bar">
+        <div class="heroes-search-input-wrap">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input type="text" id="all-heroes-search" placeholder="Быстрый поиск героя по имени (нажмите для ввода)..." autocomplete="off">
+        </div>
+      </div>
+
+      <!-- Плашки атрибутов со счётчиками -->
+      <div class="heroes-pills">
+        <button type="button" class="heroes-pill active" data-filter="all-attr">
+          Все герои (127)
+        </button>
+        <button type="button" class="heroes-pill heroes-pill--str" data-filter="str">
+          <span class="dota-column__icon dota-column__icon--str"></span> Сила (36)
+        </button>
+        <button type="button" class="heroes-pill heroes-pill--agi" data-filter="agi">
+          <span class="dota-column__icon dota-column__icon--agi"></span> Ловкость (35)
+        </button>
+        <button type="button" class="heroes-pill heroes-pill--int" data-filter="int">
+          <span class="dota-column__icon dota-column__icon--int"></span> Интеллект (34)
+        </button>
+        <button type="button" class="heroes-pill heroes-pill--all" data-filter="all">
+          <span class="dota-column__icon dota-column__icon--all"></span> Универсальные (22)
+        </button>
+      </div>
+    </section>
+
+    <!-- Экран 4 колонок в стиле Dota 2 -->
+    <div class="dota-pick-screen" id="dota-pick-screen">
+      <!-- Колонка 1: Сила -->
+      <div class="dota-column dota-column--str" data-attr="str">
+        <div class="dota-column__head">
+          <span class="dota-column__icon dota-column__icon--str"></span>
+          <span class="dota-column__title">СИЛА</span>
+          <span class="dota-column__count" id="count-str">36</span>
+        </div>
+        <div class="dota-column__grid" id="grid-str"></div>
+      </div>
+
+      <!-- Колонка 2: Ловкость -->
+      <div class="dota-column dota-column--agi" data-attr="agi">
+        <div class="dota-column__head">
+          <span class="dota-column__icon dota-column__icon--agi"></span>
+          <span class="dota-column__title">ЛОВКОСТЬ</span>
+          <span class="dota-column__count" id="count-agi">35</span>
+        </div>
+        <div class="dota-column__grid" id="grid-agi"></div>
+      </div>
+
+      <!-- Колонка 3: Интеллект -->
+      <div class="dota-column dota-column--int" data-attr="int">
+        <div class="dota-column__head">
+          <span class="dota-column__icon dota-column__icon--int"></span>
+          <span class="dota-column__title">ИНТЕЛЛЕКТ</span>
+          <span class="dota-column__count" id="count-int">34</span>
+        </div>
+        <div class="dota-column__grid" id="grid-int"></div>
+      </div>
+
+      <!-- Колонка 4: Универсальные -->
+      <div class="dota-column dota-column--all" data-attr="all">
+        <div class="dota-column__head">
+          <span class="dota-column__icon dota-column__icon--all"></span>
+          <span class="dota-column__title">УНИВЕРСАЛЬНЫЕ</span>
+          <span class="dota-column__count" id="count-all">22</span>
+        </div>
+        <div class="dota-column__grid" id="grid-all"></div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ============================================================
+       HERO DETAIL MODAL — Интерактивное досье героя
+       Слева: полноростовая версия (GIF / рендер).
+       Справа: характеристики, лор и факты.
+       В правом верхнем углу: крестик ✕ для закрытия.
+       ============================================================ -->
+  <div class="hero-modal-backdrop" id="hero-modal-backdrop" hidden>
+    <div class="hero-modal" role="dialog" aria-modal="true" aria-labelledby="hero-modal-title">
+      <button type="button" class="hero-modal__close" id="hero-modal-close" aria-label="Закрыть окно">✕</button>
+
+      <div class="hero-modal__grid">
+        <div class="hero-modal__visual">
+          <img src="images/hoodwink_dance.gif" alt="Герой во весь рост" id="hero-modal-render" class="hero-modal__img">
+        </div>
+
+        <div class="hero-modal__content">
+          <div class="hero-modal__header">
+            <div class="hero-modal__badges" id="hero-modal-badges"></div>
+            <h3 id="hero-modal-title" class="hero-modal__title">Название героя</h3>
+            <p id="hero-modal-subtitle" class="hero-modal__subtitle">Роль и сложность</p>
+          </div>
+
+          <div class="hero-modal__stats" id="hero-modal-stats"></div>
+
+          <div class="hero-modal__section">
+            <h4>Описание и стиль игры</h4>
+            <p id="hero-modal-desc"></p>
+          </div>
+
+          <div class="hero-modal__section">
+            <h4>Интересные факты и лор</h4>
+            <ul id="hero-modal-facts" class="hero-modal__facts"></ul>
+          </div>
+
+          <div class="hero-modal__actions">
+            <a href="index.html#registration" class="hero-modal__btn" id="hero-modal-action">Выбрать для турнирной заявки</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer id="contacts">
+    <h2>Контакты</h2>
+    <address>
+      Организационный комитет «DotaArena 2026»<br>
+      Email: <a href="mailto:info@dotaarena2026.ru">info@dotaarena2026.ru</a><br>
+      Телефон: <a href="tel:+74951234567">+7 (495) 123-45-67</a><br>
+      Адрес: ул. Технологическая, 12, г. Москва, 115432
+    </address>
+    <p>Авторы: Барышев Даниил, Мисриханов Тимур, Марьин Вадим | Группа 37-ВЕБ | 2026 г.</p>
+    <p><a href="#top">↑ Наверх</a> · <a href="index.html">На главную страницу</a></p>
+  </footer>
+
+  <script src="js/heroes_data.js"></script>
+  <script src="js/script.js"></script>
+</body>
+</html>

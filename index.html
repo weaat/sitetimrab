@@ -1,0 +1,1716 @@
+<!DOCTYPE html>
+<html lang="ru" id="top">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="DotaArena 2026 — открытый турнир по Dota 2. Storm Spirit, Hoodwink, Shadow Fiend. Призовой фонд 600 000 ₽.">
+  <meta name="theme-color" content="#0a0a14">
+  <title>DotaArena 2026 — Открытый турнир по Dota 2</title>
+
+  <!-- RSS-лента новостей турнира -->
+  <link rel="alternate" type="application/rss+xml" title="DotaArena 2026 — Новости" href="feed.xml">
+
+  <!-- Основные стили -->
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+  <!-- ============================================================
+       HEADER — шапка с логотипом, счётчиками и витриной героев
+       ============================================================ -->
+  <header class="site-header">
+    <div class="header-bg"></div>
+    <div class="header-content">
+
+      <!-- Логотип и название турнира -->
+      <div class="header-logo">
+        <img src="images/dota2_logo.png" alt="Dota 2 Logo" class="logo-img">
+        <h1>DotaArena 2026</h1>
+      </div>
+
+      <!-- Подзаголовок -->
+      <p class="header-subtitle">Городской открытый турнир по <strong>Dota 2</strong></p>
+
+      <!-- Дата проведения -->
+      <time datetime="2026-11-14" class="header-date">14–16 ноября 2026 года</time>
+
+      <!-- Место проведения -->
+      <p class="header-place">Место проведения: Киберспорт-центр «Арена», ул. Технологическая, 12, г. Москва</p>
+
+      <!-- ========================================================
+           СЧЁТЧИК ДЕДЛАЙНА РЕГИСТРАЦИИ
+           Обратный отсчёт до 1 ноября 2026 года.
+           Обновляется каждую секунду из script.js
+           ======================================================== -->
+      <div class="deadline-counter" id="deadline-counter" role="timer" aria-live="polite">
+        <span class="deadline-counter__label">⏳ До конца регистрации</span>
+        <div class="deadline-counter__time">
+          <span class="deadline-counter__unit">
+            <b id="dd-days">00</b><i>дней</i>
+          </span>
+          <span class="deadline-counter__sep">:</span>
+          <span class="deadline-counter__unit">
+            <b id="dd-hours">00</b><i>часов</i>
+          </span>
+          <span class="deadline-counter__sep">:</span>
+          <span class="deadline-counter__unit">
+            <b id="dd-mins">00</b><i>минут</i>
+          </span>
+          <span class="deadline-counter__sep">:</span>
+          <span class="deadline-counter__unit">
+            <b id="dd-secs">00</b><i>секунд</i>
+          </span>
+        </div>
+      </div>
+
+      <!-- ========================================================
+           ПРОГРЕСС-БАР ЗАПОЛНЕНИЯ ТУРНИРА
+           Показывает, сколько мест занято (из 64).
+           ======================================================== -->
+      <div class="progress-fill" id="progress-fill-wrap" aria-label="Прогресс заполнения турнира">
+        <div class="progress-fill__head">
+          <span id="progress-text">0 из 64 мест занято</span>
+          <span id="progress-percent">0%</span>
+        </div>
+        <div class="progress-fill__bar">
+          <div class="progress-fill__inner" id="progress-bar"></div>
+        </div>
+      </div>
+
+      <!-- Витрина трёх ключевых героев турнира: полноростовые рендеры -->
+      <div class="hero-showcase">
+        <div class="hero-card" data-hero="storm_spirit" role="button" tabindex="0" title="Storm Spirit — нажать для досье">
+          <div class="hero-card__render-wrap">
+            <img src="images/storm_spirit_render.png" alt="Storm Spirit" class="hero-card__render hero-card__render--storm">
+          </div>
+          <span class="hero-card__name">Storm Spirit</span>
+        </div>
+        <div class="hero-card hero-card--center" data-hero="hoodwink" role="button" tabindex="0" title="Hoodwink — нажать для досье">
+          <div class="hero-card__render-wrap">
+            <img src="images/hoodwink_render.png" alt="Hoodwink" class="hero-card__render hero-card__render--hoodwink">
+          </div>
+          <span class="hero-card__name">Hoodwink</span>
+        </div>
+        <div class="hero-card" data-hero="shadow_fiend" role="button" tabindex="0" title="Shadow Fiend — нажать для досье">
+          <div class="hero-card__render-wrap">
+            <img src="images/shadow_fiend_render.png" alt="Shadow Fiend" class="hero-card__render hero-card__render--sf">
+          </div>
+          <span class="hero-card__name">Shadow Fiend</span>
+        </div>
+      </div>
+
+      <!-- Главная CTA-кнопка -->
+      <a href="#registration" class="btn-primary">Подать заявку</a>
+    </div>
+  </header>
+
+  <!-- ============================================================
+       NAVIGATION — липкая навигация с переключателем темы
+       и ссылкой на Telegram
+       ============================================================ -->
+  <nav>
+    <ul>
+      <li><a href="#about">О турнире</a></li>
+      <li><a href="#heroes">Герои Dota 2</a></li>
+      <li><a href="#live">Live</a></li>
+      <li><a href="#program">Программа</a></li>
+      <li><a href="#teams">Команды</a></li>
+      <li><a href="#bracket">Сетка</a></li>
+      <li><a href="#rules">Правила</a></li>
+      <li><a href="#news">Новости</a></li>
+      <li><a href="#contacts">Контакты</a></li>
+      <li><a href="#registration" class="nav-cta">Регистрация</a></li>
+    </ul>
+
+    <!-- Инструменты в правой части навигации: крупный логотип Telegram и тема -->
+    <div class="nav-tools">
+      <!-- Переключатель тёмной / светлой темы (SVG) -->
+      <button type="button" id="theme-toggle" class="theme-toggle"
+              aria-label="Переключить тему" title="Переключить тему">
+        <svg class="theme-svg theme-svg--moon" id="theme-svg-moon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+        </svg>
+        <svg class="theme-svg theme-svg--sun" id="theme-svg-sun" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none;">
+          <circle cx="12" cy="12" r="5"></circle>
+          <line x1="12" y1="1" x2="12" y2="3"></line>
+          <line x1="12" y1="21" x2="12" y2="23"></line>
+          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+          <line x1="1" y1="12" x2="3" y2="12"></line>
+          <line x1="21" y1="12" x2="23" y2="12"></line>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+        </svg>
+      </button>
+
+      <!-- Заметная крупная кнопка Telegram с официальным логотипом -->
+      <a href="https://t.me/dotaarena2026" target="_blank" rel="noopener"
+         class="nav-tg-pill" aria-label="Telegram-канал турнира" title="Telegram-канал турнира">
+        <svg class="nav-tg-pill__svg" viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 0 0-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.75-.55 2.92-1.27 4.86-2.11 5.83-2.52 2.77-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .38z"/>
+        </svg>
+        <span class="nav-tg-pill__label">Telegram</span>
+      </a>
+    </div>
+  </nav>
+
+  <!-- ============================================================
+       MAIN — основное содержимое страницы
+       ============================================================ -->
+  <main>
+
+    <!-- ========================================================
+         СЕКЦИЯ 1: О ТУРНИРЕ
+         ======================================================== -->
+    <section id="about">
+      <h2>О турнире</h2>
+      <p>
+        DotaArena 2026 — ежегодный открытый турнир для любительских и полупрофессиональных
+        команд. В этом году ожидается участие более 64 команд из разных регионов России.
+        Призовой фонд — <strong>600 000 ₽</strong>. Регистрация открыта!
+      </p>
+
+      <!-- Блок из 4 числовых показателей -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <span class="stat-number">64</span>
+          <span class="stat-label">Команды-участники</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-number">600К ₽</span>
+          <span class="stat-label">Призовой фонд</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-number">3 дня</span>
+          <span class="stat-label">Матчи и шоу-игры</span>
+        </div>
+        <div class="stat-card">
+          <span class="stat-number">1200+</span>
+          <span class="stat-label">Зрителей трансляций</span>
+        </div>
+      </div>
+
+      <!-- Callout с дедлайном и важным условием -->
+      <div class="callout">
+        <span class="callout-icon">
+          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+            <line x1="12" y1="9" x2="12" y2="13"></line>
+            <line x1="12" y1="17" x2="12.01" y2="17"></line>
+          </svg>
+        </span>
+        <div class="callout-text">
+          <strong>Дедлайн регистрации — 1 ноября 2026 года</strong>
+          <p>Заявки принимаются только от составов с верифицированными аккаунтами.
+             После дедлайна добавление в турнир невозможно.</p>
+        </div>
+      </div>
+
+      <!-- История турнира -->
+      <article>
+        <h3>История турнира</h3>
+        <p>
+          Турнир проводится с 2019 года и каждый год привлекает всё больше участников.
+          В прошлом сезоне приняли участие более 48 команд и 1200 зрителей онлайн.
+          Победители получают официальные сертификаты и памятные кубки.
+        </p>
+        <p>
+          Организатором выступает некоммерческая ассоциация «DotaСпорт МСК» при поддержке
+          городского департамента по делам молодёжи.
+        </p>
+      </article>
+
+      <!-- Aside с важной информацией -->
+      <aside>
+        <h3>Важно знать</h3>
+        <p>
+          Для участия каждая команда должна состоять из 5 игроков (основной состав)
+          и до 2 запасных. Возраст участников — не менее 16 лет.
+        </p>
+      </aside>
+    </section>
+
+    <!-- ========================================================
+         СЕКЦИЯ 2: ГЕРОИ ТУРНИРА
+         ======================================================== -->
+    <!-- ========================================================
+         СЕКЦИЯ 2: ОФИЦИАЛЬНЫЙ РОСТЕР ПЕРСОНАЖЕЙ (ВСЕ ГЕРОИ DOTA 2)
+         Сетка выбора как в клиенте игры (Dota 2 Pick Screen).
+         4 колонки по атрибутам: СИЛА, ЛОВКОСТЬ, ИНТЕЛЛЕКТ, УНИВЕРСАЛЬНЫЕ (127 героев).
+         Все герои отображаются прямо на странице, каждый кликается!
+         ======================================================== -->
+    <section id="heroes" class="all-heroes-section">
+      <div class="all-heroes-header">
+        <div class="all-heroes-title-wrap">
+          <span class="all-heroes-subtitle">Официальный ростер персонажей</span>
+          <h2 class="all-heroes-title">Все герои Dota 2</h2>
+          <p class="all-heroes-desc">
+            Полная турнирная база персонажей по четырём категориям атрибутов (127 героев).
+            Наведите на портрет для просмотра имени и роли, либо воспользуйтесь поиском:
+          </p>
+        </div>
+
+        <div class="all-heroes-controls">
+          <div class="all-heroes-search-wrap">
+            <svg class="search-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <input type="text" id="all-heroes-search" placeholder="Быстрый поиск героя по имени..." autocomplete="off">
+            <button type="button" id="search-clear-btn" class="search-clear-btn" aria-label="Очистить поиск" hidden>✕</button>
+          </div>
+          <a href="heroes.html" target="_blank" class="all-heroes-ext-btn" title="Открыть сетку в отдельной вкладке">
+            <span class="fs-btn-icon">⛶</span>
+            <span class="fs-btn-text">Открыть во весь экран ↗</span>
+          </a>
+        </div>
+
+        <!-- Аккуратные плашки быстрой фильтрации атрибутов со счётчиками -->
+        <div class="all-heroes-pills">
+          <button type="button" class="all-heroes-pill active" data-filter="all-attr">
+            Все герои (127)
+          </button>
+          <button type="button" class="all-heroes-pill all-heroes-pill--str" data-filter="str">
+            <span class="dota-column__icon dota-column__icon--str"></span> Сила (36)
+          </button>
+          <button type="button" class="all-heroes-pill all-heroes-pill--agi" data-filter="agi">
+            <span class="dota-column__icon dota-column__icon--agi"></span> Ловкость (35)
+          </button>
+          <button type="button" class="all-heroes-pill all-heroes-pill--int" data-filter="int">
+            <span class="dota-column__icon dota-column__icon--int"></span> Интеллект (34)
+          </button>
+          <button type="button" class="all-heroes-pill all-heroes-pill--all" data-filter="all">
+            <span class="dota-column__icon dota-column__icon--all"></span> Универсальные (22)
+          </button>
+        </div>
+      </div>
+
+      <!-- 4 Колонки экрана выбора героев как в клиенте Dota 2 -->
+      <div class="dota-pick-screen" id="dota-pick-screen">
+        <!-- Колонка 1: Сила -->
+        <div class="dota-column dota-column--str" data-attr="str">
+          <div class="dota-column__head">
+            <span class="dota-column__icon dota-column__icon--str"></span>
+            <span class="dota-column__title">СИЛА</span>
+            <span class="dota-column__count" id="count-str">36</span>
+          </div>
+          <div class="dota-column__grid" id="grid-str">
+            <div class="dota-hero-pick" data-hero="axe" data-hero-name="Axe" data-attr="str" data-search="axe axe акс топор" role="button" tabindex="0" aria-label="Axe">
+              <img src="images/heroes/axe.png" alt="Axe" loading="lazy">
+              <span class="dota-hero-pick__tooltip">Axe</span>
+            </div>
+            <div class="dota-hero-pick" data-hero="earthshaker" data-hero-name="Earthshaker" data-attr="str" data-search="earthshaker earthshaker шейкер эртшейкер ес" role="button" tabindex="0" aria-label="Earthshaker">
+              <img src="images/heroes/earthshaker.png" alt="Earthshaker" loading="lazy">
+              <span class="dota-hero-pick__tooltip">Earthshaker</span>
+            </div>
+            <div class="dota-hero-pick" data-hero="pudge" data-hero-name="Pudge" data-attr="str" data-search="pudge pudge пудж падж мясник хук dendi" role="button" tabindex="0" aria-label="Pudge">
+              <img src="images/heroes/pudge.png" alt="Pudge" loading="lazy">
+              <span class="dota-hero-pick__tooltip">Pudge</span>
+            </div>
+            <div class="dota-hero-pick" data-hero="sven" data-hero-name="Sven" data-attr="str" data-search="sven sven " role="button" tabindex="0" aria-label="Sven">
+              <img src="images/heroes/sven.png" alt="Sven" loading="lazy">
+              <span class="dota-hero-pick__tooltip">Sven</span>
+            </div>
+            <div class="dota-hero-pick" data-hero="tiny" data-hero-name="Tiny" data-attr="str" data-search="tiny tiny " role="button" tabindex="0" aria-label="Tiny">
+              <img src="images/heroes/tiny.png" alt="Tiny" loading="lazy">
+              <span class="dota-hero-pick__tooltip">Tiny</span>
+            </div>
+            <div class="dota-hero-pick" data-hero="kunkka" data-hero-name="Kunkka" data-attr="str" data-search="kunkka kunkka " role="button" tabindex="0" aria-label="Kunkka">
+              <img src="images/heroes/kunkka.png" alt="Kunkka" loading="lazy">
+              <span class="dota-hero-pick__tooltip">Kunkka</span>
+            </div>
+            <div class="dota-hero-pick" data-hero="slardar" data-hero-name="Slardar" data-attr="str" data-search="slardar slardar слардар селёдка" role="button" tabindex="0" aria-label="Slardar">
+              <img src="images/heroes/slardar.png" alt="Slardar" loading="lazy">
+              <span class="dota-hero-pick__tooltip">Slardar</span>
+            </div>
+            <div class="dota-hero-pick" data-hero="tidehunter" data-hero-name="Tidehunter" data-attr="str" data-search="tidehunter tidehunter тайдхантер тайд арбуз" role="button" tabindex="0" aria-label="Tidehunter">
+              <img src="images/heroes/tidehunter.png" alt="Tidehunter" loading="lazy">
+              <span class="dota-hero-pick__tooltip">Tidehunter</span>
+            </div>
+            <div class="dota-hero-pick" data-hero="skeleton_king" data-hero-name="Wraith King" data-attr="str" data-search="skeleton_king wraith king вк врейт кинг леорик wraith king" role="button" tabindex="0" aria-label="Wraith King">
+              <img src="images/heroes/skeleton_king.png" alt="Wraith King" loading="lazy">
+              <span class="dota-hero-pick__tooltip">Wraith King</span>
+            </div>
+            <div class="dota-hero-pick" data-hero="dragon_knight" data-hero-name="Dragon Knight" data-attr="str" data-search="dragon_knight dragon knight дк драгон найт" role="button" tabindex="0" aria-label="Dragon Knight">
+              <img src="images/heroes/dragon_knight.png" alt="Dragon Knight" loading="lazy">
+              <span class="dota-hero-pick__tooltip">Dragon Knight</span>
+            </div>
+            <div class="dota-hero-pick" data-hero="rattletrap" data-hero-name="Clockwerk" data-attr="str" data-search="rattletrap clockwerk " role="button" tabindex="0" aria-label="Clockwerk">
+              <img src="images/heroes/rattletrap.png" alt="Clockwerk" loading="lazy">
+              <span class="dota-hero-pick__tooltip">Clockwerk</span>
+            </div>
+            <div class="dota-hero-pick" data-hero="life_stealer" data-hero-name="Lifestealer" data-attr="str" data-search="life_stealer lifestealer гуля найкс гуль lifestealer" role="button" tabindex="0" aria-label="Lifestealer">
+              <img src="images/heroes/life_stealer.png" alt="Lifestealer" loading="lazy">
+              <span class="dota-hero-pick__tooltip">Lifestealer</span>
+            </div>
+            <div class="dota-hero-pick" data-hero="omniknight" data-hero-name="Omniknight" data-attr="str" data-search="omniknight omniknight омник паладин" role="button" tabindex="0" aria-label="Omniknight">
+              <img src="images/heroes/omniknight.png" alt="Omniknight" loading="lazy">
+              <span class="dota-hero-pick__tooltip">Omniknight</span>
+            </div>
+            <div class="dota-hero-pick" data-hero="huskar" data-hero-name="Huskar" data-attr="str" data-search="huskar huskar хускар" role="button" tabindex="0" aria-label="Huskar">
+              <img src="images/heroes/huskar.png" alt="Huskar" loading="lazy">
+              <span class="dota-hero-pick__tooltip">Huskar</span>
+            </div>
+            <div class="dota-hero-pick" data-hero="night_stalker" data-hero-name="Night Stalker" data-attr="str" data-search="night_stalker night stalker баланар нс ночь" role="button" tabindex="0" aria-label="Night Stalker">
+              <img src="images/heroes/night_stalker.png" alt="Night Stalker" loading="lazy">
+              <span class="dota-hero-pick__tooltip">Night Stalker</span>
+            </div>
+            <div class="dota-hero-pick" data-hero="doom_bringer" data-hero-name="Doom" data-attr="str" data-search="doom_bringer doom дум люцифер" role="button" tabindex="0" aria-label="Doom">
+              <img src="images/heroes/doom_bringer.png" alt="Doom" loading="lazy">
+              <span class="dota-hero-pick__tooltip">Doom</span>
+            </div>
+            <div class="dota-hero-pick" data-hero="spirit_breaker" data-hero-name="Spirit Breaker" data-attr="str" data-search="spirit_breaker spirit breaker баратрум бара сб" role="button" tabindex="0" aria-label="Spirit Breaker">
+              <img src="images/heroes/spirit_breaker.png" alt="Spirit Breaker" loading="lazy">
+              <span class="dota-hero-pick__tooltip">Spirit Breaker</span>
+            </div>
+            <div class="dota-hero-pick" data-hero="alchemist" data-hero-name="Alchemist" data-attr="str" data-search="alchemist alchemist алхимик алхим" role="button" tabindex="0" aria-label="Alchemist">
+              <img src="images/heroes/alchemist.png" alt="Alchemist" loading="lazy">
+              <span class="dota-hero-pick__tooltip">Alchemist</span>
+            </div>
+            <div class="dota-hero-pick" data-hero="lycan" data-hero-name="Lycan" data-attr="str" data-search="lycan lycan ликан волк" role="button" tabindex="0" aria-label="Lycan">
+              <img src="images/heroes/lycan.png" alt="Lycan" loading="lazy">
+              <span class="dota-hero-pick__tooltip">Lycan</span>
+            </div>
+            <div class="dota-hero-pick" data-hero="chaos_knight" data-hero-name="Chaos Knight" data-attr="str" data-search="chaos_knight chaos knight хаос цк конь" role="button" tabindex="0" aria-label="Chaos Knight">
+              <img src="images/heroes/chaos_knight.png" alt="Chaos Knight" loading="lazy">
+              <span class="dota-hero-pick__tooltip">Chaos Knight</span>
+            </div>
+            <div class="dota-hero-pick" data-hero="treant" data-hero-name="Treant Protector" data-attr="str" data-search="treant treant protector трент дерево" role="button" tabindex="0" aria-label="Treant Protector">
+              <img src="images/heroes/treant.png" alt="Treant Protector" loading="lazy">
+              <span class="dota-hero-pick__tooltip">Treant Protector</span>
+            </div>
+            <div class="dota-hero-pick" data-hero="ogre_magi" data-hero-name="Ogre Magi" data-attr="str" data-search="ogre_magi ogre magi огр маг мультикаст" role="button" tabindex="0" aria-label="Ogre Magi">
+              <img src="images/heroes/ogre_magi.png" alt="Ogre Magi" loading="lazy">
+              <span class="dota-hero-pick__tooltip">Ogre Magi</span>
+            </div>
+            <div class="dota-hero-pick" data-hero="undying" data-hero-name="Undying" data-attr="str" data-search="undying undying зомби андаинг томба" role="button" tabindex="0" aria-label="Undying">
+              <img src="images/heroes/undying.png" alt="Undying" loading="lazy">
+              <span class="dota-hero-pick__tooltip">Undying</span>
+            </div>
+            <div class="dota-hero-pick" data-hero="centaur" data-hero-name="Centaur Warrunner" data-attr="str" data-search="centaur centaur warrunner кентавр кент" role="button" tabindex="0" aria-label="Centaur Warrunner">
+              <img src="images/heroes/centaur.png" alt="Centaur Warrunner" loading="lazy">
+              <span class="dota-hero-pick__tooltip">Centaur Warrunner</span>
+            </div>
+            <div class="dota-hero-pick" data-hero="shredder" data-hero-name="Timbersaw" data-attr="str" data-search="shredder timbersaw тимбер пила" role="button" tabindex="0" aria-label="Timbersaw">
+              <img src="images/heroes/shredder.png" alt="Timbersaw" loading="lazy">
+              <span class="dota-hero-pick__tooltip">Timbersaw</span>
+            </div>
+            <div class="dota-hero-pick" data-hero="bristleback" data-hero-name="Bristleback" data-attr="str" data-search="bristleback bristleback бристлбек брист ёж" role="button" tabindex="0" aria-label="Bristleback">
+              <img src="images/heroes/bristleback.png" alt="Bristleback" loading="lazy">
+              <span class="dota-hero-pick__tooltip">Bristleback</span>
+            </div>
+            <div class="dota-hero-pick" data-hero="tusk" data-hero-name="Tusk" data-attr="str" data-search="tusk tusk таск морж снежок" role="button" tabindex="0" aria-label="Tusk">
+              <img src="images/heroes/tusk.png" alt="Tusk" loading="lazy">
+              <span class="dota-hero-pick__tooltip">Tusk</span>
+            </div>
+            <div class="dota-hero-pick" data-hero="elder_titan" data-hero-name="Elder Titan" data-attr="str" data-search="elder_titan elder titan титан элдер титан" role="button" tabindex="0" aria-label="Elder Titan">
+              <img src="images/heroes/elder_titan.png" alt="Elder Titan" loading="lazy">
+              <span class="dota-hero-pick__tooltip">Elder Titan</span>
+            </div>
+            <div class="dota-hero-pick" data-hero="legion_commander" data-hero-name="Legion Commander" data-attr="str" data-search="legion_commander legion commander легионка дуэль" role="button" tabindex="0" aria-label="Legion Commander">
+              <img src="images/heroes/legion_commander.png" alt="Legion Commander" loading="lazy">
+              <span class="dota-hero-pick__tooltip">Legion Commander</span>
+            </div>
+            <div class="dota-hero-pick" data-hero="earth_spirit" data-hero-name="Earth Spirit" data-attr="str" data-search="earth_spirit earth spirit земеля эрт спирит" role="button" tabindex="0" aria-label="Earth Spirit">
+              <img src="images/heroes/earth_spirit.png" alt="Earth Spirit" loading="lazy">
+              <span class="dota-hero-pick__tooltip">Earth Spirit</span>
+            </div>
+            <div class="dota-hero-pick" data-hero="abyssal_underlord" data-hero-name="Underlord" data-attr="str" data-search="abyssal_underlord underlord " role="button" tabindex="0" aria-label="Underlord">
+              <img src="images/heroes/abyssal_underlord.png" alt="Underlord" loading="lazy">
+              <span class="dota-hero-pick__tooltip">Underlord</span>
+            </div>
+            <div class="dota-hero-pick" data-hero="phoenix" data-hero-name="Phoenix" data-attr="str" data-search="phoenix phoenix феникс птица яйцо" role="button" tabindex="0" aria-label="Phoenix">
+              <img src="images/heroes/phoenix.png" alt="Phoenix" loading="lazy">
+              <span class="dota-hero-pick__tooltip">Phoenix</span>
+            </div>
+            <div class="dota-hero-pick" data-hero="mars" data-hero-name="Mars" data-attr="str" data-search="mars mars марс бог войны" role="button" tabindex="0" aria-label="Mars">
+              <img src="images/heroes/mars.png" alt="Mars" loading="lazy">
+              <span class="dota-hero-pick__tooltip">Mars</span>
+            </div>
+            <div class="dota-hero-pick" data-hero="dawnbreaker" data-hero-name="Dawnbreaker" data-attr="str" data-search="dawnbreaker dawnbreaker валора даунбрейкер" role="button" tabindex="0" aria-label="Dawnbreaker">
+              <img src="images/heroes/dawnbreaker.png" alt="Dawnbreaker" loading="lazy">
+              <span class="dota-hero-pick__tooltip">Dawnbreaker</span>
+            </div>
+            <div class="dota-hero-pick" data-hero="primal_beast" data-hero-name="Primal Beast" data-attr="str" data-search="primal_beast primal beast примал бист динозавр" role="button" tabindex="0" aria-label="Primal Beast">
+              <img src="images/heroes/primal_beast.png" alt="Primal Beast" loading="lazy">
+              <span class="dota-hero-pick__tooltip">Primal Beast</span>
+            </div>
+            <div class="dota-hero-pick" data-hero="largo" data-hero-name="Largo" data-attr="str" data-search="largo largo " role="button" tabindex="0" aria-label="Largo">
+              <img src="images/heroes/largo.png" alt="Largo" loading="lazy">
+              <span class="dota-hero-pick__tooltip">Largo</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Колонка 2: Ловкость -->
+        <div class="dota-column dota-column--agi" data-attr="agi">
+          <div class="dota-column__head">
+            <span class="dota-column__icon dota-column__icon--agi"></span>
+            <span class="dota-column__title">ЛОВКОСТЬ</span>
+            <span class="dota-column__count" id="count-agi">35</span>
+          </div>
+          <div class="dota-column__grid" id="grid-agi">
+            <div class="dota-hero-pick" data-hero="antimage" data-hero-name="Anti-Mage" data-attr="agi" data-search="antimage anti-mage антимаг антмейдж магина am" role="button" tabindex="0" aria-label="Anti-Mage">
+              <img src="images/heroes/antimage.png" alt="Anti-Mage" loading="lazy">
+              <span class="dota-hero-pick__tooltip">Anti-Mage</span>
+            </div>
+            <div class="dota-hero-pick" data-hero="bloodseeker" data-hero-name="Bloodseeker" data-attr="agi" data-search="bloodseeker bloodseeker бладсикер сикер бс" role="button" tabindex="0" aria-label="Bloodseeker">
+              <img src="images/heroes/bloodseeker.png" alt="Bloodseeker" loading="lazy">
+              <span class="dota-hero-pick__tooltip">Bloodseeker</span>
+            </div>
+            <div class="dota-hero-pick" data-hero="drow_ranger" data-hero-name="Drow Ranger" data-attr="agi" data-search="drow_ranger drow ranger дровка дроу рейнджер тракса" role="button" tabindex="0" aria-label="Drow Ranger">
+              <img src="images/heroes/drow_ranger.png" alt="Drow Ranger" loading="lazy">
+              <span class="dota-hero-pick__tooltip">Drow Ranger</span>
+            </div>
+            <div class="dota-hero-pick" data-hero="juggernaut" data-hero-name="Juggernaut" data-attr="agi" data-search="juggernaut juggernaut джаггернаут джаггер юрнеро" role="button" tabindex="0" aria-label="Juggernaut">
+              <img src="images/heroes/juggernaut.png" alt="Juggernaut" loading="lazy">
+              <span class="dota-hero-pick__tooltip">Juggernaut</span>
+            </div>
+            <div class="dota-hero-pick" data-hero="mirana" data-hero-name="Mirana" data-attr="agi" data-search="mirana mirana мирана потма" role="button" tabindex="0" aria-label="Mirana">
+              <img src="images/heroes/mirana.png" alt="Mirana" loading="lazy">
+              <span class="dota-hero-pick__tooltip">Mirana</span>
+            </div>
+            <div class="dota-hero-pick" data-hero="morphling" data-hero-name="Morphling" data-attr="agi" data-search="morphling morphling морфлинг морф" role="button" tabindex="0" aria-label="Morphling">
+              <img src="images/heroes/morphling.png" alt="Morphling" loading="lazy">
+              <span class="dota-hero-pick__tooltip">Morphling</span>
+            </div>
+            <div class="dota-hero-pick" data-hero="nevermore" data-hero-name="Shadow Fiend" data-attr="agi" data-search="nevermore shadow fiend сф невермор шадоу финд shadow fiend sf" role="button" tabindex="0" aria-label="Shadow Fiend">
+              <img src="images/heroes/nevermore.png" alt="Shadow Fiend" loading="lazy">
+              <span class="dota-hero-pick__tooltip">Shadow Fiend</span>
+            </div>
+            <div class="dota-hero-pick" data-hero="phantom_lancer" data-hero-name="Phantom Lancer" data-attr="agi" data-search="phantom_lancer phantom lancer фантом лансер пл" role="button" tabindex="0" aria-label="Phantom Lancer">
+              <img src="images/heroes/phantom_lancer.png" alt="Phantom Lancer" loading="lazy">
+              <span class="dota-hero-pick__tooltip">Phantom Lancer</span>
+            </div>
+            <div class="dota-hero-pick" data-hero="razor" data-hero-name="Razor" data-attr="agi" data-search="razor razor " role="button" tabindex="0" aria-label="Razor">
+              <img src="images/heroes/razor.png" alt="Razor" loading="lazy">
+              <span class="dota-hero-pick__tooltip">Razor</span>
+            </div>
+            <div class="dota-hero-pick" data-hero="vengefulspirit" data-hero-name="Vengeful Spirit" data-attr="agi" data-search="vengefulspirit vengeful spirit " role="button" tabindex="0" aria-label="Vengeful Spirit">
+              <img src="images/heroes/vengefulspirit.png" alt="Vengeful Spirit" loading="lazy">
+              <span class="dota-hero-pick__tooltip">Vengeful Spirit</span>
+            </div>
+            <div class="dota-hero-pick" data-hero="riki" data-hero-name="Riki" data-attr="agi" data-search="riki riki рики крыса" role="button" tabindex="0" aria-label="Riki">
+              <img src="images/heroes/riki.png" alt="Riki" loading="lazy">
+              <span class="dota-hero-pick__tooltip">Riki</span>
+            </div>
+            <div class="dota-hero-pick" data-hero="sniper" data-hero-name="Sniper" data-attr="agi" data-search="sniper sniper снайпер снайп дед карлик" role="button" tabindex="0" aria-label="Sniper">
+              <img src="images/heroes/sniper.png" alt="Sniper" loading="lazy">
+              <span class="dota-hero-pick__tooltip">Sniper</span>
+            </div>
+            <div class="dota-hero-pick" data-hero="faceless_void" data-hero-name="Faceless Void" data-attr="agi" data-search="faceless_void faceless void войд купол войдик" role="button" tabindex="0" aria-label="Faceless Void">
+              <img src="images/heroes/faceless_void.png" alt="Faceless Void" loading="lazy">
+              <span class="dota-hero-pick__tooltip">Faceless Void</span>
+            </div>
+            <div class="dota-hero-pick" data-hero="phantom_assassin" data-hero-name="Phantom Assassin" data-attr="agi" data-search="phantom_assassin phantom assassin мортра фантомка па pa" role="button" tabindex="0" aria-label="Phantom Assassin">
+              <img src="images/heroes/phantom_assassin.png" alt="Phantom Assassin" loading="lazy">
+              <span class="dota-hero-pick__tooltip">Phantom Assassin</span>
+            </div>
+            <div class="dota-hero-pick" data-hero="templar_assassin" data-hero-name="Templar Assassin" data-attr="agi" data-search="templar_assassin templar assassin темплярка ланая та ta" role="button" tabindex="0" aria-label="Templar Assassin">
+              <img src="images/heroes/templar_assassin.png" alt="Templar Assassin" loading="lazy">
+              <span class="dota-hero-pick__tooltip">Templar Assassin</span>
+            </div>
+            <div class="dota-hero-pick" data-hero="viper" data-hero-name="Viper" data-attr="agi" data-search="viper viper вайпер" role="button" tabindex="0" aria-label="Viper">
+              <img src="images/heroes/viper.png" alt="Viper" loading="lazy">
+              <span class="dota-hero-pick__tooltip">Viper</span>
+            </div>
+            <div class="dota-hero-pick" data-hero="luna" data-hero-name="Luna" data-attr="agi" data-search="luna luna луна селемене" role="button" tabindex="0" aria-label="Luna">
+              <img src="images/heroes/luna.png" alt="Luna" loading="lazy">
+              <span class="dota-hero-pick__tooltip">Luna</span>
+            </div>
+            <div class="dota-hero-pick" data-hero="clinkz" data-hero-name="Clinkz" data-attr="agi" data-search="clinkz clinkz клинкз боник скелет" role="button" tabindex="0" aria-label="Clinkz">
+              <img src="images/heroes/clinkz.png" alt="Clinkz" loading="lazy">
+              <span class="dota-hero-pick__tooltip">Clinkz</span>
+            </div>
+            <div class="dota-hero-pick" data-hero="broodmother" data-hero-name="Broodmother" data-attr="agi" data-search="broodmother broodmother бруда паучиха" role="button" tabindex="0" aria-label="Broodmother">
+              <img src="images/heroes/broodmother.png" alt="Broodmother" loading="lazy">
+              <span class="dota-hero-pick__tooltip">Broodmother</span>
+            </div>
+            <div class="dota-hero-pick" data-hero="bounty_hunter" data-hero-name="Bounty Hunter" data-attr="agi" data-search="bounty_hunter bounty hunter бх баунти трек гондар" role="button" tabindex="0" aria-label="Bounty Hunter">
+              <img src="images/heroes/bounty_hunter.png" alt="Bounty Hunter" loading="lazy">
+              <span class="dota-hero-pick__tooltip">Bounty Hunter</span>
+            </div>
+            <div class="dota-hero-pick" data-hero="weaver" data-hero-name="Weaver" data-attr="agi" data-search="weaver weaver вивер жук" role="button" tabindex="0" aria-label="Weaver">
+              <img src="images/heroes/weaver.png" alt="Weaver" loading="lazy">
+              <span class="dota-hero-pick__tooltip">Weaver</span>
+            </div>
+            <div class="dota-hero-pick" data-hero="spectre" data-hero-name="Spectre" data-attr="agi" data-search="spectre spectre спектра меркуриал" role="button" tabindex="0" aria-label="Spectre">
+              <img src="images/heroes/spectre.png" alt="Spectre" loading="lazy">
+              <span class="dota-hero-pick__tooltip">Spectre</span>
+            </div>
+            <div class="dota-hero-pick" data-hero="ursa" data-hero-name="Ursa" data-attr="agi" data-search="ursa ursa урса медведь" role="button" tabindex="0" aria-label="Ursa">
+              <img src="images/heroes/ursa.png" alt="Ursa" loading="lazy">
+              <span class="dota-hero-pick__tooltip">Ursa</span>
+            </div>
+            <div class="dota-hero-pick" data-hero="gyrocopter" data-hero-name="Gyrocopter" data-attr="agi" data-search="gyrocopter gyrocopter гирокоптер вертолёт" role="button" tabindex="0" aria-label="Gyrocopter">
+              <img src="images/heroes/gyrocopter.png" alt="Gyrocopter" loading="lazy">
+              <span class="dota-hero-pick__tooltip">Gyrocopter</span>
+            </div>
+            <div class="dota-hero-pick" data-hero="lone_druid" data-hero-name="Lone Druid" data-attr="agi" data-search="lone_druid lone druid силлабир друид мишка" role="button" tabindex="0" aria-label="Lone Druid">
+              <img src="images/heroes/lone_druid.png" alt="Lone Druid" loading="lazy">
+              <span class="dota-hero-pick__tooltip">Lone Druid</span>
+            </div>
+            <div class="dota-hero-pick" data-hero="meepo" data-hero-name="Meepo" data-attr="agi" data-search="meepo meepo мипо геомансер клоны" role="button" tabindex="0" aria-label="Meepo">
+              <img src="images/heroes/meepo.png" alt="Meepo" loading="lazy">
+              <span class="dota-hero-pick__tooltip">Meepo</span>
+            </div>
+            <div class="dota-hero-pick" data-hero="naga_siren" data-hero-name="Naga Siren" data-attr="agi" data-search="naga_siren naga siren нага сирена сон" role="button" tabindex="0" aria-label="Naga Siren">
+              <img src="images/heroes/naga_siren.png" alt="Naga Siren" loading="lazy">
+              <span class="dota-hero-pick__tooltip">Naga Siren</span>
+            </div>
+            <div class="dota-hero-pick" data-hero="slark" data-hero-name="Slark" data-attr="agi" data-search="slark slark сларк рыба" role="button" tabindex="0" aria-label="Slark">
+              <img src="images/heroes/slark.png" alt="Slark" loading="lazy">
+              <span class="dota-hero-pick__tooltip">Slark</span>
+            </div>
+            <div class="dota-hero-pick" data-hero="medusa" data-hero-name="Medusa" data-attr="agi" data-search="medusa medusa медуза дуза" role="button" tabindex="0" aria-label="Medusa">
+              <img src="images/heroes/medusa.png" alt="Medusa" loading="lazy">
+              <span class="dota-hero-pick__tooltip">Medusa</span>
+            </div>
+            <div class="dota-hero-pick" data-hero="troll_warlord" data-hero-name="Troll Warlord" data-attr="agi" data-search="troll_warlord troll warlord тролль джахракал" role="button" tabindex="0" aria-label="Troll Warlord">
+              <img src="images/heroes/troll_warlord.png" alt="Troll Warlord" loading="lazy">
+              <span class="dota-hero-pick__tooltip">Troll Warlord</span>
+            </div>
+            <div class="dota-hero-pick" data-hero="ember_spirit" data-hero-name="Ember Spirit" data-attr="agi" data-search="ember_spirit ember spirit эмбер спирит" role="button" tabindex="0" aria-label="Ember Spirit">
+              <img src="images/heroes/ember_spirit.png" alt="Ember Spirit" loading="lazy">
+              <span class="dota-hero-pick__tooltip">Ember Spirit</span>
+            </div>
+            <div class="dota-hero-pick" data-hero="terrorblade" data-hero-name="Terrorblade" data-attr="agi" data-search="terrorblade terrorblade террорблейд тб" role="button" tabindex="0" aria-label="Terrorblade">
+              <img src="images/heroes/terrorblade.png" alt="Terrorblade" loading="lazy">
+              <span class="dota-hero-pick__tooltip">Terrorblade</span>
+            </div>
+            <div class="dota-hero-pick" data-hero="monkey_king" data-hero-name="Monkey King" data-attr="agi" data-search="monkey_king monkey king мк манки кинг обезьяна" role="button" tabindex="0" aria-label="Monkey King">
+              <img src="images/heroes/monkey_king.png" alt="Monkey King" loading="lazy">
+              <span class="dota-hero-pick__tooltip">Monkey King</span>
+            </div>
+            <div class="dota-hero-pick" data-hero="hoodwink" data-hero-name="Hoodwink" data-attr="agi" data-search="hoodwink hoodwink худвинк белка талисман sharpshooter" role="button" tabindex="0" aria-label="Hoodwink">
+              <img src="images/heroes/hoodwink.png" alt="Hoodwink" loading="lazy">
+              <span class="dota-hero-pick__tooltip">Hoodwink</span>
+            </div>
+            <div class="dota-hero-pick" data-hero="kez" data-hero-name="Kez" data-attr="agi" data-search="kez kez кез птица катана" role="button" tabindex="0" aria-label="Kez">
+              <img src="images/heroes/kez.png" alt="Kez" loading="lazy">
+              <span class="dota-hero-pick__tooltip">Kez</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Колонка 3: Интеллект -->
+        <div class="dota-column dota-column--int" data-attr="int">
+          <div class="dota-column__head">
+            <span class="dota-column__icon dota-column__icon--int"></span>
+            <span class="dota-column__title">ИНТЕЛЛЕКТ</span>
+            <span class="dota-column__count" id="count-int">34</span>
+          </div>
+          <div class="dota-column__grid" id="grid-int">
+            <div class="dota-hero-pick" data-hero="crystal_maiden" data-hero-name="Crystal Maiden" data-attr="int" data-search="crystal_maiden crystal maiden кристал мейден цмка цм рилай" role="button" tabindex="0" aria-label="Crystal Maiden">
+              <img src="images/heroes/crystal_maiden.png" alt="Crystal Maiden" loading="lazy">
+              <span class="dota-hero-pick__tooltip">Crystal Maiden</span>
+            </div>
+            <div class="dota-hero-pick" data-hero="puck" data-hero-name="Puck" data-attr="int" data-search="puck puck пак" role="button" tabindex="0" aria-label="Puck">
+              <img src="images/heroes/puck.png" alt="Puck" loading="lazy">
+              <span class="dota-hero-pick__tooltip">Puck</span>
+            </div>
+            <div class="dota-hero-pick" data-hero="storm_spirit" data-hero-name="Storm Spirit" data-attr="int" data-search="storm_spirit storm spirit " role="button" tabindex="0" aria-label="Storm Spirit">
+              <img src="images/heroes/storm_spirit.png" alt="Storm Spirit" loading="lazy">
+              <span class="dota-hero-pick__tooltip">Storm Spirit</span>
+            </div>
+            <div class="dota-hero-pick" data-hero="zuus" data-hero-name="Zeus" data-attr="int" data-search="zuus zeus " role="button" tabindex="0" aria-label="Zeus">
+              <img src="images/heroes/zuus.png" alt="Zeus" loading="lazy">
+              <span class="dota-hero-pick__tooltip">Zeus</span>
+            </div>
+            <div class="dota-hero-pick" data-hero="lina" data-hero-name="Lina" data-attr="int" data-search="lina lina " role="button" tabindex="0" aria-label="Lina">
+              <img src="images/heroes/lina.png" alt="Lina" loading="lazy">
+              <span class="dota-hero-pick__tooltip">Lina</span>
+            </div>
+            <div class="dota-hero-pick" data-hero="lion" data-hero-name="Lion" data-attr="int" data-search="lion lion " role="button" tabindex="0" aria-label="Lion">
+              <img src="images/heroes/lion.png" alt="Lion" loading="lazy">
+              <span class="dota-hero-pick__tooltip">Lion</span>
+            </div>
+            <div class="dota-hero-pick" data-hero="shadow_shaman" data-hero-name="Shadow Shaman" data-attr="int" data-search="shadow_shaman shadow shaman шаман раста" role="button" tabindex="0" aria-label="Shadow Shaman">
+              <img src="images/heroes/shadow_shaman.png" alt="Shadow Shaman" loading="lazy">
+              <span class="dota-hero-pick__tooltip">Shadow Shaman</span>
+            </div>
+            <div class="dota-hero-pick" data-hero="witch_doctor" data-hero-name="Witch Doctor" data-attr="int" data-search="witch_doctor witch doctor витч доктор вд" role="button" tabindex="0" aria-label="Witch Doctor">
+              <img src="images/heroes/witch_doctor.png" alt="Witch Doctor" loading="lazy">
+              <span class="dota-hero-pick__tooltip">Witch Doctor</span>
+            </div>
+            <div class="dota-hero-pick" data-hero="lich" data-hero-name="Lich" data-attr="int" data-search="lich lich лич" role="button" tabindex="0" aria-label="Lich">
+              <img src="images/heroes/lich.png" alt="Lich" loading="lazy">
+              <span class="dota-hero-pick__tooltip">Lich</span>
+            </div>
+            <div class="dota-hero-pick" data-hero="tinker" data-hero-name="Tinker" data-attr="int" data-search="tinker tinker тинкер ботинок" role="button" tabindex="0" aria-label="Tinker">
+              <img src="images/heroes/tinker.png" alt="Tinker" loading="lazy">
+              <span class="dota-hero-pick__tooltip">Tinker</span>
+            </div>
+            <div class="dota-hero-pick" data-hero="necrolyte" data-hero-name="Necrophos" data-attr="int" data-search="necrolyte necrophos некрофос некр дедушка" role="button" tabindex="0" aria-label="Necrophos">
+              <img src="images/heroes/necrolyte.png" alt="Necrophos" loading="lazy">
+              <span class="dota-hero-pick__tooltip">Necrophos</span>
+            </div>
+            <div class="dota-hero-pick" data-hero="warlock" data-hero-name="Warlock" data-attr="int" data-search="warlock warlock варлок големы" role="button" tabindex="0" aria-label="Warlock">
+              <img src="images/heroes/warlock.png" alt="Warlock" loading="lazy">
+              <span class="dota-hero-pick__tooltip">Warlock</span>
+            </div>
+            <div class="dota-hero-pick" data-hero="queenofpain" data-hero-name="Queen of Pain" data-attr="int" data-search="queenofpain queen of pain квопа квин оф пейн qop" role="button" tabindex="0" aria-label="Queen of Pain">
+              <img src="images/heroes/queenofpain.png" alt="Queen of Pain" loading="lazy">
+              <span class="dota-hero-pick__tooltip">Queen of Pain</span>
+            </div>
+            <div class="dota-hero-pick" data-hero="pugna" data-hero-name="Pugna" data-attr="int" data-search="pugna pugna пугна" role="button" tabindex="0" aria-label="Pugna">
+              <img src="images/heroes/pugna.png" alt="Pugna" loading="lazy">
+              <span class="dota-hero-pick__tooltip">Pugna</span>
+            </div>
+            <div class="dota-hero-pick" data-hero="leshrac" data-hero-name="Leshrac" data-attr="int" data-search="leshrac leshrac лешрак козёл" role="button" tabindex="0" aria-label="Leshrac">
+              <img src="images/heroes/leshrac.png" alt="Leshrac" loading="lazy">
+              <span class="dota-hero-pick__tooltip">Leshrac</span>
+            </div>
+            <div class="dota-hero-pick" data-hero="dark_seer" data-hero-name="Dark Seer" data-attr="int" data-search="dark_seer dark seer дарк сир дс" role="button" tabindex="0" aria-label="Dark Seer">
+              <img src="images/heroes/dark_seer.png" alt="Dark Seer" loading="lazy">
+              <span class="dota-hero-pick__tooltip">Dark Seer</span>
+            </div>
+            <div class="dota-hero-pick" data-hero="enchantress" data-hero-name="Enchantress" data-attr="int" data-search="enchantress enchantress энча коза" role="button" tabindex="0" aria-label="Enchantress">
+              <img src="images/heroes/enchantress.png" alt="Enchantress" loading="lazy">
+              <span class="dota-hero-pick__tooltip">Enchantress</span>
+            </div>
+            <div class="dota-hero-pick" data-hero="jakiro" data-hero-name="Jakiro" data-attr="int" data-search="jakiro jakiro джакиро твинхед" role="button" tabindex="0" aria-label="Jakiro">
+              <img src="images/heroes/jakiro.png" alt="Jakiro" loading="lazy">
+              <span class="dota-hero-pick__tooltip">Jakiro</span>
+            </div>
+            <div class="dota-hero-pick" data-hero="chen" data-hero-name="Chen" data-attr="int" data-search="chen chen чен крипы" role="button" tabindex="0" aria-label="Chen">
+              <img src="images/heroes/chen.png" alt="Chen" loading="lazy">
+              <span class="dota-hero-pick__tooltip">Chen</span>
+            </div>
+            <div class="dota-hero-pick" data-hero="ancient_apparition" data-hero-name="Ancient Apparition" data-attr="int" data-search="ancient_apparition ancient apparition аппарат аа" role="button" tabindex="0" aria-label="Ancient Apparition">
+              <img src="images/heroes/ancient_apparition.png" alt="Ancient Apparition" loading="lazy">
+              <span class="dota-hero-pick__tooltip">Ancient Apparition</span>
+            </div>
+            <div class="dota-hero-pick" data-hero="invoker" data-hero-name="Invoker" data-attr="int" data-search="invoker invoker инвокер вокер карл каэль" role="button" tabindex="0" aria-label="Invoker">
+              <img src="images/heroes/invoker.png" alt="Invoker" loading="lazy">
+              <span class="dota-hero-pick__tooltip">Invoker</span>
+            </div>
+            <div class="dota-hero-pick" data-hero="silencer" data-hero-name="Silencer" data-attr="int" data-search="silencer silencer сало сайленсер" role="button" tabindex="0" aria-label="Silencer">
+              <img src="images/heroes/silencer.png" alt="Silencer" loading="lazy">
+              <span class="dota-hero-pick__tooltip">Silencer</span>
+            </div>
+            <div class="dota-hero-pick" data-hero="obsidian_destroyer" data-hero-name="Outworld Destroyer" data-attr="int" data-search="obsidian_destroyer outworld destroyer од астрал дестроер outworld" role="button" tabindex="0" aria-label="Outworld Destroyer">
+              <img src="images/heroes/obsidian_destroyer.png" alt="Outworld Destroyer" loading="lazy">
+              <span class="dota-hero-pick__tooltip">Outworld Destroyer</span>
+            </div>
+            <div class="dota-hero-pick" data-hero="shadow_demon" data-hero-name="Shadow Demon" data-attr="int" data-search="shadow_demon shadow demon шд шадоу демон" role="button" tabindex="0" aria-label="Shadow Demon">
+              <img src="images/heroes/shadow_demon.png" alt="Shadow Demon" loading="lazy">
+              <span class="dota-hero-pick__tooltip">Shadow Demon</span>
+            </div>
+            <div class="dota-hero-pick" data-hero="rubick" data-hero-name="Rubick" data-attr="int" data-search="rubick rubick рубик маг вор" role="button" tabindex="0" aria-label="Rubick">
+              <img src="images/heroes/rubick.png" alt="Rubick" loading="lazy">
+              <span class="dota-hero-pick__tooltip">Rubick</span>
+            </div>
+            <div class="dota-hero-pick" data-hero="disruptor" data-hero-name="Disruptor" data-attr="int" data-search="disruptor disruptor дизраптор тралл" role="button" tabindex="0" aria-label="Disruptor">
+              <img src="images/heroes/disruptor.png" alt="Disruptor" loading="lazy">
+              <span class="dota-hero-pick__tooltip">Disruptor</span>
+            </div>
+            <div class="dota-hero-pick" data-hero="keeper_of_the_light" data-hero-name="Keeper of the Light" data-attr="int" data-search="keeper_of_the_light keeper of the light котл старик свет гендальф" role="button" tabindex="0" aria-label="Keeper of the Light">
+              <img src="images/heroes/keeper_of_the_light.png" alt="Keeper of the Light" loading="lazy">
+              <span class="dota-hero-pick__tooltip">Keeper of the Light</span>
+            </div>
+            <div class="dota-hero-pick" data-hero="skywrath_mage" data-hero-name="Skywrath Mage" data-attr="int" data-search="skywrath_mage skywrath mage скаймаг драгонус петух" role="button" tabindex="0" aria-label="Skywrath Mage">
+              <img src="images/heroes/skywrath_mage.png" alt="Skywrath Mage" loading="lazy">
+              <span class="dota-hero-pick__tooltip">Skywrath Mage</span>
+            </div>
+            <div class="dota-hero-pick" data-hero="oracle" data-hero-name="Oracle" data-attr="int" data-search="oracle oracle оракул нерис" role="button" tabindex="0" aria-label="Oracle">
+              <img src="images/heroes/oracle.png" alt="Oracle" loading="lazy">
+              <span class="dota-hero-pick__tooltip">Oracle</span>
+            </div>
+            <div class="dota-hero-pick" data-hero="winter_wyvern" data-hero-name="Winter Wyvern" data-attr="int" data-search="winter_wyvern winter wyvern виверна" role="button" tabindex="0" aria-label="Winter Wyvern">
+              <img src="images/heroes/winter_wyvern.png" alt="Winter Wyvern" loading="lazy">
+              <span class="dota-hero-pick__tooltip">Winter Wyvern</span>
+            </div>
+            <div class="dota-hero-pick" data-hero="dark_willow" data-hero-name="Dark Willow" data-attr="int" data-search="dark_willow dark willow миреска виллоу фея" role="button" tabindex="0" aria-label="Dark Willow">
+              <img src="images/heroes/dark_willow.png" alt="Dark Willow" loading="lazy">
+              <span class="dota-hero-pick__tooltip">Dark Willow</span>
+            </div>
+            <div class="dota-hero-pick" data-hero="grimstroke" data-hero-name="Grimstroke" data-attr="int" data-search="grimstroke grimstroke гримстрок грим" role="button" tabindex="0" aria-label="Grimstroke">
+              <img src="images/heroes/grimstroke.png" alt="Grimstroke" loading="lazy">
+              <span class="dota-hero-pick__tooltip">Grimstroke</span>
+            </div>
+            <div class="dota-hero-pick" data-hero="ringmaster" data-hero-name="Ringmaster" data-attr="int" data-search="ringmaster ringmaster рингмастер цирк" role="button" tabindex="0" aria-label="Ringmaster">
+              <img src="images/heroes/ringmaster.png" alt="Ringmaster" loading="lazy">
+              <span class="dota-hero-pick__tooltip">Ringmaster</span>
+            </div>
+            <div class="dota-hero-pick" data-hero="muerta" data-hero-name="Muerta" data-attr="int" data-search="muerta muerta муэрта пистолеты" role="button" tabindex="0" aria-label="Muerta">
+              <img src="images/heroes/muerta.png" alt="Muerta" loading="lazy">
+              <span class="dota-hero-pick__tooltip">Muerta</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Колонка 4: Универсальные -->
+        <div class="dota-column dota-column--all" data-attr="all">
+          <div class="dota-column__head">
+            <span class="dota-column__icon dota-column__icon--all"></span>
+            <span class="dota-column__title">УНИВЕРСАЛЬНЫЕ</span>
+            <span class="dota-column__count" id="count-all">22</span>
+          </div>
+          <div class="dota-column__grid" id="grid-all">
+            <div class="dota-hero-pick" data-hero="bane" data-hero-name="Bane" data-attr="all" data-search="bane bane бейн бейнхаллоу" role="button" tabindex="0" aria-label="Bane">
+              <img src="images/heroes/bane.png" alt="Bane" loading="lazy">
+              <span class="dota-hero-pick__tooltip">Bane</span>
+            </div>
+            <div class="dota-hero-pick" data-hero="sand_king" data-hero-name="Sand King" data-attr="all" data-search="sand_king sand king " role="button" tabindex="0" aria-label="Sand King">
+              <img src="images/heroes/sand_king.png" alt="Sand King" loading="lazy">
+              <span class="dota-hero-pick__tooltip">Sand King</span>
+            </div>
+            <div class="dota-hero-pick" data-hero="windrunner" data-hero-name="Windranger" data-attr="all" data-search="windrunner windranger " role="button" tabindex="0" aria-label="Windranger">
+              <img src="images/heroes/windrunner.png" alt="Windranger" loading="lazy">
+              <span class="dota-hero-pick__tooltip">Windranger</span>
+            </div>
+            <div class="dota-hero-pick" data-hero="enigma" data-hero-name="Enigma" data-attr="all" data-search="enigma enigma энигма блэкхол" role="button" tabindex="0" aria-label="Enigma">
+              <img src="images/heroes/enigma.png" alt="Enigma" loading="lazy">
+              <span class="dota-hero-pick__tooltip">Enigma</span>
+            </div>
+            <div class="dota-hero-pick" data-hero="beastmaster" data-hero-name="Beastmaster" data-attr="all" data-search="beastmaster beastmaster бистмастер бист" role="button" tabindex="0" aria-label="Beastmaster">
+              <img src="images/heroes/beastmaster.png" alt="Beastmaster" loading="lazy">
+              <span class="dota-hero-pick__tooltip">Beastmaster</span>
+            </div>
+            <div class="dota-hero-pick" data-hero="venomancer" data-hero-name="Venomancer" data-attr="all" data-search="venomancer venomancer веномансер веник змейка" role="button" tabindex="0" aria-label="Venomancer">
+              <img src="images/heroes/venomancer.png" alt="Venomancer" loading="lazy">
+              <span class="dota-hero-pick__tooltip">Venomancer</span>
+            </div>
+            <div class="dota-hero-pick" data-hero="death_prophet" data-hero-name="Death Prophet" data-attr="all" data-search="death_prophet death prophet кробелус дп банша" role="button" tabindex="0" aria-label="Death Prophet">
+              <img src="images/heroes/death_prophet.png" alt="Death Prophet" loading="lazy">
+              <span class="dota-hero-pick__tooltip">Death Prophet</span>
+            </div>
+            <div class="dota-hero-pick" data-hero="dazzle" data-hero-name="Dazzle" data-attr="all" data-search="dazzle dazzle даззл крест" role="button" tabindex="0" aria-label="Dazzle">
+              <img src="images/heroes/dazzle.png" alt="Dazzle" loading="lazy">
+              <span class="dota-hero-pick__tooltip">Dazzle</span>
+            </div>
+            <div class="dota-hero-pick" data-hero="furion" data-hero-name="Nature&#39;s Prophet" data-attr="all" data-search="furion nature's prophet фурион фура природа nature" role="button" tabindex="0" aria-label="Nature&#39;s Prophet">
+              <img src="images/heroes/furion.png" alt="Nature&#39;s Prophet" loading="lazy">
+              <span class="dota-hero-pick__tooltip">Nature&#39;s Prophet</span>
+            </div>
+            <div class="dota-hero-pick" data-hero="batrider" data-hero-name="Batrider" data-attr="all" data-search="batrider batrider бэт райдер мышь" role="button" tabindex="0" aria-label="Batrider">
+              <img src="images/heroes/batrider.png" alt="Batrider" loading="lazy">
+              <span class="dota-hero-pick__tooltip">Batrider</span>
+            </div>
+            <div class="dota-hero-pick" data-hero="brewmaster" data-hero-name="Brewmaster" data-attr="all" data-search="brewmaster brewmaster панда брюмастер" role="button" tabindex="0" aria-label="Brewmaster">
+              <img src="images/heroes/brewmaster.png" alt="Brewmaster" loading="lazy">
+              <span class="dota-hero-pick__tooltip">Brewmaster</span>
+            </div>
+            <div class="dota-hero-pick" data-hero="nyx_assassin" data-hero-name="Nyx Assassin" data-attr="all" data-search="nyx_assassin nyx assassin никс жук карапаси" role="button" tabindex="0" aria-label="Nyx Assassin">
+              <img src="images/heroes/nyx_assassin.png" alt="Nyx Assassin" loading="lazy">
+              <span class="dota-hero-pick__tooltip">Nyx Assassin</span>
+            </div>
+            <div class="dota-hero-pick" data-hero="wisp" data-hero-name="Io" data-attr="all" data-search="wisp io " role="button" tabindex="0" aria-label="Io">
+              <img src="images/heroes/wisp.png" alt="Io" loading="lazy">
+              <span class="dota-hero-pick__tooltip">Io</span>
+            </div>
+            <div class="dota-hero-pick" data-hero="visage" data-hero-name="Visage" data-attr="all" data-search="visage visage визаж горгульи" role="button" tabindex="0" aria-label="Visage">
+              <img src="images/heroes/visage.png" alt="Visage" loading="lazy">
+              <span class="dota-hero-pick__tooltip">Visage</span>
+            </div>
+            <div class="dota-hero-pick" data-hero="magnataur" data-hero-name="Magnus" data-attr="all" data-search="magnataur magnus магнус маг рп" role="button" tabindex="0" aria-label="Magnus">
+              <img src="images/heroes/magnataur.png" alt="Magnus" loading="lazy">
+              <span class="dota-hero-pick__tooltip">Magnus</span>
+            </div>
+            <div class="dota-hero-pick" data-hero="abaddon" data-hero-name="Abaddon" data-attr="all" data-search="abaddon abaddon абаддон время заимствования" role="button" tabindex="0" aria-label="Abaddon">
+              <img src="images/heroes/abaddon.png" alt="Abaddon" loading="lazy">
+              <span class="dota-hero-pick__tooltip">Abaddon</span>
+            </div>
+            <div class="dota-hero-pick" data-hero="techies" data-hero-name="Techies" data-attr="all" data-search="techies techies минеры течис бомбы" role="button" tabindex="0" aria-label="Techies">
+              <img src="images/heroes/techies.png" alt="Techies" loading="lazy">
+              <span class="dota-hero-pick__tooltip">Techies</span>
+            </div>
+            <div class="dota-hero-pick" data-hero="arc_warden" data-hero-name="Arc Warden" data-attr="all" data-search="arc_warden arc warden арк варден зет" role="button" tabindex="0" aria-label="Arc Warden">
+              <img src="images/heroes/arc_warden.png" alt="Arc Warden" loading="lazy">
+              <span class="dota-hero-pick__tooltip">Arc Warden</span>
+            </div>
+            <div class="dota-hero-pick" data-hero="pangolier" data-hero-name="Pangolier" data-attr="all" data-search="pangolier pangolier пангольер панго" role="button" tabindex="0" aria-label="Pangolier">
+              <img src="images/heroes/pangolier.png" alt="Pangolier" loading="lazy">
+              <span class="dota-hero-pick__tooltip">Pangolier</span>
+            </div>
+            <div class="dota-hero-pick" data-hero="void_spirit" data-hero-name="Void Spirit" data-attr="all" data-search="void_spirit void spirit войд спирит" role="button" tabindex="0" aria-label="Void Spirit">
+              <img src="images/heroes/void_spirit.png" alt="Void Spirit" loading="lazy">
+              <span class="dota-hero-pick__tooltip">Void Spirit</span>
+            </div>
+            <div class="dota-hero-pick" data-hero="snapfire" data-hero-name="Snapfire" data-attr="all" data-search="snapfire snapfire бабка снепфайр мортимер" role="button" tabindex="0" aria-label="Snapfire">
+              <img src="images/heroes/snapfire.png" alt="Snapfire" loading="lazy">
+              <span class="dota-hero-pick__tooltip">Snapfire</span>
+            </div>
+            <div class="dota-hero-pick" data-hero="marci" data-hero-name="Marci" data-attr="all" data-search="marci marci марси аниме" role="button" tabindex="0" aria-label="Marci">
+              <img src="images/heroes/marci.png" alt="Marci" loading="lazy">
+              <span class="dota-hero-pick__tooltip">Marci</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================
+         СЕКЦИЯ 3: LIVE — текущие матчи
+         Ссылка на Twitch-канал турнира
+         ======================================================== -->
+    <section id="live">
+      <h2>🔴 Live — текущие матчи</h2>
+      <p>Прямые трансляции всех матчей плей-офф. Следи за счётом в реальном времени.</p>
+
+      <div class="live-header">
+        <!-- Кнопка перехода на Twitch -->
+        <a href="https://www.twitch.tv/dotaarena2026" target="_blank" rel="noopener" class="live-stream-btn">
+          <span class="live-stream-btn__dot"></span>
+          Смотреть на Twitch
+        </a>
+        <span class="live-updated" id="live-updated">Обновлено только что</span>
+      </div>
+
+      <!-- Сетка матчей формируется из mock-API в script.js -->
+      <div class="live-grid" id="live-grid"></div>
+    </section>
+
+    <!-- ========================================================
+         СЕКЦИЯ 4: ПРОГРАММА ТУРНИРА
+         ======================================================== -->
+    <section id="program">
+      <h2>Программа турнира</h2>
+      <p>Три дня соревнований, мастер-классов и шоу-матчей от приглашённых игроков.</p>
+
+      <h3>День 1 — 14 ноября (Групповой этап)</h3>
+      <ul>
+        <li>09:00 — Регистрация и заезд команд</li>
+        <li>10:00 — Открытие турнира и жеребьёвка</li>
+        <li>11:00 — Начало групповых матчей Dota 2</li>
+        <li>15:00 — Шоу-матч Storm Spirit vs Hoodwink</li>
+        <li>19:00 — Итоги первого дня</li>
+      </ul>
+
+      <h3>День 2 — 15 ноября (Плей-офф)</h3>
+      <ol>
+        <li>1/8 финала по всем дивизионам</li>
+        <li>Четвертьфинал</li>
+        <li>Мастер-класс от профессионального игрока</li>
+        <li>Полуфинал</li>
+        <li>Пресс-конференция участников</li>
+      </ol>
+
+      <h3>Расписание финальных матчей</h3>
+      <table>
+        <caption>Финальные матчи — 16 ноября 2026</caption>
+        <thead>
+          <tr>
+            <th>Время</th>
+            <th>Дивизион</th>
+            <th>Команда 1</th>
+            <th>Команда 2</th>
+            <th>Площадка</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>12:00</td>
+            <td>Dota 2 — Дивизион B</td>
+            <td>TBD</td>
+            <td>TBD</td>
+            <td>Стрим-зал A</td>
+          </tr>
+          <tr>
+            <td>15:00</td>
+            <td>Dota 2 — Дивизион A</td>
+            <td>TBD</td>
+            <td>TBD</td>
+            <td>Стрим-зал B</td>
+          </tr>
+          <tr>
+            <td>18:00</td>
+            <td>Dota 2 — Гранд-финал</td>
+            <td>TBD</td>
+            <td>TBD</td>
+            <td>Главная сцена</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <!-- ========================================================
+         СЕКЦИЯ 5: КОМАНДЫ-УЧАСТНИКИ
+         Список пустой — данные добавляются через форму.
+         Фильтры, вкладки, модалка — всё работает из script.js
+         ======================================================== -->
+    <section id="teams">
+      <h2>Команды-участники</h2>
+      <p>
+        Список обновляется по мере подтверждения заявок.
+        Клик по названию команды откроет детали.
+      </p>
+
+      <!-- Фильтры команд: поиск, регион, дивизион, MMR -->
+      <div class="teams-filters">
+        <input type="search" id="filter-search"
+               placeholder="🔍 Поиск по названию или капитану…"
+               class="filter-input">
+
+        <select id="filter-region" class="filter-select">
+          <option value="">Все регионы</option>
+          <option>Москва</option>
+          <option>Санкт-Петербург</option>
+          <option>Екатеринбург</option>
+          <option>Казань</option>
+          <option>Новосибирск</option>
+          <option>Самара</option>
+          <option>Ростов-на-Дону</option>
+        </select>
+
+        <select id="filter-division" class="filter-select">
+          <option value="">Все дивизионы</option>
+          <option value="A">Дивизион A</option>
+          <option value="B">Дивизион B</option>
+          <option value="Open">Open</option>
+        </select>
+
+        <select id="filter-mmr" class="filter-select">
+          <option value="">Любой MMR</option>
+          <option value="3000">от 3000</option>
+          <option value="5000">от 5000</option>
+          <option value="7000">от 7000</option>
+          <option value="9000">от 9000</option>
+        </select>
+      </div>
+
+      <!-- Баннер секции -->
+      <figure>
+        <img src="images/shadow_fiend_bg.jpg"
+             alt="Shadow Fiend — официальный арт DotaArena 2026"
+             class="teams-banner">
+        <figcaption>Shadow Fiend Arcana 2026 — официальный арт турнира DotaArena 2026</figcaption>
+      </figure>
+
+      <blockquote cite="https://dotaarena2026.ru/interview">
+        <p>
+          «DotaArena — это не просто турнир, это место, где рождаются настоящие чемпионы.
+           Организация на высшем уровне, атмосфера невероятная.»
+        </p>
+        <footer>— Алексей Громов, главный организатор DotaArena 2026</footer>
+      </blockquote>
+
+      <p>
+        Формат участия: <abbr title="Best of Three — серия из трёх карт">BO3</abbr> в плей-офф
+        и <abbr title="Best of One — одна решающая карта">BO1</abbr> в групповом этапе.
+      </p>
+
+      <!-- Вкладки: Зарегистрированные / На рассмотрении -->
+      <div class="tabs-container">
+        <div class="tabs-header">
+          <button class="tab-btn active" data-target="tab-registered">
+            Зарегистрированные команды
+          </button>
+          <button class="tab-btn" data-target="tab-pending">
+            На рассмотрении
+          </button>
+        </div>
+
+        <!-- Вкладка: зарегистрированные -->
+        <div id="tab-registered" class="tab-content active">
+          <ol id="registered-list" class="teams-list"></ol>
+          <p id="registered-empty" class="empty-state">
+            Пока нет подтверждённых команд. Подайте заявку — и вы окажетесь здесь первыми!
+          </p>
+        </div>
+
+        <!-- Вкладка: на рассмотрении -->
+        <div id="tab-pending" class="tab-content">
+          <p>Список команд, ожидающих подтверждения:</p>
+          <ol id="pending-list" class="teams-list"></ol>
+          <p id="pending-empty" class="empty-state">
+            Нет заявок на рассмотрении. Станьте первым участником DotaArena 2026!
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================
+         СЕКЦИЯ 6: СЕТКА МАТЧЕЙ
+         Заполняется автоматически, когда в registered ≥ 16 команд.
+         Все слоты помечены атрибутом data-slot для JS-автозаполнения.
+         ======================================================== -->
+    <section id="bracket">
+      <h2>Сетка матчей</h2>
+      <p>
+        Турнирная сетка формируется по системе двойного выбывания.
+        <strong>Заполнится автоматически, когда наберётся 16 команд.</strong>
+      </p>
+
+      <!-- Статус заполнения сетки -->
+      <div class="bracket-status" id="bracket-status">
+        Заполнено: <b id="bracket-count">0</b> / 16 команд для старта сетки
+      </div>
+
+      <div class="tournament-bracket">
+
+        <!-- ================= ВЕРХНЯЯ СЕТКА ================= -->
+        <div class="bracket-section upper-bracket">
+          <h4>Верхняя сетка</h4>
+          <div class="bracket-rounds">
+
+            <!-- Раунд 1 верхней сетки -->
+            <div class="bracket-round">
+              <span class="round-label">Раунд 1</span>
+              <div class="slot">
+                <div class="match">
+                  <div class="team" data-slot="U1-1a">TBD</div>
+                  <div class="team" data-slot="U1-1b">TBD</div>
+                </div>
+              </div>
+              <div class="slot">
+                <div class="match">
+                  <div class="team" data-slot="U1-2a">TBD</div>
+                  <div class="team" data-slot="U1-2b">TBD</div>
+                </div>
+              </div>
+              <div class="slot">
+                <div class="match">
+                  <div class="team" data-slot="U1-3a">TBD</div>
+                  <div class="team" data-slot="U1-3b">TBD</div>
+                </div>
+              </div>
+              <div class="slot">
+                <div class="match">
+                  <div class="team" data-slot="U1-4a">TBD</div>
+                  <div class="team" data-slot="U1-4b">TBD</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Коннектор между раундами 1 и 2 -->
+            <div class="bracket-connector">
+              <svg class="conn" viewBox="0 0 100 100" preserveAspectRatio="none">
+                <path d="M0,25 L50,25 L50,75 L0,75 M50,50 L100,50"
+                      stroke="#dc2626" stroke-width="1.5" stroke-dasharray="4 4"
+                      fill="none" vector-effect="non-scaling-stroke"/>
+              </svg>
+              <svg class="conn" viewBox="0 0 100 100" preserveAspectRatio="none">
+                <path d="M0,25 L50,25 L50,75 L0,75 M50,50 L100,50"
+                      stroke="#dc2626" stroke-width="1.5" stroke-dasharray="4 4"
+                      fill="none" vector-effect="non-scaling-stroke"/>
+              </svg>
+            </div>
+
+            <!-- Раунд 2 верхней сетки -->
+            <div class="bracket-round">
+              <span class="round-label">Раунд 2</span>
+              <div class="slot">
+                <div class="match">
+                  <div class="team" data-slot="U2-1a">TBD</div>
+                  <div class="team" data-slot="U2-1b">TBD</div>
+                </div>
+              </div>
+              <div class="slot">
+                <div class="match">
+                  <div class="team" data-slot="U2-2a">TBD</div>
+                  <div class="team" data-slot="U2-2b">TBD</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Коннектор между раундом 2 и финалом верхней -->
+            <div class="bracket-connector">
+              <svg class="conn" viewBox="0 0 100 100" preserveAspectRatio="none">
+                <path d="M0,25 L50,25 L50,75 L0,75 M50,50 L100,50"
+                      stroke="#dc2626" stroke-width="1.5" stroke-dasharray="4 4"
+                      fill="none" vector-effect="non-scaling-stroke"/>
+              </svg>
+            </div>
+
+            <!-- Финал верхней сетки -->
+            <div class="bracket-round">
+              <span class="round-label">Финал верхней сетки</span>
+              <div class="slot">
+                <div class="match">
+                  <div class="team" data-slot="UF-a">TBD</div>
+                  <div class="team" data-slot="UF-b">TBD</div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- ================= НИЖНЯЯ СЕТКА ================= -->
+        <div class="bracket-section lower-bracket">
+          <h4>Нижняя сетка</h4>
+          <div class="bracket-rounds">
+
+            <!-- Раунд 1 нижней сетки -->
+            <div class="bracket-round">
+              <span class="round-label">Раунд 1</span>
+              <div class="slot">
+                <div class="match">
+                  <div class="team" data-slot="L1-1a">TBD</div>
+                  <div class="team" data-slot="L1-1b">TBD</div>
+                </div>
+              </div>
+              <div class="slot">
+                <div class="match">
+                  <div class="team" data-slot="L1-2a">TBD</div>
+                  <div class="team" data-slot="L1-2b">TBD</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Коннектор -->
+            <div class="bracket-connector">
+              <svg class="conn" viewBox="0 0 100 100" preserveAspectRatio="none">
+                <path d="M0,50 L100,50"
+                      stroke="#dc2626" stroke-width="1.5" stroke-dasharray="4 4"
+                      fill="none" vector-effect="non-scaling-stroke"/>
+              </svg>
+              <svg class="conn" viewBox="0 0 100 100" preserveAspectRatio="none">
+                <path d="M0,50 L100,50"
+                      stroke="#dc2626" stroke-width="1.5" stroke-dasharray="4 4"
+                      fill="none" vector-effect="non-scaling-stroke"/>
+              </svg>
+            </div>
+
+            <!-- Раунд 2 нижней сетки -->
+            <div class="bracket-round">
+              <span class="round-label">Раунд 2</span>
+              <div class="slot">
+                <div class="match">
+                  <div class="team" data-slot="L2-1a">TBD</div>
+                  <div class="team" data-slot="L2-1b">TBD</div>
+                </div>
+              </div>
+              <div class="slot">
+                <div class="match">
+                  <div class="team" data-slot="L2-2a">TBD</div>
+                  <div class="team" data-slot="L2-2b">TBD</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Коннектор -->
+            <div class="bracket-connector">
+              <svg class="conn" viewBox="0 0 100 100" preserveAspectRatio="none">
+                <path d="M0,25 L50,25 L50,75 L0,75 M50,50 L100,50"
+                      stroke="#dc2626" stroke-width="1.5" stroke-dasharray="4 4"
+                      fill="none" vector-effect="non-scaling-stroke"/>
+              </svg>
+            </div>
+
+            <!-- Раунд 3 нижней сетки -->
+            <div class="bracket-round">
+              <span class="round-label">Раунд 3</span>
+              <div class="slot">
+                <div class="match">
+                  <div class="team" data-slot="L3-1a">TBD</div>
+                  <div class="team" data-slot="L3-1b">TBD</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Коннектор -->
+            <div class="bracket-connector">
+              <svg class="conn" viewBox="0 0 100 100" preserveAspectRatio="none">
+                <path d="M0,50 L100,50"
+                      stroke="#dc2626" stroke-width="1.5" stroke-dasharray="4 4"
+                      fill="none" vector-effect="non-scaling-stroke"/>
+              </svg>
+            </div>
+
+            <!-- Финал нижней сетки -->
+            <div class="bracket-round">
+              <span class="round-label">Финал нижней сетки</span>
+              <div class="slot">
+                <div class="match">
+                  <div class="team" data-slot="LF-a">TBD</div>
+                  <div class="team" data-slot="LF-b">TBD</div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+
+        <!-- ================= ГРАНД-ФИНАЛ ================= -->
+        <div class="bracket-section grand-final">
+          <h4>Гранд-финал</h4>
+          <div class="bracket-rounds">
+            <div class="bracket-round">
+              <div class="slot">
+                <div class="match">
+                  <div class="team" data-slot="GF-a">TBD</div>
+                  <div class="team" data-slot="GF-b">TBD</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Групповой этап -->
+      <h3>Групповой этап — Dota 2</h3>
+      <table>
+        <caption>Группа A — Dota 2, групповой этап</caption>
+        <thead>
+          <tr>
+            <th>Команда</th>
+            <th>Игры</th>
+            <th>Победы</th>
+            <th>Поражения</th>
+            <th>Очки</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr><td>TBD</td><td>0</td><td>0</td><td>0</td><td>0</td></tr>
+          <tr><td>TBD</td><td>0</td><td>0</td><td>0</td><td>0</td></tr>
+          <tr><td>TBD</td><td>0</td><td>0</td><td>0</td><td>0</td></tr>
+          <tr><td>TBD</td><td>0</td><td>0</td><td>0</td><td>0</td></tr>
+        </tbody>
+      </table>
+
+      <aside>
+        <h3>Памятка по формату</h3>
+        <p>
+          За победу начисляется 3 очка, за техническое поражение — 0.
+          При равенстве очков учитывается разница нетворта.
+        </p>
+      </aside>
+    </section>
+
+    <!-- ========================================================
+         СЕКЦИЯ 7: ПРАВИЛА
+         ======================================================== -->
+    <section id="rules">
+      <h2>Правила участия</h2>
+      <p>Все участники обязаны ознакомиться с официальными правилами до начала турнира.</p>
+
+      <h3>Основные требования</h3>
+      <ul>
+        <li>Команда должна состоять из 5 основных и до 2 запасных игроков.</li>
+        <li>Минимальный возраст участника — 16 лет.</li>
+        <li>Каждый игрок обязан иметь верифицированный аккаунт Dota 2.</li>
+        <li>Запрещено использование читов, скриптов и стороннего ПО.</li>
+      </ul>
+
+      <h3>Санкции</h3>
+      <ol>
+        <li>Предупреждение за незначительные нарушения.</li>
+        <li>Техническое поражение в матче.</li>
+        <li>Дисквалификация команды с турнира.</li>
+        <li>Внесение в чёрный список на последующие сезоны.</li>
+      </ol>
+    </section>
+
+    <!-- ========================================================
+         СЕКЦИЯ 8: РЕГИСТРАЦИЯ
+         Форма + выбор тарифа (оплата имитируется на фронте)
+         ======================================================== -->
+    <section id="registration">
+      <h2>Регистрация команды</h2>
+      <p>
+        Заполните заявку. Регистрация открыта до <strong>1 ноября 2026</strong>.
+        Оплата взноса подтверждает участие команды.
+      </p>
+
+      <form method="post" action="#" novalidate>
+
+        <!-- Группа 1: Личные сведения капитана -->
+        <fieldset>
+          <legend>Личные сведения капитана команды</legend>
+
+          <div>
+            <label for="captain-name">ФИО капитана *</label>
+            <input type="text" id="captain-name" name="captain_name"
+                   placeholder="Иванов Иван Иванович"
+                   required minlength="5" maxlength="100">
+          </div>
+
+          <div>
+            <label for="captain-email">Email *</label>
+            <input type="email" id="captain-email" name="captain_email"
+                   placeholder="example@mail.ru" required inputmode="email"
+                   pattern="^[a-zA-Z0-9._%+-]+@(mail\.ru|gmail\.com|yandex\.ru|ya\.ru|bk\.ru|list\.ru|inbox\.ru|internet\.ru|rambler\.ru|icloud\.com)$"
+                   title="Пожалуйста, используйте почту mail.ru, gmail.com, yandex.ru, ya.ru и т.д.">
+          </div>
+
+          <div>
+            <label for="captain-phone">Телефон *</label>
+            <input type="tel" id="captain-phone" name="captain_phone"
+                   placeholder="89099329823 или +7 (999) 000-00-00"
+                   required>
+            <small id="phone-hint" class="field-hint">
+              Любой формат: 89001234567, +79001234567, 8(900)123-45-67
+            </small>
+          </div>
+
+          <div>
+            <label for="captain-age">Возраст *</label>
+            <input type="number" id="captain-age" name="captain_age"
+                   min="16" max="99" required>
+          </div>
+
+          <div>
+            <label for="captain-mmr">Пиковый MMR *</label>
+            <input type="number" id="captain-mmr" name="captain_mmr"
+                   min="3000" max="15000" placeholder="например: 6500" required>
+          </div>
+        </fieldset>
+
+        <!-- Группа 2: Параметры участия -->
+        <fieldset>
+          <legend>Параметры участия</legend>
+
+          <div>
+            <label for="team-name">Название команды *</label>
+            <input type="text" id="team-name" name="team_name"
+                   placeholder="RedDragons" required minlength="2" maxlength="50">
+          </div>
+
+          <div>
+            <label for="discipline">Дивизион *</label>
+            <select id="discipline" name="discipline" required>
+              <option value="">— Выберите дивизион —</option>
+              <option value="A">Дивизион A (полупрофессионалы)</option>
+              <option value="B">Дивизион B (любители)</option>
+              <option value="Open">Open (все желающие)</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="team-region">Регион *</label>
+            <select id="team-region" name="team_region" required>
+              <option value="">— Выберите регион —</option>
+              <option>Москва</option>
+              <option>Санкт-Петербург</option>
+              <option>Екатеринбург</option>
+              <option>Казань</option>
+              <option>Новосибирск</option>
+              <option>Самара</option>
+              <option>Ростов-на-Дону</option>
+            </select>
+          </div>
+
+          <div>
+            <label for="team-size">Количество игроков в составе *</label>
+            <input type="number" id="team-size" name="team_size"
+                   min="5" max="7" required>
+          </div>
+
+          <div>
+            <label for="team-members">Состав команды (по одному игроку в строке)</label>
+            <textarea id="team-members" name="team_members" rows="5"
+                      placeholder="Player1&#10;Player2&#10;Player3&#10;Player4&#10;Player5"
+                      maxlength="400"></textarea>
+          </div>
+
+          <div>
+            <label for="team-achievements">Достижения команды</label>
+            <textarea id="team-achievements" name="team_achievements" rows="3"
+                      placeholder="Например: 1-е место на City Cup 2025, топ-4 на Winter Clash"
+                      maxlength="300"></textarea>
+          </div>
+
+          <p class="field-label">Формат участия:</p>
+          <div>
+            <input type="radio" id="format-online" name="participation_format" value="online">
+            <label for="format-online">Онлайн</label>
+          </div>
+          <div>
+            <input type="radio" id="format-offline" name="participation_format" value="offline" checked>
+            <label for="format-offline">Офлайн (личное присутствие)</label>
+          </div>
+        </fieldset>
+
+        <!-- ============================================================
+             Группа 3: ВЫБОР ТАРИФА (имитация оплаты)
+             Три варианта: 500₽ / 1000₽ / 2000₽.
+             По клику на кнопку «Оплатить и зарегистрироваться»
+             откроется модальное окно с имитацией процесса оплаты.
+             ============================================================ -->
+        <fieldset class="payment-fieldset">
+          <legend>💰 Взнос за участие</legend>
+
+          <p class="payment-desc">
+            Выберите взнос. После нажатия «Оплатить и зарегистрироваться»
+            откроется защищённая страница оплаты (демо-режим).
+          </p>
+
+          <div class="payment-plans">
+            <label class="payment-plan">
+              <input type="radio" name="payment_plan" value="500" data-label="Базовый">
+              <div class="payment-plan__body">
+                <span class="payment-plan__name">Базовый</span>
+                <span class="payment-plan__amount">500 ₽</span>
+                <span class="payment-plan__hint">Слот в турнире + доступ к трансляции</span>
+              </div>
+            </label>
+
+            <label class="payment-plan payment-plan--popular">
+              <input type="radio" name="payment_plan" value="1000" data-label="Стандартный" checked>
+              <div class="payment-plan__body">
+                <span class="payment-plan__badge">Популярный</span>
+                <span class="payment-plan__name">Стандартный</span>
+                <span class="payment-plan__amount">1000 ₽</span>
+                <span class="payment-plan__hint">+ слот в основном дивизионе + мерч</span>
+              </div>
+            </label>
+
+            <label class="payment-plan">
+              <input type="radio" name="payment_plan" value="2000" data-label="Pro">
+              <div class="payment-plan__body">
+                <span class="payment-plan__name">Pro</span>
+                <span class="payment-plan__amount">2000 ₽</span>
+                <span class="payment-plan__hint">+ приватный коучинг + приоритетная поддержка</span>
+              </div>
+            </label>
+          </div>
+        </fieldset>
+
+        <!-- Группа 4: Согласия -->
+        <fieldset>
+          <legend>Согласия и дополнительная информация</legend>
+
+          <div>
+            <label for="about-team">Расскажите о вашей команде</label>
+            <textarea id="about-team" name="about_team" rows="4"
+                      placeholder="Краткое описание команды: достижения, состав, история..."
+                      maxlength="500"></textarea>
+          </div>
+
+          <div>
+            <input type="checkbox" id="agree-rules" name="agree_rules" required>
+            <label for="agree-rules">
+              Я ознакомился(ась) с правилами турнира и обязуюсь их соблюдать *
+            </label>
+          </div>
+
+          <div>
+            <input type="checkbox" id="agree-data" name="agree_data" required>
+            <label for="agree-data">
+              Я даю согласие на обработку персональных данных *
+            </label>
+          </div>
+
+          <div>
+            <input type="checkbox" id="subscribe" name="subscribe">
+            <label for="subscribe">Подписаться на новости и анонсы турнира</label>
+          </div>
+        </fieldset>
+
+        <div class="form-actions">
+          <button type="submit" id="submit-btn">
+            💳 Оплатить и зарегистрироваться
+          </button>
+          <button type="reset">Очистить форму</button>
+        </div>
+      </form>
+    </section>
+
+    <!-- ========================================================
+         СЕКЦИЯ 9: НОВОСТИ + RSS + Telegram-виджет
+         Обновлено под патч 7.41f (актуально на 04.10.2026)
+         ======================================================== -->
+    <section id="news">
+      <h2>Новости турнира</h2>
+      <p>Следите за обновлениями в нашем Telegram-канале и через RSS.</p>
+
+      <div class="news-layout">
+        <!-- Лента новостей (mock-RSS) -->
+        <div class="news-feed" id="news-feed"></div>
+
+        <!-- Сайдбар: Telegram + RSS -->
+        <aside class="news-sidebar">
+          <!-- Telegram-виджет -->
+          <a href="https://t.me/dotaarena2026" target="_blank" rel="noopener" class="tg-widget">
+            <div class="tg-widget__head">
+              <span class="tg-widget__icon">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="#229ed9">
+                  <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 0 0-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.75-.55 2.92-1.27 4.86-2.11 5.83-2.52 2.77-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .38z"/>
+                </svg>
+              </span>
+              <div>
+                <strong>Telegram-канал</strong>
+                <p>@dotaarena2026</p>
+              </div>
+            </div>
+            <div class="tg-widget__body">
+              Оперативные анонсы, расписание матчей, результаты в реальном времени.
+            </div>
+            <span class="tg-widget__btn">Подписаться →</span>
+          </a>
+
+          <!-- RSS-виджет -->
+          <a href="feed.xml" class="rss-widget">
+            <span class="rss-widget__icon">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#f59e0b" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 11a9 9 0 0 1 9 9"></path>
+                <path d="M4 4a16 16 0 0 1 16 16"></path>
+                <circle cx="5" cy="19" r="1" fill="#f59e0b"></circle>
+              </svg>
+            </span>
+            <div>
+              <strong>RSS-лента</strong>
+              <p>feed.xml</p>
+            </div>
+          </a>
+        </aside>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ============================================================
+       MODAL — детали команды
+       Открывается при клике на команду в списке.
+       ============================================================ -->
+  <div class="modal-backdrop" id="modal-backdrop" hidden>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+      <button class="modal__close" id="modal-close" aria-label="Закрыть">✕</button>
+
+      <div class="modal__head">
+        <div class="modal__avatar" id="modal-avatar">🛡️</div>
+        <div>
+          <h3 id="modal-title">Название команды</h3>
+          <p id="modal-subtitle" class="modal__subtitle">Регион · Дивизион</p>
+        </div>
+      </div>
+
+      <div class="modal__body">
+        <div class="modal__row">
+          <span>Капитан:</span>
+          <b id="modal-captain">—</b>
+        </div>
+        <div class="modal__row">
+          <span>Пиковый MMR:</span>
+          <b id="modal-mmr">—</b>
+        </div>
+        <div class="modal__row">
+          <span>Взнос:</span>
+          <b id="modal-payment">—</b>
+        </div>
+        <div class="modal__row">
+          <span>Состав:</span>
+        </div>
+        <ul class="modal__members" id="modal-members"></ul>
+        <div class="modal__row">
+          <span>Достижения:</span>
+          <b id="modal-achievements">—</b>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       МОДАЛЬНОЕ ОКНО «ОПЛАТА» — имитация страницы оплаты
+       Открывается при отправке формы, имитирует процесс
+       оплаты (прогресс-бар), затем показывает успех.
+       ============================================================ -->
+  <div class="payment-modal-backdrop" id="payment-modal" hidden>
+    <div class="payment-modal" role="dialog" aria-modal="true" aria-labelledby="pm-title">
+      <button class="payment-modal__close" id="payment-modal-close" aria-label="Закрыть">✕</button>
+
+      <div class="payment-modal__head">
+        <span class="payment-modal__lock">🔒</span>
+        <h3 id="pm-title">Оплата участия</h3>
+        <p>Безопасный платёж · Демо-режим</p>
+      </div>
+
+      <div class="payment-modal__summary">
+        <div class="payment-modal__row">
+          <span>Команда:</span>
+          <b id="pm-team">—</b>
+        </div>
+        <div class="payment-modal__row">
+          <span>Тариф:</span>
+          <b id="pm-plan">—</b>
+        </div>
+        <div class="payment-modal__row payment-modal__row--total">
+          <span>К оплате:</span>
+          <b id="pm-amount">—</b>
+        </div>
+      </div>
+
+      <div class="payment-modal__progress">
+        <div class="payment-modal__bar">
+          <div class="payment-modal__bar-inner" id="pm-bar"></div>
+        </div>
+        <p id="pm-status">Инициализация платежа…</p>
+      </div>
+
+      <div class="payment-modal__success" id="pm-success" hidden>
+        <span class="payment-modal__check">✓</span>
+        <b>Оплата прошла успешно!</b>
+        <p>Команда добавлена в список «На рассмотрении»</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       HERO DETAIL MODAL — интерактивное досье героя
+       Слева: полноростовая версия/анимация (GIF / рендер).
+       Справа: характеристики, лор и интересные факты.
+       Справа вверху: кнопка закрытия ✕.
+       ============================================================ -->
+  <div class="hero-modal-backdrop" id="hero-modal-backdrop" hidden>
+    <div class="hero-modal" role="dialog" aria-modal="true" aria-labelledby="hero-modal-title">
+      <button type="button" class="hero-modal__close" id="hero-modal-close" aria-label="Закрыть окно">✕</button>
+
+      <div class="hero-modal__grid">
+        <!-- Левая колонка: полноростовая версия / анимация -->
+        <div class="hero-modal__visual">
+          <video id="hero-modal-video" class="hero-modal__video" autoplay loop muted playsinline hidden></video>
+          <img src="images/hoodwink_dance.gif" alt="Герой во весь рост" id="hero-modal-render" class="hero-modal__img">
+        </div>
+
+        <!-- Правая колонка: характеристики и факты -->
+        <div class="hero-modal__content">
+          <div class="hero-modal__header">
+            <div class="hero-modal__badges" id="hero-modal-badges"></div>
+            <h3 id="hero-modal-title" class="hero-modal__title">Название героя</h3>
+            <p id="hero-modal-subtitle" class="hero-modal__subtitle">Роль и сложность</p>
+          </div>
+
+          <div class="hero-modal__stats" id="hero-modal-stats"></div>
+
+          <div class="hero-modal__section">
+            <h4>Описание и стиль игры</h4>
+            <p id="hero-modal-desc"></p>
+          </div>
+
+          <div class="hero-modal__section">
+            <h4>Интересные факты и лор</h4>
+            <ul id="hero-modal-facts" class="hero-modal__facts"></ul>
+          </div>
+
+          <div class="hero-modal__actions">
+            <a href="#registration" class="hero-modal__btn" id="hero-modal-action">Выбрать для турнирной заявки</a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================================
+       STICKY CTA — кнопка «Подать заявку» внизу экрана
+       Появляется только на мобильных (см. CSS)
+       ============================================================ -->
+  <a href="#registration" class="sticky-cta" id="sticky-cta" aria-label="Подать заявку">
+    Подать заявку
+  </a>
+
+  <!-- ============================================================
+       FOOTER — контакты
+       ============================================================ -->
+  <footer id="contacts">
+    <h2>Контакты</h2>
+
+    <address>
+      Организационный комитет «DotaArena 2026»<br>
+      Email: <a href="mailto:info@dotaarena2026.ru">info@dotaarena2026.ru</a><br>
+      Телефон: <a href="tel:+74951234567">+7 (495) 123-45-67</a><br>
+      Адрес: ул. Технологическая, 12, г. Москва, 115432
+    </address>
+
+    <p>Авторы: Барышев Даниил, Мисриханов Тимур, Марьин Вадим | Группа 37-ВЕБ | 2026 г.</p>
+    <p><a href="#top">↑ Наверх</a></p>
+  </footer>
+
+  <!-- Данные героев и основной скрипт -->
+  <script src="js/heroes_data.js"></script>
+  <script src="js/script.js"></script>
+</body>
+</html>

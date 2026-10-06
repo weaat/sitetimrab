@@ -1,0 +1,723 @@
+/* ============================================================
+   ДотаАрена 2026 — style.css  (Практика 4)
+   Тема: тёмная, акцент #7c3aed (фиолетовый Dota 2)
+   Flexbox: nav, hero, benefits, heroes-grid
+   ============================================================ */
+
+/* 1. Сброс и box-sizing */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+/* 2. CSS-переменные (:root) */
+:root {
+  --color-bg:        #0a0a0f;
+  --color-surface:   #14141e;
+  --color-surface2:  #1c1c2a;
+  --color-border:    #2a2a3d;
+  --color-text:      #e0e0f0;
+  --color-muted:     #8080a0;
+  --color-accent:    #7c3aed;       /* фиолетовый — Dota 2 */
+  --color-accent-h:  #6d28d9;
+  --color-storm:     #38bdf8;       /* голубой — Storm Spirit */
+  --color-hood:      #4ade80;       /* зелёный — Hoodwink */
+  --color-sfa:       #f59e0b;       /* золотой — SFA Arcana */
+  --radius:          8px;
+  --gap:             1.25rem;
+  --section-gap:     3rem;
+  --max-w:           1100px;
+}
+
+/* 3. Базовая типографика */
+body {
+  background: var(--color-bg);
+  color: var(--color-text);
+  font-family: 'Segoe UI', Arial, sans-serif;
+  font-size: 1rem;
+  line-height: 1.7;
+}
+
+h1 { font-size: 2.4rem; line-height: 1.15; }
+h2 { font-size: 1.6rem; line-height: 1.25; }
+h3 { font-size: 1.15rem; }
+
+a {
+  color: var(--color-accent);
+  text-decoration: underline;
+}
+a:hover { color: var(--color-accent-h); }
+
+ul, ol {
+  padding-left: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+/* ─────────────────────────────────────────
+   4. КОНТЕЙНЕР (max-width + adaptive padding)
+   ───────────────────────────────────────── */
+.container {
+  max-width: var(--max-w);
+  margin-inline: auto;       /* авто-центровка по горизонтали */
+  padding-inline: var(--gap); /* адаптивный боковой отступ */
+}
+
+/* ─────────────────────────────────────────
+   5. ШАПКА + НАВИГАЦИЯ (Flexbox)
+   ───────────────────────────────────────── */
+.site-header {
+  background: var(--color-surface);
+  border-bottom: 2px solid var(--color-accent);
+  position: sticky;
+  top: 0;
+  z-index: 200;
+}
+
+/* nav-bar: логотип слева, ссылки справа */
+.nav-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--gap);
+  padding-block: .6rem;
+}
+
+.nav-logo {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--color-accent);
+  text-decoration: none;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+.nav-logo:hover { color: var(--color-accent-h); }
+
+.nav-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .2rem;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.nav-links a {
+  display: inline-block;
+  padding: .35rem .75rem;
+  border-radius: var(--radius);
+  color: var(--color-text);
+  text-decoration: none;
+  font-size: .9rem;
+  transition: background .2s, color .2s;
+}
+
+.nav-links a:hover {
+  background: var(--color-accent);
+  color: #fff;
+}
+
+.nav-links a:focus-visible {
+  outline: 3px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+.nav-links a:active {
+  background: var(--color-accent-h);
+  color: #fff;
+}
+
+/* активная ссылка (подсвечивается через JS) */
+.nav-links a.active {
+  background: rgba(124, 58, 237, .2);
+  color: var(--color-accent);
+  font-weight: 600;
+}
+
+/* CTA-кнопка в nav */
+.nav-cta {
+  background: var(--color-accent) !important;
+  color: #fff !important;
+  font-weight: 700;
+}
+.nav-cta:hover {
+  background: var(--color-accent-h) !important;
+}
+
+/* ─────────────────────────────────────────
+   6. HERO (Flexbox: текст + визуал)
+   ───────────────────────────────────────── */
+.hero {
+  background: linear-gradient(135deg, #0a0a0f 60%, #1a0a2e);
+  border-bottom: 1px solid var(--color-border);
+  padding: 4rem 0 3rem;
+}
+
+.hero-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 2rem;
+}
+
+/* Текстовая колонка */
+.hero-text {
+  flex: 1 1 55%;
+  max-width: 600px;
+}
+
+.hero-text h1 {
+  color: var(--color-accent);
+  margin-bottom: .75rem;
+}
+
+.hero-sub {
+  font-size: 1.1rem;
+  color: var(--color-muted);
+  margin-bottom: 1rem;
+}
+
+.hero-sub time {
+  color: var(--color-storm);
+  font-weight: 600;
+}
+
+.hero-desc {
+  color: var(--color-text);
+  margin-bottom: 1.75rem;
+  font-size: 1.05rem;
+}
+
+/* Главная CTA-кнопка */
+.btn-cta {
+  display: inline-block;
+  background: var(--color-accent);
+  color: #fff;
+  text-decoration: none;
+  font-weight: 700;
+  font-size: 1.05rem;
+  padding: .75rem 2rem;
+  border-radius: var(--radius);
+  transition: background .2s, transform .15s;
+}
+
+.btn-cta:hover {
+  background: var(--color-accent-h);
+  color: #fff;
+  transform: translateY(-2px);
+}
+
+.btn-cta:focus-visible {
+  outline: 3px solid var(--color-accent);
+  outline-offset: 3px;
+}
+
+.btn-cta:active {
+  transform: translateY(0);
+  background: var(--color-accent-h);
+}
+
+/* Визуальная колонка */
+.hero-visual {
+  flex: 1 1 40%;
+  text-align: center;
+}
+
+.hero-art {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+  margin-bottom: .75rem;
+}
+
+.hero-icon {
+  font-size: 4rem;
+  line-height: 1;
+  filter: drop-shadow(0 0 16px currentColor);
+  transition: transform .2s;
+  cursor: default;
+}
+.hero-icon:hover { transform: scale(1.15); }
+
+.hero-icon.storm { color: var(--color-storm); }
+.hero-icon.hood  { color: var(--color-hood);  }
+.hero-icon.sfa   { color: var(--color-sfa);   }
+
+.hero-art-caption {
+  font-size: .85rem;
+  color: var(--color-muted);
+}
+
+/* ─────────────────────────────────────────
+   7. БЛОК ПРЕИМУЩЕСТВ (Flexbox-сетка)
+   ───────────────────────────────────────── */
+.benefits {
+  padding: var(--section-gap) 0;
+}
+
+.benefits h2 {
+  color: var(--color-accent);
+  margin-bottom: 1.5rem;
+  padding-bottom: .5rem;
+  border-bottom: 2px solid var(--color-border);
+}
+
+.benefits-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--gap);
+}
+
+.benefit-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 1.25rem;
+  flex: 1 1 220px;       /* минимум 220px, растягивается */
+  display: flex;
+  flex-direction: column;
+  gap: .5rem;
+}
+
+.benefit-icon {
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.benefit-card h3 {
+  color: var(--color-accent);
+  font-size: 1rem;
+}
+
+.benefit-card p {
+  font-size: .92rem;
+  color: var(--color-muted);
+}
+
+/* ─────────────────────────────────────────
+   8. КАРТОЧКИ ГЕРОЕВ (Flexbox)
+   ───────────────────────────────────────── */
+.heroes-section {
+  padding: var(--section-gap) 0;
+  background: var(--color-surface);
+  border-top: 1px solid var(--color-border);
+  border-bottom: 1px solid var(--color-border);
+}
+
+.heroes-section h2 {
+  color: var(--color-accent);
+  margin-bottom: .75rem;
+  padding-bottom: .5rem;
+  border-bottom: 2px solid var(--color-border);
+}
+
+.heroes-section > .container > p {
+  color: var(--color-muted);
+  margin-bottom: 1.5rem;
+}
+
+.heroes-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--gap);
+  margin-bottom: 1.5rem;
+}
+
+.hero-card {
+  background: var(--color-surface2);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 1.25rem;
+  flex: 1 1 280px;
+}
+
+/* Цветные левые полосы по герою */
+.storm-card { border-left: 4px solid var(--color-storm); }
+.hood-card  { border-left: 4px solid var(--color-hood);  }
+.sfa-card   { border-left: 4px solid var(--color-sfa);   }
+
+/* Шапка карточки героя */
+.hero-card-head {
+  display: flex;
+  align-items: center;
+  gap: .75rem;
+  margin-bottom: .75rem;
+}
+
+.hero-card-icon {
+  font-size: 2.5rem;
+  flex-shrink: 0;
+}
+
+.hero-card-head h3 {
+  margin-bottom: .1rem;
+  color: var(--color-text);
+}
+
+.hero-card-role {
+  font-size: .82rem;
+  color: var(--color-muted);
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  flex-wrap: wrap;
+}
+
+.arcana-badge {
+  background: linear-gradient(90deg, #7c3aed, #f59e0b);
+  color: #fff;
+  font-size: .75rem;
+  font-weight: 700;
+  padding: .15rem .5rem;
+  border-radius: 50px;
+  text-decoration: none;
+}
+
+.hero-card p {
+  margin-bottom: .75rem;
+  font-size: .93rem;
+  color: var(--color-muted);
+}
+
+.hero-card blockquote {
+  border-left: 3px solid var(--color-accent);
+  background: var(--color-bg);
+  padding: .6rem 1rem;
+  border-radius: 0 var(--radius) var(--radius) 0;
+  margin: .75rem 0;
+  font-style: italic;
+  font-size: .88rem;
+  color: var(--color-muted);
+}
+
+.hero-card blockquote footer {
+  font-style: normal;
+  font-size: .82rem;
+  color: var(--color-text);
+  margin-top: .3rem;
+  background: none;
+  border: none;
+  padding: 0;
+}
+
+.heroes-note {
+  background: #1e1a0a;
+  border: 1px solid #4a3a00;
+  border-radius: var(--radius);
+  padding: 1rem 1.25rem;
+  font-size: .9rem;
+  margin-top: .5rem;
+}
+
+.heroes-note h3 {
+  color: #facc15;
+  margin-bottom: .4rem;
+}
+
+/* ─────────────────────────────────────────
+   9. ОСНОВНОЙ КОНТЕНТ — sections
+   (вертикальный ритм)
+   ───────────────────────────────────────── */
+main.container {
+  padding-top: var(--section-gap);
+  padding-bottom: var(--section-gap);
+}
+
+section {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 1.75rem;
+  margin-bottom: var(--section-gap);  /* одинаковый ритм */
+}
+
+section:last-child {
+  margin-bottom: 0;
+}
+
+section h2 {
+  color: var(--color-accent);
+  margin-bottom: 1rem;
+  padding-bottom: .5rem;
+  border-bottom: 1px solid var(--color-border);
+}
+
+section h3 {
+  margin: 1.25rem 0 .5rem;
+  color: var(--color-text);
+}
+
+section p {
+  margin-bottom: .75rem;
+}
+
+section li {
+  margin-bottom: .35rem;
+}
+
+/* article внутри секции */
+article {
+  background: var(--color-bg);
+  border-left: 3px solid var(--color-accent);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  padding: 1rem;
+  margin: 1rem 0;
+}
+
+/* aside внутри секции */
+aside {
+  background: #1e1e10;
+  border: 1px solid #4a3a00;
+  border-radius: var(--radius);
+  padding: 1rem;
+  margin: 1rem 0;
+  font-size: .9rem;
+}
+
+aside h3 {
+  color: #facc15;
+  margin-bottom: .4rem;
+}
+
+/* ─────────────────────────────────────────
+   10. ТАБЛИЦА
+   ───────────────────────────────────────── */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+  font-size: .92rem;
+}
+
+caption {
+  caption-side: top;
+  text-align: left;
+  font-weight: 600;
+  color: var(--color-muted);
+  margin-bottom: .5rem;
+  font-size: .85rem;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+}
+
+th, td {
+  border: 1px solid var(--color-border);
+  padding: .6rem .9rem;
+  text-align: left;
+}
+
+th {
+  background: var(--color-accent);
+  color: #fff;
+  font-weight: 600;
+}
+
+tbody tr:nth-child(even) { background: rgba(255,255,255,.03); }
+tbody tr:hover           { background: rgba(124, 58, 237, .1); }
+
+/* ─────────────────────────────────────────
+   11. ИЗОБРАЖЕНИЕ
+   ───────────────────────────────────────── */
+figure { margin: 1rem 0; }
+
+figure img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  border-radius: var(--radius);
+  border: 2px solid var(--color-border);
+}
+
+figcaption {
+  color: var(--color-muted);
+  font-size: .85rem;
+  margin-top: .4rem;
+  font-style: italic;
+}
+
+blockquote {
+  border-left: 4px solid var(--color-accent);
+  background: var(--color-bg);
+  padding: 1rem 1.25rem;
+  border-radius: 0 var(--radius) var(--radius) 0;
+  margin: 1rem 0;
+  font-style: italic;
+  color: var(--color-muted);
+}
+
+blockquote footer {
+  margin-top: .5rem;
+  font-style: normal;
+  font-size: .9rem;
+  color: var(--color-text);
+  background: none;
+  border: none;
+  padding: 0;
+}
+
+details {
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: .75rem 1rem;
+  margin: 1rem 0;
+}
+
+summary {
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--color-accent);
+  list-style: none;
+}
+
+summary::-webkit-details-marker { display: none; }
+summary::before { content: '▶ '; font-size: .75em; }
+details[open] summary::before { content: '▼ '; }
+
+/* ─────────────────────────────────────────
+   12. ФОРМА
+   ───────────────────────────────────────── */
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+fieldset {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 1.25rem;
+}
+
+legend {
+  color: var(--color-accent);
+  font-weight: 700;
+  padding: 0 .5rem;
+  font-size: 1rem;
+}
+
+fieldset > div {
+  display: flex;
+  flex-direction: column;
+  gap: .3rem;
+  margin-bottom: .85rem;
+}
+
+label {
+  font-size: .9rem;
+  color: var(--color-muted);
+}
+
+input[type="text"],
+input[type="email"],
+input[type="tel"],
+input[type="number"],
+select,
+textarea {
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  color: var(--color-text);
+  font-family: inherit;
+  font-size: 1rem;
+  padding: .5rem .75rem;
+  width: 100%;
+  transition: border-color .2s;
+}
+
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 1px;
+  border-color: var(--color-accent);
+}
+
+input:invalid:not(:placeholder-shown),
+select:invalid {
+  border-color: #f59e0b;
+}
+
+textarea {
+  resize: vertical;
+  min-height: 7rem;
+}
+
+input[type="radio"],
+input[type="checkbox"] {
+  width: auto;
+  accent-color: var(--color-accent);
+}
+
+fieldset > div:has(input[type="radio"]),
+fieldset > div:has(input[type="checkbox"]) {
+  flex-direction: row;
+  align-items: center;
+  gap: .5rem;
+}
+
+/* кнопки формы */
+.form-actions {
+  display: flex;
+  gap: .75rem;
+  align-items: center;
+}
+
+button {
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 1rem;
+  border: none;
+  border-radius: var(--radius);
+  padding: .65rem 1.5rem;
+  transition: background .2s;
+}
+
+button[type="submit"] {
+  background: var(--color-accent);
+  color: #fff;
+  font-weight: 700;
+}
+button[type="submit"]:hover        { background: var(--color-accent-h); }
+button[type="submit"]:focus-visible { outline: 3px solid var(--color-accent); outline-offset: 2px; }
+
+button[type="reset"] {
+  background: var(--color-surface);
+  color: var(--color-muted);
+  border: 1px solid var(--color-border);
+}
+button[type="reset"]:hover {
+  background: var(--color-border);
+  color: var(--color-text);
+}
+
+/* ─────────────────────────────────────────
+   13. FOOTER
+   ───────────────────────────────────────── */
+footer {
+  background: var(--color-surface);
+  border-top: 3px solid var(--color-accent);
+  padding: 2rem 0;
+  text-align: center;
+  color: var(--color-muted);
+  font-size: .9rem;
+}
+
+footer h2 {
+  color: var(--color-accent);
+  margin-bottom: 1rem;
+}
+
+address {
+  font-style: normal;
+  line-height: 2;
+  margin-bottom: 1rem;
+}
+
+footer a { color: var(--color-accent); }
+
+.footer-authors {
+  margin-bottom: .5rem;
+  color: var(--color-text);
+  font-size: .88rem;
+}

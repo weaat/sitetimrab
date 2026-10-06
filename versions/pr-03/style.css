@@ -1,0 +1,416 @@
+/* ============================================================
+   КиберАрена 2025 — style.css  (Практика 3)
+   Акцент: #DC2626
+   ============================================================ */
+
+/* 1. Базовая система */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  --color-bg:       #0d0d0f;
+  --color-surface:  #18181c;
+  --color-border:   #2a2a33;
+  --color-text:     #e2e2e8;
+  --color-muted:    #8888a0;
+  --color-accent:   #dc2626;
+  --color-accent-h: #b91c1c;
+  --radius:         6px;
+  --gap:            1.25rem;
+}
+
+/* 2. Страница и типографика */
+body {
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  font-family: 'Segoe UI', Arial, sans-serif;
+  font-size: 1rem;
+  line-height: 1.65;
+}
+
+.container {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 0 var(--gap);
+}
+
+h1 { font-size: 2rem;   line-height: 1.2; }
+h2 { font-size: 1.5rem; line-height: 1.3; }
+h3 { font-size: 1.15rem; }
+
+/* 3. Крупные области */
+header {
+  background: var(--color-surface);
+  border-bottom: 3px solid var(--color-accent);
+  padding: 2rem var(--gap);
+  text-align: center;
+}
+
+header h1 {
+  color: var(--color-accent);
+  margin-bottom: .4rem;
+}
+
+header p,
+header time {
+  color: var(--color-muted);
+  font-size: .95rem;
+  display: block;
+  margin-top: .25rem;
+}
+
+nav {
+  background: var(--color-surface);
+  border-bottom: 1px solid var(--color-border);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+nav ul {
+  display: flex;
+  flex-wrap: wrap;
+  gap: .25rem;
+  list-style: none;
+  padding: .5rem var(--gap);
+  max-width: 960px;
+  margin: 0 auto;
+}
+
+/* 4. Навигация и ссылки */
+nav a {
+  display: inline-block;
+  padding: .4rem .8rem;
+  border-radius: var(--radius);
+  color: var(--color-text);
+  text-decoration: none;
+  font-size: .9rem;
+  transition: background .2s, color .2s;
+}
+
+nav a:hover {
+  background: var(--color-accent);
+  color: #fff;
+}
+
+nav a:focus-visible {
+  outline: 3px solid var(--color-accent);
+  outline-offset: 2px;
+}
+
+nav a:active {
+  background: var(--color-accent-h);
+  color: #fff;
+}
+
+a {
+  color: var(--color-accent);
+  text-decoration: underline;
+}
+
+a:hover { color: var(--color-accent-h); }
+
+/* 5. Основной контент */
+main {
+  max-width: 960px;
+  margin: 2rem auto;
+  padding: 0 var(--gap);
+}
+
+section {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+section h2 {
+  color: var(--color-accent);
+  margin-bottom: 1rem;
+  padding-bottom: .5rem;
+  border-bottom: 1px solid var(--color-border);
+}
+
+section h3 {
+  margin: 1rem 0 .5rem;
+  color: var(--color-text);
+}
+
+section p,
+section li {
+  margin-bottom: .5rem;
+}
+
+article {
+  background: var(--color-bg);
+  border-left: 3px solid var(--color-accent);
+  border-radius: 0 var(--radius) var(--radius) 0;
+  padding: 1rem;
+  margin: 1rem 0;
+}
+
+aside {
+  background: #1e1e10;
+  border: 1px solid #4a3a00;
+  border-radius: var(--radius);
+  padding: 1rem;
+  margin: 1rem 0;
+  font-size: .9rem;
+}
+
+aside h3 {
+  color: #facc15;
+  margin-bottom: .4rem;
+}
+
+ul, ol {
+  padding-left: 1.5rem;
+  margin-bottom: 1rem;
+}
+
+/* 6. Таблица */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 1rem 0;
+  font-size: .92rem;
+}
+
+caption {
+  caption-side: top;
+  text-align: left;
+  font-weight: 600;
+  color: var(--color-muted);
+  margin-bottom: .5rem;
+  font-size: .85rem;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+}
+
+th, td {
+  border: 1px solid var(--color-border);
+  padding: .6rem .9rem;
+  text-align: left;
+}
+
+th {
+  background: var(--color-accent);
+  color: #fff;
+  font-weight: 600;
+}
+
+tbody tr:nth-child(even) {
+  background: rgba(255,255,255,.03);
+}
+
+tbody tr:hover {
+  background: rgba(220, 38, 38, .1);
+}
+
+/* 7. Изображение */
+figure {
+  margin: 1rem 0;
+}
+
+figure img {
+  display: block;
+  max-width: 100%;
+  height: auto;
+  border-radius: var(--radius);
+  border: 2px solid var(--color-border);
+}
+
+figcaption {
+  color: var(--color-muted);
+  font-size: .85rem;
+  margin-top: .4rem;
+  font-style: italic;
+}
+
+blockquote {
+  border-left: 4px solid var(--color-accent);
+  background: var(--color-bg);
+  padding: 1rem 1.25rem;
+  border-radius: 0 var(--radius) var(--radius) 0;
+  margin: 1rem 0;
+  font-style: italic;
+  color: var(--color-muted);
+}
+
+blockquote footer {
+  margin-top: .5rem;
+  font-style: normal;
+  font-size: .9rem;
+  color: var(--color-text);
+  background: none;
+  border: none;
+  padding: 0;
+}
+
+details {
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: .75rem 1rem;
+  margin: 1rem 0;
+}
+
+summary {
+  cursor: pointer;
+  font-weight: 600;
+  color: var(--color-accent);
+  list-style: none;
+}
+
+summary::-webkit-details-marker { display: none; }
+summary::before { content: '▶ '; font-size: .75em; }
+details[open] summary::before { content: '▼ '; }
+
+/* 8. Форма */
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+fieldset {
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  padding: 1.25rem;
+}
+
+legend {
+  color: var(--color-accent);
+  font-weight: 700;
+  padding: 0 .5rem;
+  font-size: 1rem;
+}
+
+fieldset > div {
+  display: flex;
+  flex-direction: column;
+  gap: .3rem;
+  margin-bottom: .85rem;
+}
+
+label {
+  font-size: .9rem;
+  color: var(--color-muted);
+}
+
+input[type="text"],
+input[type="email"],
+input[type="tel"],
+input[type="number"],
+select,
+textarea {
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius);
+  color: var(--color-text);
+  font-family: inherit;
+  font-size: 1rem;
+  padding: .5rem .75rem;
+  width: 100%;
+  transition: border-color .2s, outline .2s;
+}
+
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible {
+  outline: 2px solid var(--color-accent);
+  outline-offset: 1px;
+  border-color: var(--color-accent);
+}
+
+input:invalid:not(:placeholder-shown),
+select:invalid {
+  border-color: #f59e0b;
+}
+
+input:disabled,
+select:disabled,
+textarea:disabled {
+  opacity: .5;
+  cursor: not-allowed;
+}
+
+textarea {
+  resize: vertical;
+  min-height: 7rem;
+}
+
+/* radio / checkbox */
+input[type="radio"],
+input[type="checkbox"] {
+  width: auto;
+  accent-color: var(--color-accent);
+}
+
+fieldset > div:has(input[type="radio"]),
+fieldset > div:has(input[type="checkbox"]) {
+  flex-direction: row;
+  align-items: center;
+  gap: .5rem;
+}
+
+/* кнопки */
+button {
+  cursor: pointer;
+  font-family: inherit;
+  font-size: 1rem;
+  border: none;
+  border-radius: var(--radius);
+  padding: .65rem 1.5rem;
+  transition: background .2s;
+}
+
+button[type="submit"] {
+  background: var(--color-accent);
+  color: #fff;
+  font-weight: 700;
+}
+
+button[type="submit"]:hover { background: var(--color-accent-h); }
+button[type="submit"]:focus-visible { outline: 3px solid var(--color-accent); outline-offset: 2px; }
+
+button[type="reset"] {
+  background: var(--color-surface);
+  color: var(--color-muted);
+  border: 1px solid var(--color-border);
+  margin-left: .75rem;
+}
+
+button[type="reset"]:hover {
+  background: var(--color-border);
+  color: var(--color-text);
+}
+
+/* 9. Footer */
+footer {
+  background: var(--color-surface);
+  border-top: 3px solid var(--color-accent);
+  padding: 1.5rem var(--gap);
+  text-align: center;
+  color: var(--color-muted);
+  font-size: .9rem;
+}
+
+footer h2 {
+  color: var(--color-accent);
+  margin-bottom: 1rem;
+}
+
+address {
+  font-style: normal;
+  line-height: 2;
+  margin-bottom: 1rem;
+}
+
+footer a {
+  color: var(--color-accent);
+}

@@ -1,0 +1,646 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <!-- ШАГ 1: viewport обязателен для адаптации -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>DotaArena 2026 — Практика 06: Адаптивная вёрстка</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    /* =============================================
+       ПРАКТИКА 06 — Адаптивная вёрстка
+       База: pr-05 (карточки героев)
+       Добавлено: 3 брейкпоинта, clamp(), 5 исправлений
+       Тест: 360px · 768px · 1280px в DevTools
+       ============================================= */
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:       #0d0d0f;
+      --surface:  rgba(255,255,255,.06);
+      --border:   rgba(255,255,255,.1);
+      --accent:   #dc2626;
+      --accent-h: #b91c1c;
+      --text:     #f0f0f8;
+      --muted:    rgba(240,240,248,.55);
+      --radius:   14px;
+      --radius-sm:8px;
+      /* ПРОБЛЕМА 1 НАЙДЕНА: фиксированный gap ломал карточки на 360px
+         ИСПРАВЛЕНИЕ: переменная с адаптивным значением через clamp() */
+      --gap:      clamp(.75rem, 3vw, 1.5rem);
+    }
+
+    /* =============================================
+       ШАГ 2: Базовые элементы гибкие
+       Без фиксированных px для ширины контейнеров
+       ============================================= */
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      line-height: 1.65;
+      /* ИСПРАВЛЕНИЕ 2: нет фиксированной ширины body */
+      width: 100%;
+      overflow-x: hidden;
+    }
+
+    /* =============================================
+       ШАГ 7: clamp() для крупных заголовков
+       Браузер растягивает текст от 14 до 200% без
+       переполнения и перекрытия
+       ============================================= */
+    h1 { font-size: clamp(1.5rem, 5vw, 2.8rem); font-weight: 800; color: #fff; letter-spacing: -.01em; }
+    h2 { font-size: clamp(1.2rem, 3vw, 1.8rem); font-weight: 700; }
+    h3 { font-size: clamp(1rem,  2vw, 1.15rem); font-weight: 600; }
+
+    /* =============================================
+       ШАГ 3: HERO-СЕКЦИЯ — горизонтальный макет на широком,
+       вертикальный на узком (перестроен через flex)
+       ============================================= */
+    .site-header {
+      display: flex;
+      align-items: center;
+      gap: var(--gap);
+      padding: clamp(1.5rem, 5vw, 3rem) clamp(1rem, 4vw, 2rem);
+      border-bottom: 1px solid rgba(220,38,38,.3);
+      background: rgba(255,255,255,.04);
+      backdrop-filter: blur(16px);
+    }
+
+    .header-logo {
+      display: flex;
+      align-items: center;
+      gap: .6rem;
+      flex-shrink: 0;
+    }
+    .header-logo span { font-size: 2rem; }
+    .header-logo h1 { white-space: nowrap; }
+
+    .header-desc { color: var(--muted); font-size: clamp(.82rem, 2vw, 1rem); }
+
+    .header-cta {
+      margin-left: auto;
+      flex-shrink: 0;
+      display: inline-block;
+      background: linear-gradient(135deg, var(--accent), #991b1b);
+      color: #fff;
+      font-weight: 700;
+      font-size: clamp(.82rem, 1.8vw, 1rem);
+      padding: .65rem clamp(1rem, 2vw, 1.8rem);
+      border-radius: 50px;
+      text-decoration: none;
+      white-space: nowrap;
+      box-shadow: 0 4px 16px rgba(220,38,38,.35);
+    }
+
+    /* =============================================
+       ШАГ 4: НАВИГАЦИЯ — адаптивная
+       ПРОБЛЕМА 3 НАЙДЕНА: nav переполнялся на 360px
+       ИСПРАВЛЕНИЕ: flex-wrap + горизонтальная прокрутка
+       ============================================= */
+    nav {
+      background: rgba(10,10,20,.8);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    nav ul {
+      display: flex;
+      justify-content: center;
+      flex-wrap: nowrap;            /* не переносим — скроллим */
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      gap: .2rem;
+      list-style: none;
+      padding: .4rem 1rem;
+    }
+
+    nav ul::-webkit-scrollbar { display: none; }
+
+    nav a {
+      display: inline-block;
+      padding: .38rem .75rem;
+      border-radius: 50px;
+      color: rgba(255,255,255,.75);
+      text-decoration: none;
+      font-size: clamp(.75rem, 1.8vw, .9rem);
+      font-weight: 500;
+      white-space: nowrap;          /* ссылки не переносятся */
+      transition: background .2s;
+    }
+
+    nav a:hover { background: rgba(220,38,38,.2); color: #fff; }
+    nav a.active { background: rgba(220,38,38,.25); color: #fff; }
+    nav a.cta {
+      background: linear-gradient(135deg, var(--accent), #991b1b);
+      color: #fff;
+      font-weight: 700;
+    }
+
+    /* =============================================
+       MAIN — гибкая ширина без фиксированных px
+       ============================================= */
+    main {
+      width: 100%;
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: clamp(1rem, 3vw, 2rem) clamp(1rem, 4vw, 2rem) 4rem;
+    }
+
+    section { margin-bottom: clamp(2rem, 5vw, 3.5rem); }
+
+    .section-title {
+      font-size: clamp(1.1rem, 3vw, 1.5rem);
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+    }
+    .section-title::before {
+      content: '';
+      width: 4px; height: 1.2em;
+      background: var(--accent);
+      border-radius: 2px; flex-shrink: 0;
+    }
+
+    /* Блок статистики */
+    .stats-block {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--gap);
+      margin-bottom: 1.5rem;
+    }
+
+    .stat-card {
+      flex: 1 1 140px;
+      background: var(--surface);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1rem;
+      text-align: center;
+    }
+
+    .stat-card .num {
+      font-size: clamp(1.6rem, 4vw, 2.4rem);
+      font-weight: 800;
+      color: var(--accent);
+      display: block;
+    }
+
+    .stat-card .lbl {
+      font-size: clamp(.75rem, 1.5vw, .85rem);
+      color: var(--muted);
+    }
+
+    /* Callout */
+    .callout {
+      background: rgba(220,38,38,.08);
+      border: 1px solid rgba(220,38,38,.35);
+      border-left: 4px solid var(--accent);
+      border-radius: var(--radius-sm);
+      padding: 1rem 1.2rem;
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: flex-start;
+      gap: .8rem;
+    }
+    .callout-icon { font-size: 1.3rem; flex-shrink: 0; }
+    .callout-text strong { color: var(--accent); font-size: .95rem; }
+    .callout-text p { color: var(--muted); font-size: .85rem; margin-top: .2rem; }
+
+    /* =============================================
+       ШАГ 1: ОДНА КАРТОЧКА — базовый компонент
+       ============================================= */
+    .hero-card {
+      display: flex;
+      flex-direction: column;
+      background: var(--surface);
+      backdrop-filter: blur(14px);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow: hidden;
+      transition: transform .25s, border-color .25s;
+    }
+
+    .hero-card:hover {
+      transform: translateY(-4px);
+      border-color: rgba(220,38,38,.35);
+    }
+
+    .hero-card__img-wrap {
+      height: 130px;
+      background: rgba(0,0,0,.3);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 3rem;
+    }
+
+    /* ПРОБЛЕМА 4 НАЙДЕНА: img без max-width выходил за карточку
+       ИСПРАВЛЕНИЕ: max-width: 100%, height: auto */
+    .hero-card__img-wrap img {
+      max-width: 100%;
+      height: auto;
+      object-fit: cover;
+    }
+
+    .hero-card__body {
+      padding: .9rem;
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+    }
+
+    .hero-card__body h3 { font-size: clamp(.9rem, 2vw, 1.05rem); color: #fff; font-weight: 700; }
+
+    .hero-card__meta {
+      display: flex;
+      gap: .35rem;
+      flex-wrap: wrap;
+      margin-top: .35rem;
+    }
+
+    .hero-card__meta span {
+      font-size: .7rem;
+      padding: .15rem .5rem;
+      border-radius: 50px;
+      background: rgba(220,38,38,.15);
+      border: 1px solid rgba(220,38,38,.3);
+      color: #fca5a5;
+      font-weight: 600;
+    }
+
+    .hero-card__body p { font-size: clamp(.82rem, 1.5vw, .88rem); color: var(--muted); margin-top: .5rem; flex: 1; }
+
+    .hero-card__footer { padding: .7rem .9rem; margin-top: auto; }
+
+    .hero-card__btn {
+      display: block;
+      width: 100%;
+      text-align: center;
+      background: linear-gradient(135deg, var(--accent), #991b1b);
+      color: #fff;
+      font-weight: 600;
+      font-size: .82rem;
+      padding: .5rem;
+      border-radius: 50px;
+      text-decoration: none;
+    }
+
+    .hero-card--featured {
+      border-color: rgba(220,38,38,.4);
+      box-shadow: 0 0 24px rgba(220,38,38,.15);
+    }
+    .hero-card--featured .hero-card__img-wrap { height: 170px; }
+    .hero-card--featured .hero-card__body h3 { color: #fca5a5; font-size: clamp(1rem, 2.5vw, 1.2rem); }
+    .hero-card--featured .hero-card__btn { background: linear-gradient(135deg, #fbbf24, #d97706); }
+
+    .badge {
+      display: inline-block;
+      font-size: .62rem;
+      font-weight: 700;
+      padding: .12rem .45rem;
+      border-radius: 50px;
+      background: rgba(251,191,36,.15);
+      border: 1px solid rgba(251,191,36,.4);
+      color: #fcd34d;
+      text-transform: uppercase;
+      margin-left: .4rem;
+    }
+
+    /* =============================================
+       ШАГ 5: КОНТЕЙНЕР КАРТОЧЕК — адаптивный Flexbox
+       На широком: 3 в строке, планшет: 2, телефон: 1
+       ============================================= */
+    .cards-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: var(--gap);
+    }
+
+    /* Широкий экран: 3 карточки в строке (≥1280px) */
+    .cards-container .hero-card {
+      flex: 1 1 260px;
+      max-width: calc(33.333% - var(--gap));
+    }
+
+    .cards-container .hero-card--featured {
+      flex: 1 1 340px;
+      max-width: calc(50% - var(--gap) / 2);
+    }
+
+    /* =============================================
+       ШАГ 6: ТАБЛИЦА — горизонтальная прокрутка
+       ПРОБЛЕМА 5 НАЙДЕНА: таблица выходила за экран на 360px
+       ИСПРАВЛЕНИЕ: обёртка с overflow-x: auto
+       ============================================= */
+    .table-wrap {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: clamp(.78rem, 1.8vw, .92rem);
+      min-width: 500px;        /* гарантируем скролл вместо сжатия */
+    }
+
+    caption {
+      text-align: left;
+      font-size: .78rem;
+      font-weight: 600;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .05em;
+      padding: .5rem .9rem;
+    }
+
+    th, td { border: 1px solid var(--border); padding: .55rem .8rem; text-align: left; white-space: nowrap; }
+    th { background: rgba(220,38,38,.3); color: #fff; font-weight: 600; font-size: .82rem; text-transform: uppercase; }
+    tbody tr:nth-child(even) { background: rgba(255,255,255,.03); }
+    tbody tr:hover { background: rgba(220,38,38,.08); }
+
+    /* =============================================
+       АДАПТАЦИЯ — 3 БРЕЙКПОИНТА
+       ============================================= */
+
+    /* ПЛАНШЕТ (≤1280px): карточки 2 в строке */
+    @media (max-width: 1280px) {
+      .cards-container .hero-card {
+        flex: 1 1 220px;
+        max-width: calc(50% - var(--gap) / 2);
+      }
+      .cards-container .hero-card--featured {
+        max-width: 100%;         /* featured на всю ширину */
+      }
+    }
+
+    /* МОБИЛЬНЫЙ (≤768px) */
+    @media (max-width: 768px) {
+      /* ШАГ 3: Hero-блок вертикально */
+      .site-header {
+        flex-direction: column;
+        text-align: center;
+        padding: 1.5rem 1rem;
+      }
+
+      .header-cta { margin: .5rem auto 0; }
+
+      /* ШАГ 5: Карточки в одну колонку */
+      .cards-container .hero-card,
+      .cards-container .hero-card--featured {
+        flex: 1 1 100%;
+        max-width: 100%;
+      }
+
+      .hero-card__img-wrap { height: 120px; }
+      .hero-card--featured .hero-card__img-wrap { height: 150px; }
+
+      /* ШАГ 6: Форма — поля на всю ширину */
+      .form-row { flex-direction: column; }
+      .form-row > * { width: 100%; }
+    }
+
+    /* МАЛЕНЬКИЙ ТЕЛЕФОН (≤480px) */
+    @media (max-width: 480px) {
+      nav a { padding: .3rem .55rem; }
+
+      .stats-block .stat-card {
+        flex: 1 1 calc(50% - var(--gap) / 2);  /* 2 в строке на маленьком */
+      }
+
+      /* Уменьшаем изображения карточек */
+      .hero-card__img-wrap { height: 100px; font-size: 2.2rem; }
+    }
+
+    /* =============================================
+       РАЗДЕЛ ОТЧЁТА — итоги тестирования
+       ============================================= */
+    .report {
+      background: var(--surface);
+      backdrop-filter: blur(14px);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      margin-top: 2rem;
+    }
+
+    .report h2 { color: var(--accent); margin-bottom: 1rem; font-size: 1.2rem; }
+
+    .problem-list { display: flex; flex-direction: column; gap: 1rem; list-style: none; }
+
+    .problem-item {
+      background: rgba(255,255,255,.04);
+      border-radius: var(--radius-sm);
+      padding: .9rem 1rem;
+      border-left: 3px solid var(--accent);
+    }
+
+    .problem-item .prob { color: #fca5a5; font-weight: 600; font-size: .88rem; }
+    .problem-item .fix  { color: var(--muted); font-size: .85rem; margin-top: .3rem; }
+
+    /* Footer */
+    .page-footer {
+      text-align: center;
+      color: var(--muted);
+      font-size: .82rem;
+      margin-top: 2rem;
+      padding-top: 1.5rem;
+      border-top: 1px solid var(--border);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ШАГ 3: Hero-секция (горизонтально → вертикально на мобильном) -->
+  <header class="site-header">
+    <div class="header-logo">
+      <span>🎮</span>
+      <h1>DotaArena 2026</h1>
+    </div>
+    <p class="header-desc">Практика 06 · Адаптивная вёрстка · 360 / 768 / 1280 px</p>
+    <a href="#registration" class="header-cta">Регистрация</a>
+  </header>
+
+  <!-- ШАГ 4: Навигация — горизонтальная прокрутка на мобильном -->
+  <nav>
+    <ul>
+      <li><a href="#about">О турнире</a></li>
+      <li><a href="#heroes">Герои</a></li>
+      <li><a href="#program">Программа</a></li>
+      <li><a href="#teams">Команды</a></li>
+      <li><a href="#bracket">Сетка</a></li>
+      <li><a href="#rules">Правила</a></li>
+      <li><a href="#registration" class="cta">Регистрация</a></li>
+    </ul>
+  </nav>
+
+  <main>
+
+    <!-- Статистика -->
+    <section id="about">
+      <h2 class="section-title">Турнир в цифрах</h2>
+      <div class="stats-block">
+        <div class="stat-card"><span class="num">64</span><span class="lbl">Команды</span></div>
+        <div class="stat-card"><span class="num">600К</span><span class="lbl">Призовой фонд ₽</span></div>
+        <div class="stat-card"><span class="num">3</span><span class="lbl">Дня</span></div>
+        <div class="stat-card"><span class="num">1200+</span><span class="lbl">Зрителей онлайн</span></div>
+      </div>
+
+      <div class="callout">
+        <span class="callout-icon">⚠️</span>
+        <div class="callout-text">
+          <strong>Дедлайн регистрации — 1 ноября 2026</strong>
+          <p>Заявки от команд с верифицированными аккаунтами. После дедлайна слот занять невозможно.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ШАГ 5: Карточки — адаптивный контейнер -->
+    <section id="heroes">
+      <h2 class="section-title">Герои турнира</h2>
+      <div class="cards-container">
+
+        <article class="hero-card">
+          <div class="hero-card__img-wrap">
+            <img src="../../images/storm_spirit.png" alt="Storm Spirit — повелитель бури и молний">
+          </div>
+          <div class="hero-card__body">
+            <h3>Storm Spirit</h3>
+            <div class="hero-card__meta"><span>Mid</span><span>★★★★☆</span></div>
+            <p>Повелитель молний. Ball Lightning — главный козырь в командных боях.</p>
+          </div>
+          <div class="hero-card__footer"><a href="#" class="hero-card__btn">Выбрать героя</a></div>
+        </article>
+
+        <article class="hero-card hero-card--featured">
+          <div class="hero-card__img-wrap">
+            <img src="../../images/hoodwink.png" alt="Hoodwink — хитрая белка-охотница с арбалетом">
+          </div>
+          <div class="hero-card__body">
+            <h3>Hoodwink <span class="badge">Талисман</span></h3>
+            <div class="hero-card__meta"><span>Support</span><span>Offlane</span><span>★★★☆☆</span></div>
+            <p>Белка-охотница — символ DotaArena 2026. Sharpshooter с огромной дальностью решает исход боя. Sniper рядом не стоял.</p>
+          </div>
+          <div class="hero-card__footer"><a href="#" class="hero-card__btn">Выбрать героя</a></div>
+        </article>
+
+        <article class="hero-card">
+          <div class="hero-card__img-wrap">
+            <img src="../../images/shadow_fiend.png" alt="Shadow Fiend — собиратель душ Nevermore в аркане">
+          </div>
+          <div class="hero-card__body">
+            <h3>Shadow Fiend</h3>
+            <div class="hero-card__meta"><span>Mid</span><span>Arcana 2026</span><span>★★★★★</span></div>
+            <p>Nevermore — собиратель душ. Requiem of Souls в командном бою незабываем.</p>
+          </div>
+          <div class="hero-card__footer"><a href="#" class="hero-card__btn">Выбрать героя</a></div>
+        </article>
+
+        <article class="hero-card">
+          <div class="hero-card__img-wrap">
+            <img src="../../images/antimage.png" alt="Anti-Mage — истребитель магии и заклинателей">
+          </div>
+          <div class="hero-card__body">
+            <h3>Anti-Mage</h3>
+            <div class="hero-card__meta"><span>Carry</span><span>★★★☆☆</span></div>
+            <p>Фарм-машина поздней игры. Blink позволяет уходить от любой опасности.</p>
+          </div>
+          <div class="hero-card__footer"><a href="#" class="hero-card__btn">Выбрать героя</a></div>
+        </article>
+
+        <article class="hero-card">
+          <div class="hero-card__img-wrap">
+            <img src="../../images/invoker.png" alt="Invoker — верховный магистр десяти заклинаний">
+          </div>
+          <div class="hero-card__body">
+            <h3>Invoker</h3>
+            <div class="hero-card__meta"><span>Mid</span><span>★★★★★</span></div>
+            <p>10 способностей, бесконечные комбо. Требует сотни часов — отдача незабываема.</p>
+          </div>
+          <div class="hero-card__footer"><a href="#" class="hero-card__btn">Выбрать героя</a></div>
+        </article>
+
+        <article class="hero-card">
+          <div class="hero-card__img-wrap">
+            <img src="../../images/pudge.png" alt="Pudge — культовый мясник с крюком Meat Hook">
+          </div>
+          <div class="hero-card__body">
+            <h3>Pudge</h3>
+            <div class="hero-card__meta"><span>Support</span><span>★★★☆☆</span></div>
+            <p>Meat Hook — способность, которая определяет ход матча. Один крюк меняет всё.</p>
+          </div>
+          <div class="hero-card__footer"><a href="#" class="hero-card__btn">Выбрать героя</a></div>
+        </article>
+
+      </div>
+    </section>
+
+    <!-- ШАГ 6: Таблица с горизонтальной прокруткой -->
+    <section id="bracket">
+      <h2 class="section-title">Расписание матчей</h2>
+      <div class="table-wrap">
+        <table>
+          <caption>Финальные матчи — 16 ноября 2026</caption>
+          <thead>
+            <tr>
+              <th>Время</th><th>Дивизион</th><th>Команда 1</th><th>Команда 2</th><th>Площадка</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr><td>12:00</td><td>Дивизион B</td><td>NightOwls</td><td>IronClaw</td><td>Стрим-зал A</td></tr>
+            <tr><td>15:00</td><td>Дивизион A</td><td>RedDragons</td><td>StormForce</td><td>Стрим-зал B</td></tr>
+            <tr><td>18:00</td><td>Гранд-финал</td><td>TBD</td><td>TBD</td><td>Главная сцена</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ШАГ 8: Отчёт — 5 найденных проблем и исправления -->
+    <section class="report" id="report">
+      <h2>Отчёт о тестировании адаптации</h2>
+      <ul class="problem-list">
+        <li class="problem-item">
+          <div class="prob">🔴 Проблема 1 (360px): Карточки переполнялись — фиксированный gap 1.5rem давил контент</div>
+          <div class="fix">✅ Исправлено: gap заменён на clamp(.75rem, 3vw, 1.5rem) через CSS-переменную --gap</div>
+        </li>
+        <li class="problem-item">
+          <div class="prob">🔴 Проблема 2 (360px): Широкий заголовок h1 выходил за экран, текст обрезался</div>
+          <div class="fix">✅ Исправлено: font-size: clamp(1.5rem, 5vw, 2.8rem) — размер подстраивается под ширину</div>
+        </li>
+        <li class="problem-item">
+          <div class="prob">🔴 Проблема 3 (768px): Навигация переполняла строку, ссылки накладывались друг на друга</div>
+          <div class="fix">✅ Исправлено: overflow-x: auto + flex-wrap: nowrap + scrollbar скрыт — скролл вместо переноса</div>
+        </li>
+        <li class="problem-item">
+          <div class="prob">🔴 Проблема 4: img без max-width выходил за ширину карточки на узких экранах</div>
+          <div class="fix">✅ Исправлено: max-width: 100%, height: auto на всех img — изображения гибкие</div>
+        </li>
+        <li class="problem-item">
+          <div class="prob">🔴 Проблема 5 (360px): Широкая таблица расписания выталкивала страницу горизонтально</div>
+          <div class="fix">✅ Исправлено: таблица завёрнута в div.table-wrap с overflow-x: auto и min-width: 500px</div>
+        </li>
+      </ul>
+    </section>
+
+  </main>
+
+  <footer class="page-footer">
+    <p>DotaArena 2026 · Практика 06 · Адаптивная вёрстка</p>
+    <p>Авторы: Барышев Даниил, Мисриханов Тимур, Марьин Вадим | Группа 37-ВЕБ</p>
+  </footer>
+
+</body>
+</html>
