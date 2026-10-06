@@ -1523,21 +1523,26 @@ document.addEventListener('DOMContentLoaded', () => {
 
       heroModalRender.hidden = false;
 
-      const hasGif = Boolean(HERO_GIFS && HERO_GIFS[shortName]);
-      const defaultSrc = hasGif ? HERO_GIFS[shortName] : `images/renders/${shortName}.png`;
+      // Каждый герой имеет локальную анимированную GIF (на диске images/gifs/ или dance для Hoodwink)
+      const gifSrc = (shortName === 'hoodwink') ? 'images/hoodwink_dance.gif' : `images/gifs/${shortName}.gif`;
+      const renderSrc = `images/renders/${shortName}.png`;
 
-      heroModalRender.src = defaultSrc;
+      heroModalRender.src = gifSrc;
       heroModalRender.alt = `${heroName} во весь рост`;
       heroModalRender.onerror = function() {
         this.onerror = null;
-        this.src = `images/heroes/${shortName}.png`;
+        this.src = renderSrc;
+        this.onerror = function() {
+          this.onerror = null;
+          this.src = `images/heroes/${shortName}.png`;
+        };
       };
 
       // Интерактивный переключатель режимов (GIF / ZXC / 3D Рендер)
       if (heroModalModeSwitcher) {
         heroModalModeSwitcher.innerHTML = '';
 
-        if (shortName === 'shadow_fiend') {
+        if (shortName === 'shadow_fiend' || shortName === 'nevermore') {
           // Эксклюзивный культовый набор для Shadow Fiend: ZXC Requiem, ZXCURSED, 3D Рендер
           const sfModes = [
             { label: '⚡ ZXC Requiem', src: 'images/gifs/shadow_fiend.gif', active: true },
@@ -1557,11 +1562,11 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             heroModalModeSwitcher.appendChild(btn);
           });
-        } else if (hasGif) {
-          // Герои с анимацией GIF (включая Hoodwink с танцем)
+        } else {
+          // Для каждого героя доступна GIF анимация (мемная / игровая / танец) и статичный 3D рендер
           const heroModes = [
-            { label: shortName === 'hoodwink' ? '💃 Танец белки' : '⚡ GIF Анимация', src: HERO_GIFS[shortName], active: true },
-            { label: '🖼 3D Рендер', src: `images/renders/${shortName}.png`, active: false }
+            { label: shortName === 'hoodwink' ? '💃 Танец белки' : '⚡ GIF Анимация', src: gifSrc, active: true },
+            { label: '🖼 3D Рендер', src: renderSrc, active: false }
           ];
 
           heroModes.forEach(mode => {
