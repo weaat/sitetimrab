@@ -31,8 +31,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const THEME_KEY          = 'dotaarena2026_theme';           // ключ localStorage для темы
   const STEAM_KEY          = 'dotaarena2026_steam';           // ключ localStorage для Steam
   const PHONE_HINT_DEFAULT = 'Любой формат: 89001234567, +79001234567, 8(900)123-45-67';
-  const MAX_TEAMS          = 64;                              // максимум команд в турнире
-  const BRACKET_MIN        = 16;                              // минимум для старта сетки
+  const MAX_TEAMS          = 8;                               // максимум команд в финальной сетке (8 команд)
+  const BRACKET_MIN        = 8;                               // минимум для старта сетки (8 команд)
   const DEADLINE_DATE      = new Date('2026-11-01T23:59:59'); // дедлайн регистрации
   const TOURNAMENT_START   = new Date('2026-11-14T10:00:00'); // старт турнира
 
@@ -340,9 +340,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // Статус сетки
     if (bracketCount) bracketCount.textContent = total;
 
-    // Автозаполнение сетки при ≥ 16 команд
+    // Автозаполнение сетки при ≥ 8 команд
     if (state.registered.length >= BRACKET_MIN) {
-      fillBracket(state.registered.slice(0, 16));
+      fillBracket(state.registered.slice(0, MAX_TEAMS));
       createLaunchCounter();
       updateLaunchCounter();
     }
