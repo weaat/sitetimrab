@@ -606,123 +606,21 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   };
 
-  const heroModalBackdrop = $('#hero-modal-backdrop');
-  const heroModalClose    = $('#hero-modal-close');
-  const heroModalAction   = $('#hero-modal-action');
-
+  // ============================================================
+  //  11. МОДАЛЬНОЕ ОКНО ДЕТАЛЕЙ ГЕРОЕВ (делегируется к единой системе ростера)
+  // ============================================================
   function openHeroModal(heroKey) {
-    const data = heroData[heroKey];
-    if (!data || !heroModalBackdrop) return;
-
-    const img = $('#hero-modal-render');
-    if (img) {
-      img.src = data.render;
-      img.alt = `${data.name} во весь рост`;
+    if (typeof openHeroDossier === 'function') {
+      openHeroDossier(heroKey);
     }
-
-    const titleEl = $('#hero-modal-title');
-    if (titleEl) titleEl.textContent = data.name;
-
-    const subtitleEl = $('#hero-modal-subtitle');
-    if (subtitleEl) subtitleEl.textContent = data.subtitle;
-
-    const descEl = $('#hero-modal-desc');
-    if (descEl) descEl.textContent = data.desc;
-
-    const badgesWrap = $('#hero-modal-badges');
-    if (badgesWrap) {
-      badgesWrap.innerHTML = '';
-      data.badges.forEach(b => {
-        const span = document.createElement('span');
-        span.className = b.includes('Arcana') ? 'badge badge--gold' : 'badge';
-        span.textContent = b;
-        badgesWrap.appendChild(span);
-      });
-    }
-
-    const statsWrap = $('#hero-modal-stats');
-    if (statsWrap) {
-      statsWrap.innerHTML = '';
-      data.stats.forEach(s => {
-        const pill = document.createElement('div');
-        pill.className = 'hero-modal-stat-pill';
-        pill.innerHTML = `<span>${s.label}:</span> <b>${s.val}</b>`;
-        statsWrap.appendChild(pill);
-      });
-    }
-
-    const factsUl = $('#hero-modal-facts');
-    if (factsUl) {
-      factsUl.innerHTML = '';
-      data.facts.forEach(fact => {
-        const li = document.createElement('li');
-        li.textContent = fact;
-        factsUl.appendChild(li);
-      });
-    }
-
-    heroModalBackdrop.hidden = false;
-    document.body.style.overflow = 'hidden';
   }
 
   function closeHeroModal() {
-    if (!heroModalBackdrop) return;
-    heroModalBackdrop.hidden = true;
-    document.body.style.overflow = '';
+    if (typeof closeHeroDossier === 'function') {
+      closeHeroDossier();
+    }
   }
 
-  // Клик по карточкам героев в сетке Dota 2
-  const dotaHeroCards = $$('.dota-hero-card');
-  dotaHeroCards.forEach(card => {
-    card.addEventListener('click', () => {
-      const heroKey = card.getAttribute('data-hero');
-      if (heroKey) openHeroModal(heroKey);
-    });
-  });
-
-  // Фильтры по атрибутам (Все / Сила / Ловкость / Интеллект)
-  const dotaAttrBtns = $$('.dota-attr-btn');
-  dotaAttrBtns.forEach(btn => {
-    btn.addEventListener('click', () => {
-      dotaAttrBtns.forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-
-      const filter = btn.getAttribute('data-filter');
-      dotaHeroCards.forEach(card => {
-        const attr = card.getAttribute('data-attr');
-        if (filter === 'all' || attr === filter) {
-          card.style.display = 'flex';
-        } else {
-          card.style.display = 'none';
-        }
-      });
-    });
-  });
-
-  // Клик по витрине героев в шапке (Storm, Hoodwink, SF)
-  $$('.hero-showcase .hero-card').forEach(card => {
-    card.style.cursor = 'pointer';
-    card.setAttribute('title', 'Нажмите, чтобы открыть досье героя');
-    card.addEventListener('click', () => {
-      const text = card.textContent.toLowerCase();
-      if (text.includes('storm')) openHeroModal('storm_spirit');
-      else if (text.includes('hoodwink')) openHeroModal('hoodwink');
-      else if (text.includes('shadow')) openHeroModal('shadow_fiend');
-    });
-  });
-
-  heroModalClose?.addEventListener('click', closeHeroModal);
-  heroModalBackdrop?.addEventListener('click', e => {
-    if (e.target === heroModalBackdrop) closeHeroModal();
-  });
-  heroModalAction?.addEventListener('click', () => {
-    closeHeroModal();
-  });
-  document.addEventListener('keydown', e => {
-    if (e.key === 'Escape' && heroModalBackdrop && !heroModalBackdrop.hidden) {
-      closeHeroModal();
-    }
-  });
 
   // ============================================================
   //  11. ТЕЛЕФОН: гибкая валидация и нормализация
@@ -1563,13 +1461,17 @@ document.addEventListener('DOMContentLoaded', () => {
   function openHeroDossier(shortName, heroObj, cardElement) {
     if (!heroModalBackdrop) return;
 
+    if (!heroObj && heroesData.length > 0) {
+      heroObj = heroesData.find(h => h.name === `npc_dota_hero_${shortName}`) || null;
+    }
+
     const dossier = BUILTIN_DOSSIERS[shortName] || (heroDossiers && heroDossiers[shortName]) || null;
     const heroName = (dossier && dossier.title) || (heroObj && heroObj.localized_name) || (cardElement && cardElement.dataset.heroName) || shortName;
     const attrKey = (heroObj && heroObj.primary_attr) || (cardElement && cardElement.dataset.attr) || (dossier ? (dossier.badgeAttr === 'Сила' ? 'str' : dossier.badgeAttr === 'Ловкость' ? 'agi' : dossier.badgeAttr === 'Интеллект' ? 'int' : 'all') : 'all');
     const attrName = ATTR_NAMES[attrKey] || 'Атрибут';
-    const attrColor = ATTR_COLORS[attrKey] || '#dc2626';
+    const attrColor = ATTR_COLORS[attrKey] || '#0ea5e9';
 
-    // 1. Изображение слева (полный рост / анимация / видео / портрет)
+    // 1. Изображение слева — 100% ЛОКАЛЬНЫЙ РЕНДЕР НА ПК
     if (heroModalRender) {
       if (heroModalVideo) {
         heroModalVideo.hidden = true;
@@ -1577,41 +1479,35 @@ document.addEventListener('DOMContentLoaded', () => {
         heroModalVideo.removeAttribute('src');
       }
 
-      if (dossier && dossier.render) {
-        heroModalRender.hidden = false;
-        heroModalRender.src = dossier.render;
-        heroModalRender.alt = `${heroName} во весь рост`;
-      } else {
-        if (heroModalVideo) {
-          const webmUrl = `https://cdn.cloudflare.steamstatic.com/apps/dota2/videos/dota_react/heroes/renders/${shortName}.webm`;
-          heroModalVideo.src = webmUrl;
-          heroModalVideo.onloadeddata = () => {
-            heroModalVideo.hidden = false;
-            heroModalRender.hidden = true;
-            heroModalVideo.play().catch(() => {});
-          };
-          heroModalVideo.onerror = () => {
-            heroModalVideo.hidden = true;
-            heroModalRender.hidden = false;
-          };
-        }
+      heroModalRender.hidden = false;
 
-        heroModalRender.hidden = false;
-        heroModalRender.src = `images/heroes/${shortName}.png`;
-        heroModalRender.onerror = function() {
-          this.onerror = null;
-          this.src = `https://cdn.cloudflare.steamstatic.com/apps/dota2/images/dota_react/heroes/${shortName}.png`;
-        };
-        heroModalRender.alt = heroName;
+      // Приоритет локального рендера
+      if (shortName === 'hoodwink' && dossier && dossier.render) {
+        heroModalRender.src = dossier.render;
+      } else {
+        heroModalRender.src = `images/renders/${shortName}.png`;
       }
+
+      heroModalRender.alt = `${heroName} во весь рост`;
+      heroModalRender.onerror = function() {
+        this.onerror = null;
+        this.src = `images/heroes/${shortName}.png`;
+      };
+    }
+
+    // Динамическая подсветка ауры в стиле Liquid Glass под атрибут героя
+    const heroModalVisual = $('.hero-modal__visual');
+    if (heroModalVisual) {
+      const aColor = attrColor.startsWith('#') ? attrColor : '#0ea5e9';
+      heroModalVisual.style.background = `radial-gradient(circle at center, ${aColor}38 0%, ${aColor}14 50%, rgba(4, 9, 20, .94) 85%)`;
     }
 
     // 2. Бейджи
     if (heroModalBadges) {
-      const roles = (heroObj && heroObj.roles) || ['Боец'];
+      const roles = (heroObj && heroObj.roles) || (dossier && dossier.badges) || ['Боец турнира'];
       const attack = (heroObj && heroObj.attack_type === 'Melee') ? 'Ближний бой' : 'Дальний бой';
       heroModalBadges.innerHTML = `
-        <span class="hero-modal__badge" style="background:${attrColor}22; color:${attrColor}; border-color:${attrColor}66;">${attrName}</span>
+        <span class="hero-modal__badge" style="background:${attrColor}25; color:${attrColor}; border-color:${attrColor}77;">${attrName}</span>
         <span class="hero-modal__badge">${attack}</span>
         ${roles.slice(0, 3).map(r => `<span class="hero-modal__badge">${r}</span>`).join('')}
       `;
@@ -1708,22 +1604,52 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Полноэкранный режим прямо внутри сайта (без перехода на другой файл)
+  // Полноэкранный режим сетки ростера героев
   const fsBtn = $('#all-heroes-fs-toggle');
   const heroesSection = $('#heroes');
 
   if (fsBtn && heroesSection) {
-    fsBtn.addEventListener('click', () => {
+    fsBtn.addEventListener('click', (e) => {
+      e.preventDefault();
       const isFs = heroesSection.classList.toggle('roster-fullscreen-mode');
       if (isFs) {
         document.body.style.overflow = 'hidden';
-        fsBtn.innerHTML = '<span class="fs-btn-icon">✕</span> <span class="fs-btn-text">Свернуть полноэкранный режим</span>';
+        fsBtn.innerHTML = '<span class="fs-btn-icon">✕</span> <span class="fs-btn-text">Свернуть (ESC)</span>';
+        fsBtn.classList.add('active');
+        try {
+          if (!document.fullscreenElement && document.documentElement.requestFullscreen) {
+            document.documentElement.requestFullscreen().catch(() => {});
+          }
+        } catch(err) {}
       } else {
         document.body.style.overflow = '';
         fsBtn.innerHTML = '<span class="fs-btn-icon">⛶</span> <span class="fs-btn-text">Открыть во весь экран ↗</span>';
+        fsBtn.classList.remove('active');
+        try {
+          if (document.fullscreenElement && document.exitFullscreen) {
+            document.exitFullscreen().catch(() => {});
+          }
+        } catch(err) {}
       }
     });
   }
+
+  const fsCornerClose = $('#roster-fs-close-corner');
+  if (fsCornerClose && heroesSection && fsBtn) {
+    fsCornerClose.addEventListener('click', (e) => {
+      e.preventDefault();
+      heroesSection.classList.remove('roster-fullscreen-mode');
+      document.body.style.overflow = '';
+      fsBtn.innerHTML = '<span class="fs-btn-icon">⛶</span> <span class="fs-btn-text">Открыть во весь экран ↗</span>';
+      fsBtn.classList.remove('active');
+      try {
+        if (document.fullscreenElement && document.exitFullscreen) {
+          document.exitFullscreen().catch(() => {});
+        }
+      } catch(err) {}
+    });
+  }
+
 
   // Закрытие по Escape (модалка или полноэкранный режим)
   document.addEventListener('keydown', (e) => {
@@ -1733,7 +1659,27 @@ document.addEventListener('DOMContentLoaded', () => {
       } else if (heroesSection && heroesSection.classList.contains('roster-fullscreen-mode')) {
         heroesSection.classList.remove('roster-fullscreen-mode');
         document.body.style.overflow = '';
-        if (fsBtn) fsBtn.innerHTML = '<span class="fs-btn-icon">⛶</span> <span class="fs-btn-text">Открыть во весь экран ↗</span>';
+        if (fsBtn) {
+          fsBtn.innerHTML = '<span class="fs-btn-icon">⛶</span> <span class="fs-btn-text">Открыть во весь экран ↗</span>';
+          fsBtn.classList.remove('active');
+        }
+        try {
+          if (document.fullscreenElement && document.exitFullscreen) {
+            document.exitFullscreen().catch(() => {});
+          }
+        } catch(err) {}
+      }
+    }
+  });
+
+  // Синхронизация при выходе из нативного полноэкранного режима браузера
+  document.addEventListener('fullscreenchange', () => {
+    if (!document.fullscreenElement && heroesSection && heroesSection.classList.contains('roster-fullscreen-mode')) {
+      heroesSection.classList.remove('roster-fullscreen-mode');
+      document.body.style.overflow = '';
+      if (fsBtn) {
+        fsBtn.innerHTML = '<span class="fs-btn-icon">⛶</span> <span class="fs-btn-text">Открыть во весь экран ↗</span>';
+        fsBtn.classList.remove('active');
       }
     }
   });
@@ -1766,30 +1712,45 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Фильтр по плашкам категорий атрибутов
-  $$('.roster-attr-card, .heroes-pill, .all-heroes-pill').forEach(card => {
-    card.addEventListener('click', () => {
-      const filterAttr = card.dataset.filter;
-      const wasActive = card.classList.contains('active');
+  // Фильтр по плашкам категорий атрибутов со счётчиками
+  const dotaPickScreen = $('#dota-pick-screen');
+  const filterPills = $$('.all-heroes-pill, .roster-attr-card, .heroes-pill');
+  const dotaColumns = $$('.dota-column');
 
-      $$('.roster-attr-card, .heroes-pill, .all-heroes-pill').forEach(c => c.classList.remove('active'));
+  filterPills.forEach(pill => {
+    pill.addEventListener('click', (e) => {
+      e.preventDefault();
+      const filterAttr = pill.dataset.filter;
+      const wasActive = pill.classList.contains('active');
 
-      const columns = $$('.dota-column');
+      filterPills.forEach(p => p.classList.remove('active'));
 
       if (wasActive && filterAttr !== 'all-attr') {
-        // Сброс на показ всех колонок
+        // Повторный клик — возврат к "Все герои"
         const allBtn = document.querySelector('[data-filter="all-attr"]');
         if (allBtn) allBtn.classList.add('active');
-        columns.forEach(col => col.style.display = '');
+        dotaColumns.forEach(col => col.style.display = '');
+        if (dotaPickScreen) {
+          dotaPickScreen.classList.remove('single-column-active');
+          dotaPickScreen.style.gridTemplateColumns = '';
+        }
       } else if (filterAttr === 'all-attr') {
-        card.classList.add('active');
-        columns.forEach(col => col.style.display = '');
+        pill.classList.add('active');
+        dotaColumns.forEach(col => col.style.display = '');
+        if (dotaPickScreen) {
+          dotaPickScreen.classList.remove('single-column-active');
+          dotaPickScreen.style.gridTemplateColumns = '';
+        }
       } else {
-        card.classList.add('active');
-        columns.forEach(col => {
+        pill.classList.add('active');
+        dotaColumns.forEach(col => {
           const colAttr = col.dataset.attr;
-          col.style.display = (colAttr === filterAttr) ? '' : 'none';
+          col.style.display = (colAttr === filterAttr) ? 'flex' : 'none';
         });
+        if (dotaPickScreen) {
+          dotaPickScreen.classList.add('single-column-active');
+          dotaPickScreen.style.gridTemplateColumns = '1fr';
+        }
       }
     });
   });
