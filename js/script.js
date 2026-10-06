@@ -1794,6 +1794,32 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
+  // Проверка статуса авторизации из localStorage (страница входа login.html)
+  try {
+    const savedUser = localStorage.getItem('dotaarena_user');
+    const navLoginBtn = $('#nav-login-btn');
+    if (savedUser && navLoginBtn) {
+      const userData = JSON.parse(savedUser);
+      if (userData && userData.name) {
+        navLoginBtn.innerHTML = `
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+            <circle cx="12" cy="7" r="4"></circle>
+          </svg>
+          <span>${userData.name}</span>
+        `;
+        navLoginBtn.title = `Вы вошли как ${userData.name}. Нажмите для выхода`;
+        navLoginBtn.addEventListener('click', (e) => {
+          if (confirm(`Вы вошли как ${userData.name}. Хотите выйти из профиля?`)) {
+            e.preventDefault();
+            localStorage.removeItem('dotaarena_user');
+            window.location.reload();
+          }
+        });
+      }
+    }
+  } catch(e) {}
+
   initHeroPickGrid();
 
 });

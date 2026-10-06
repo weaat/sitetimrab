@@ -1,0 +1,828 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Вход в личный кабинет — DotaArena 2026</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/style.css">
+
+  <style>
+    /* ============================================================
+       LIQUID GLASS AUTH PORTAL STYLES (СИНЕ-ГОЛУБОЙ ЖИДКИЙ СТИЛЬ)
+       ============================================================ */
+    :root {
+      --mouse-x: 50vw;
+      --mouse-y: 50vh;
+    }
+
+    body.login-page-body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      background: #020712;
+      overflow-x: hidden;
+      position: relative;
+      perspective: 1200px;
+    }
+
+    /* Фоновые жидкие сферы, реагирующие на мышь */
+    .liquid-background {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      overflow: hidden;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    /* Интерактивный световой луч, следующий за курсором */
+    .mouse-spotlight {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: radial-gradient(650px circle at var(--mouse-x) var(--mouse-y), rgba(14, 165, 233, 0.16), transparent 70%);
+      pointer-events: none;
+      z-index: 2;
+      transition: background 0.05s ease-out;
+    }
+
+    /* Жидкие светящиеся сферы */
+    .liquid-orb {
+      position: absolute;
+      border-radius: 50%;
+      filter: blur(80px);
+      opacity: 0.65;
+      will-change: transform;
+      transition: transform 0.18s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .liquid-orb--1 {
+      width: 520px;
+      height: 520px;
+      top: 5%;
+      left: 10%;
+      background: radial-gradient(circle, #0284c7 0%, #0369a1 40%, rgba(2, 132, 199, 0) 70%);
+    }
+
+    .liquid-orb--2 {
+      width: 580px;
+      height: 580px;
+      bottom: 5%;
+      right: 10%;
+      background: radial-gradient(circle, #06b6d4 0%, #0284c7 45%, rgba(6, 182, 212, 0) 70%);
+    }
+
+    .liquid-orb--3 {
+      width: 420px;
+      height: 420px;
+      top: 50%;
+      left: 60%;
+      background: radial-gradient(circle, #38bdf8 0%, #0ea5e9 50%, rgba(56, 189, 248, 0) 70%);
+      opacity: 0.45;
+    }
+
+    .liquid-orb--4 {
+      width: 380px;
+      height: 380px;
+      top: 65%;
+      left: 20%;
+      background: radial-gradient(circle, #0ea5e9 0%, #0369a1 50%, rgba(14, 165, 233, 0) 70%);
+      opacity: 0.5;
+    }
+
+    /* Верхняя панель страницы входа */
+    .login-nav {
+      position: relative;
+      z-index: 10;
+      padding: 1.5rem 2.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      width: 100%;
+    }
+
+    .login-brand {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.8rem;
+      text-decoration: none;
+      color: #fff;
+    }
+
+    .login-brand__logo {
+      height: 42px;
+      width: auto;
+      filter: drop-shadow(0 0 16px rgba(14, 165, 233, 0.65));
+    }
+
+    .login-brand__title {
+      font-size: 1.25rem;
+      font-weight: 800;
+      letter-spacing: -0.01em;
+      background: linear-gradient(135deg, #fff 0%, #7dd3fc 60%, #38bdf8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .login-back-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.6rem 1.25rem;
+      border-radius: 50px;
+      background: rgba(14, 165, 233, 0.1);
+      border: 1px solid var(--glass-border-accent);
+      color: #7dd3fc;
+      font-size: 0.9rem;
+      font-weight: 600;
+      text-decoration: none;
+      backdrop-filter: blur(14px);
+      box-shadow: 0 4px 16px rgba(2, 6, 23, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+      transition: all 0.25s ease;
+    }
+
+    .login-back-btn:hover {
+      background: var(--accent);
+      color: #fff;
+      transform: translateX(-3px);
+      box-shadow: 0 6px 24px var(--accent-glow-strong);
+    }
+
+    /* Контейнер страницы входа */
+    .login-container {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1.5rem 3rem;
+      position: relative;
+      z-index: 5;
+    }
+
+    /* 3D Liquid Glass Card */
+    .liquid-glass-card {
+      width: 100%;
+      max-width: 460px;
+      background: rgba(8, 20, 42, 0.65);
+      backdrop-filter: blur(28px) saturate(200%);
+      -webkit-backdrop-filter: blur(28px) saturate(200%);
+      border: 1px solid rgba(125, 211, 252, 0.28);
+      border-radius: 24px;
+      padding: 2.8rem 2.4rem;
+      box-shadow:
+        0 20px 50px rgba(2, 6, 23, 0.7),
+        0 0 40px rgba(14, 165, 233, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.35),
+        inset 0 0 20px rgba(56, 189, 248, 0.08);
+      transform-style: preserve-3d;
+      will-change: transform;
+      transition: transform 0.15s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.3s ease;
+      position: relative;
+    }
+
+    /* Блик жидкого стекла */
+    .liquid-glass-card::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; height: 45%;
+      border-radius: 24px 24px 100px 100px;
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0) 100%);
+      pointer-events: none;
+    }
+
+    .liquid-glass-card:hover {
+      box-shadow:
+        0 25px 60px rgba(2, 6, 23, 0.8),
+        0 0 55px rgba(56, 189, 248, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.45);
+    }
+
+    /* Заголовок карточки */
+    .auth-header {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+
+    .auth-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.75rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      color: #38bdf8;
+      background: rgba(14, 165, 233, 0.15);
+      border: 1px solid rgba(56, 189, 248, 0.4);
+      padding: 0.3rem 0.9rem;
+      border-radius: 50px;
+      margin-bottom: 0.8rem;
+    }
+
+    .auth-title {
+      font-size: 1.85rem;
+      font-weight: 800;
+      color: #fff;
+      margin-bottom: 0.4rem;
+      letter-spacing: -0.02em;
+    }
+
+    .auth-subtitle {
+      font-size: 0.92rem;
+      color: var(--text-muted);
+    }
+
+    /* Вкладки: Вход / Регистрация */
+    .auth-tabs {
+      display: flex;
+      background: rgba(4, 12, 28, 0.6);
+      border: 1px solid rgba(125, 211, 252, 0.18);
+      border-radius: 14px;
+      padding: 4px;
+      margin-bottom: 1.8rem;
+    }
+
+    .auth-tab {
+      flex: 1;
+      text-align: center;
+      padding: 0.65rem 0.5rem;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      font-size: 0.92rem;
+      font-weight: 700;
+      border-radius: 10px;
+      cursor: pointer;
+      transition: all 0.25s ease;
+      font-family: inherit;
+    }
+
+    .auth-tab.active {
+      background: linear-gradient(135deg, rgba(14, 165, 233, 0.35) 0%, rgba(2, 132, 199, 0.25) 100%);
+      color: #fff;
+      box-shadow: 0 4px 15px rgba(14, 165, 233, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+    }
+
+    /* Поля ввода (Liquid Glass Inputs) */
+    .auth-form-group {
+      margin-bottom: 1.35rem;
+      text-align: left;
+    }
+
+    .auth-label {
+      display: block;
+      font-size: 0.84rem;
+      font-weight: 600;
+      color: #cbd5e1;
+      margin-bottom: 0.45rem;
+      letter-spacing: 0.02em;
+    }
+
+    .auth-input-wrap {
+      position: relative;
+    }
+
+    .auth-input-icon {
+      position: absolute;
+      left: 1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #38bdf8;
+      pointer-events: none;
+      display: flex;
+      align-items: center;
+    }
+
+    .auth-input {
+      width: 100%;
+      background: rgba(4, 12, 28, 0.55);
+      border: 1px solid rgba(125, 211, 252, 0.22);
+      border-radius: 12px;
+      padding: 0.85rem 1rem 0.85rem 2.85rem;
+      font-size: 0.95rem;
+      color: #fff;
+      font-family: inherit;
+      outline: none;
+      backdrop-filter: blur(10px);
+      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
+      transition: border-color 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
+    }
+
+    .auth-input:focus {
+      background: rgba(8, 22, 46, 0.7);
+      border-color: #38bdf8;
+      box-shadow:
+        0 0 0 3px rgba(14, 165, 233, 0.25),
+        0 0 20px rgba(56, 189, 248, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.15);
+    }
+
+    .auth-input::placeholder {
+      color: rgba(148, 163, 184, 0.55);
+    }
+
+    .auth-pass-toggle {
+      position: absolute;
+      right: 0.85rem;
+      top: 50%;
+      transform: translateY(-50%);
+      background: transparent;
+      border: none;
+      color: #94a3b8;
+      cursor: pointer;
+      padding: 0.3rem;
+      display: flex;
+      align-items: center;
+      transition: color 0.2s ease;
+    }
+
+    .auth-pass-toggle:hover {
+      color: #38bdf8;
+    }
+
+    /* Запомнить меня и Забыли пароль */
+    .auth-meta-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.6rem;
+      font-size: 0.84rem;
+    }
+
+    .auth-remember {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      cursor: pointer;
+      color: var(--text-muted);
+      user-select: none;
+    }
+
+    .auth-remember input {
+      accent-color: #0ea5e9;
+      width: 16px;
+      height: 16px;
+      cursor: pointer;
+    }
+
+    .auth-forgot {
+      color: #38bdf8;
+      text-decoration: none;
+      font-weight: 600;
+      transition: color 0.2s ease;
+    }
+
+    .auth-forgot:hover {
+      color: #7dd3fc;
+      text-decoration: underline;
+    }
+
+    /* Главная кнопка ВОЙТИ */
+    .auth-submit-btn {
+      width: 100%;
+      padding: 0.95rem 1.5rem;
+      border: none;
+      border-radius: 50px;
+      background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+      color: #fff;
+      font-size: 1.05rem;
+      font-weight: 800;
+      letter-spacing: 0.02em;
+      cursor: pointer;
+      font-family: inherit;
+      box-shadow:
+        0 6px 24px rgba(14, 165, 233, 0.45),
+        inset 0 1px 0 rgba(255, 255, 255, 0.4);
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .auth-submit-btn::before {
+      content: '';
+      position: absolute;
+      top: -50%; left: -50%; width: 200%; height: 200%;
+      background: linear-gradient(60deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+      transform: rotate(30deg) translateY(-100%);
+      transition: transform 0.6s ease;
+    }
+
+    .auth-submit-btn:hover {
+      transform: translateY(-2px) scale(1.02);
+      box-shadow:
+        0 10px 32px rgba(56, 189, 248, 0.65),
+        inset 0 1px 0 rgba(255, 255, 255, 0.6);
+      filter: brightness(1.1);
+    }
+
+    .auth-submit-btn:hover::before {
+      transform: rotate(30deg) translateY(100%);
+    }
+
+    .auth-submit-btn:active {
+      transform: translateY(0) scale(0.99);
+    }
+
+    /* Разделитель ИЛИ */
+    .auth-divider {
+      display: flex;
+      align-items: center;
+      margin: 1.6rem 0;
+      color: var(--text-muted);
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+    }
+
+    .auth-divider::before,
+    .auth-divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: rgba(125, 211, 252, 0.18);
+    }
+
+    .auth-divider span {
+      padding: 0 1rem;
+    }
+
+    /* Кнопка входа через Steam */
+    .steam-login-btn {
+      width: 100%;
+      padding: 0.85rem 1.4rem;
+      border-radius: 50px;
+      background: rgba(18, 38, 70, 0.55);
+      border: 1px solid rgba(125, 211, 252, 0.25);
+      color: #fff;
+      font-size: 0.95rem;
+      font-weight: 700;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.75rem;
+      cursor: pointer;
+      backdrop-filter: blur(12px);
+      box-shadow: 0 4px 16px rgba(2, 6, 23, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+      transition: all 0.25s ease;
+      font-family: inherit;
+    }
+
+    .steam-login-btn:hover {
+      background: rgba(26, 54, 98, 0.8);
+      border-color: #38bdf8;
+      box-shadow: 0 6px 24px rgba(14, 165, 233, 0.35);
+      transform: translateY(-2px);
+      color: #fff;
+    }
+
+    .steam-login-btn svg {
+      width: 22px;
+      height: 22px;
+      fill: currentColor;
+    }
+
+    /* Сообщение об успешном входе */
+    .auth-status-alert {
+      margin-top: 1.2rem;
+      padding: 0.85rem 1.2rem;
+      border-radius: 12px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      text-align: center;
+      display: none;
+      animation: fadeIn 0.3s ease;
+    }
+
+    .auth-status-alert--success {
+      background: rgba(14, 165, 233, 0.15);
+      border: 1px solid rgba(56, 189, 248, 0.5);
+      color: #7dd3fc;
+      box-shadow: 0 0 20px rgba(14, 165, 233, 0.3);
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 520px) {
+      .login-nav {
+        padding: 1rem 1.2rem;
+      }
+      .liquid-glass-card {
+        padding: 2rem 1.4rem;
+        border-radius: 20px;
+      }
+      .auth-title {
+        font-size: 1.6rem;
+      }
+    }
+  </style>
+</head>
+<body class="login-page-body">
+
+  <!-- Интерактивный светящийся фон, реагирующий на курсор мыши -->
+  <div class="mouse-spotlight" id="mouse-spotlight"></div>
+
+  <div class="liquid-background">
+    <div class="liquid-orb liquid-orb--1" id="orb-1"></div>
+    <div class="liquid-orb liquid-orb--2" id="orb-2"></div>
+    <div class="liquid-orb liquid-orb--3" id="orb-3"></div>
+    <div class="liquid-orb liquid-orb--4" id="orb-4"></div>
+  </div>
+
+  <!-- Верхняя панель страницы входа -->
+  <header class="login-nav">
+    <a href="index.html" class="login-brand" title="На главную DotaArena 2026">
+      <img src="images/dota2_logo.png" alt="Dota 2 Logo" class="login-brand__logo">
+      <span class="login-brand__title">DotaArena 2026</span>
+    </a>
+
+    <a href="index.html" class="login-back-btn">
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="19" y1="12" x2="5" y2="12"></line>
+        <polyline points="12 19 5 12 12 5"></polyline>
+      </svg>
+      <span>На главную</span>
+    </a>
+  </header>
+
+  <!-- Основная область с 3D Liquid Glass карточкой -->
+  <main class="login-container">
+    <div class="liquid-glass-card" id="login-card">
+
+      <div class="auth-header">
+        <span class="auth-badge">Киберспортивный портал</span>
+        <h1 class="auth-title">Личный кабинет</h1>
+        <p class="auth-subtitle">Управление командой и турнирная статистика</p>
+      </div>
+
+      <!-- Переключатель: Вход / Регистрация -->
+      <div class="auth-tabs" role="tablist">
+        <button type="button" class="auth-tab active" id="tab-login" role="tab" aria-selected="true">Вход</button>
+        <button type="button" class="auth-tab" id="tab-register" role="tab" aria-selected="false">Регистрация</button>
+      </div>
+
+      <!-- Форма входа -->
+      <form id="login-form">
+        <div class="auth-form-group">
+          <label for="login-email" class="auth-label">Email или логин игрока</label>
+          <div class="auth-input-wrap">
+            <span class="auth-input-icon">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                <circle cx="12" cy="7" r="4"></circle>
+              </svg>
+            </span>
+            <input type="text" id="login-email" class="auth-input" placeholder="player@dotaarena.ru" required autocomplete="username">
+          </div>
+        </div>
+
+        <div class="auth-form-group">
+          <label for="login-password" class="auth-label">Пароль</label>
+          <div class="auth-input-wrap">
+            <span class="auth-input-icon">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+              </svg>
+            </span>
+            <input type="password" id="login-password" class="auth-input" placeholder="••••••••" required autocomplete="current-password">
+            <button type="button" class="auth-pass-toggle" id="pass-toggle" aria-label="Показать пароль">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                <circle cx="12" cy="12" r="3"></circle>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="auth-meta-row">
+          <label class="auth-remember">
+            <input type="checkbox" id="remember-me" checked>
+            <span>Запомнить меня</span>
+          </label>
+          <a href="#" class="auth-forgot" id="forgot-link">Забыли пароль?</a>
+        </div>
+
+        <button type="submit" class="auth-submit-btn" id="btn-submit-login">
+          <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"></path>
+            <polyline points="10 17 15 12 10 7"></polyline>
+            <line x1="15" y1="12" x2="3" y2="12"></line>
+          </svg>
+          <span>Войти</span>
+        </button>
+      </form>
+
+      <!-- Форма регистрации (скрыта по умолчанию) -->
+      <form id="register-form" style="display: none;">
+        <div class="auth-form-group">
+          <label for="reg-nickname" class="auth-label">Игровой никнейм в Dota 2</label>
+          <div class="auth-input-wrap">
+            <span class="auth-input-icon">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M6 9H4.5a2.5 2.5 0 0 1 0-5H6"></path>
+                <path d="M18 9h1.5a2.5 2.5 0 0 0 0-5H18"></path>
+                <path d="M4 22h16"></path>
+                <path d="M10 14.66V17c0 .55-.47.98-.97 1.21C7.85 18.75 7 20.24 7 22"></path>
+                <path d="M14 14.66V17c0 .55.47.98.97 1.21C16.15 18.75 17 20.24 17 22"></path>
+                <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path>
+              </svg>
+            </span>
+            <input type="text" id="reg-nickname" class="auth-input" placeholder="Miracle- / Dendi" required>
+          </div>
+        </div>
+
+        <div class="auth-form-group">
+          <label for="reg-email" class="auth-label">Email для связи</label>
+          <div class="auth-input-wrap">
+            <span class="auth-input-icon">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                <polyline points="22,6 12,13 2,6"></polyline>
+              </svg>
+            </span>
+            <input type="email" id="reg-email" class="auth-input" placeholder="captain@team.ru" required>
+          </div>
+        </div>
+
+        <div class="auth-form-group">
+          <label for="reg-password" class="auth-label">Придумайте пароль</label>
+          <div class="auth-input-wrap">
+            <span class="auth-input-icon">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+              </svg>
+            </span>
+            <input type="password" id="reg-password" class="auth-input" placeholder="Минимум 6 символов" required>
+          </div>
+        </div>
+
+        <button type="submit" class="auth-submit-btn" id="btn-submit-register">
+          <span>Создать аккаунт</span>
+        </button>
+      </form>
+
+      <div class="auth-divider">
+        <span>или</span>
+      </div>
+
+      <!-- Вход через Steam -->
+      <button type="button" class="steam-login-btn" id="btn-steam-login">
+        <svg viewBox="0 0 496 512">
+          <path d="M496 256c0 137-111.2 248-248.4 248-113.8 0-209.6-76.3-239-180.4l95.2 39.3c6.4 14.5 19.3 25.2 35.1 28.7 27.6 6.1 54.8-11.4 60.9-39 6.1-27.6-11.4-54.8-39-60.9-13.9-3.1-28.3 1-38.9 9.9l-42-17.3c9.9-57.9 60.3-102.3 121.3-102.3 68.3 0 123.7 55.4 123.7 123.7 0 68.3-55.4 123.7-123.7 123.7-2.6 0-5.1-.1-7.7-.3l-55.9 23.1c20.3 6.9 42 10.7 64.6 10.7 109.8 0 199.1-89.3 199.1-199.1S357.4 56.9 247.6 56.9 48.5 146.2 48.5 256c0 5.4.2 10.8.7 16.1L.8 251.8C1.8 114.7 112.5 4 249.6 4 386.8 4 496 117 496 256z"/>
+        </svg>
+        <span>Войти через Steam</span>
+      </button>
+
+      <!-- Информационное уведомление -->
+      <div class="auth-status-alert auth-status-alert--success" id="auth-status-alert"></div>
+
+    </div>
+  </main>
+
+  <!-- Скрипт: 3D Parallax и реакция фона на движение мыши -->
+  <script>
+    (function() {
+      const card = document.getElementById('login-card');
+      const spotlight = document.getElementById('mouse-spotlight');
+      const orb1 = document.getElementById('orb-1');
+      const orb2 = document.getElementById('orb-2');
+      const orb3 = document.getElementById('orb-3');
+      const orb4 = document.getElementById('orb-4');
+
+      let targetX = 0;
+      let targetY = 0;
+      let currentX = 0;
+      let currentY = 0;
+
+      // Отслеживание мыши с плавным параллаксом
+      window.addEventListener('mousemove', (e) => {
+        const mouseX = e.clientX;
+        const mouseY = e.clientY;
+
+        // Обновляем световой луч под курсором
+        document.documentElement.style.setProperty('--mouse-x', `${mouseX}px`);
+        document.documentElement.style.setProperty('--mouse-y', `${mouseY}px`);
+
+        // Нормализованные координаты от центра экрана (-1 до 1)
+        const centerX = window.innerWidth / 2;
+        const centerY = window.innerHeight / 2;
+        targetX = (mouseX - centerX) / centerX;
+        targetY = (mouseY - centerY) / centerY;
+      });
+
+      // Плавная анимация с инерцией (LERP / requestAnimationFrame)
+      function renderParallax() {
+        currentX += (targetX - currentX) * 0.08;
+        currentY += (targetY - currentY) * 0.08;
+
+        // 1. Движение фоновых светящихся сфер
+        if (orb1) orb1.style.transform = `translate3d(${currentX * 65}px, ${currentY * 65}px, 0)`;
+        if (orb2) orb2.style.transform = `translate3d(${-currentX * 75}px, ${-currentY * 75}px, 0)`;
+        if (orb3) orb3.style.transform = `translate3d(${currentX * 45}px, ${-currentY * 45}px, 0)`;
+        if (orb4) orb4.style.transform = `translate3d(${-currentX * 55}px, ${currentY * 55}px, 0)`;
+
+        // 2. 3D-наклон стеклянной карточки (Tilt Effect)
+        if (card) {
+          const rotateY = currentX * 12; // градусы наклона влево-вправо
+          const rotateX = -currentY * 12; // градусы наклона вверх-вниз
+          card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
+        }
+
+        requestAnimationFrame(renderParallax);
+      }
+      renderParallax();
+
+      // Переключение вкладок Вход / Регистрация
+      const tabLogin = document.getElementById('tab-login');
+      const tabRegister = document.getElementById('tab-register');
+      const loginForm = document.getElementById('login-form');
+      const registerForm = document.getElementById('register-form');
+      const alertBox = document.getElementById('auth-status-alert');
+
+      tabLogin.addEventListener('click', () => {
+        tabLogin.classList.add('active');
+        tabRegister.classList.remove('active');
+        loginForm.style.display = 'block';
+        registerForm.style.display = 'none';
+        if (alertBox) alertBox.style.display = 'none';
+      });
+
+      tabRegister.addEventListener('click', () => {
+        tabRegister.classList.add('active');
+        tabLogin.classList.remove('active');
+        registerForm.style.display = 'block';
+        loginForm.style.display = 'none';
+        if (alertBox) alertBox.style.display = 'none';
+      });
+
+      // Переключатель скрытия/показа пароля
+      const passToggle = document.getElementById('pass-toggle');
+      const passInput = document.getElementById('login-password');
+      if (passToggle && passInput) {
+        passToggle.addEventListener('click', () => {
+          const isPass = passInput.type === 'password';
+          passInput.type = isPass ? 'text' : 'password';
+          passToggle.style.color = isPass ? '#38bdf8' : '#94a3b8';
+        });
+      }
+
+      // Обработка входа
+      function handleSuccessLogin(username) {
+        localStorage.setItem('dotaarena_user', JSON.stringify({
+          name: username,
+          loggedInAt: new Date().toISOString()
+        }));
+
+        if (alertBox) {
+          alertBox.textContent = `Успешный вход! Добро пожаловать, ${username}. Перенаправление...`;
+          alertBox.style.display = 'block';
+        }
+
+        setTimeout(() => {
+          window.location.href = 'index.html';
+        }, 1200);
+      }
+
+      loginForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const email = document.getElementById('login-email').value.trim();
+        const username = email.split('@')[0] || 'Игрок DotaArena';
+        handleSuccessLogin(username);
+      });
+
+      registerForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const nick = document.getElementById('reg-nickname').value.trim();
+        handleSuccessLogin(nick || 'Новый Капитан');
+      });
+
+      // Вход через Steam
+      const steamBtn = document.getElementById('btn-steam-login');
+      if (steamBtn) {
+        steamBtn.addEventListener('click', () => {
+          handleSuccessLogin('Steam Pro Player');
+        });
+      }
+
+      // Забыли пароль
+      const forgotLink = document.getElementById('forgot-link');
+      if (forgotLink) {
+        forgotLink.addEventListener('click', (e) => {
+          e.preventDefault();
+          alert('Инструкция по восстановлению пароля отправлена на указанную почту.');
+        });
+      }
+    })();
+  </script>
+</body>
+</html>
