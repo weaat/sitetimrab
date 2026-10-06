@@ -1070,6 +1070,48 @@ document.addEventListener('DOMContentLoaded', () => {
   const heroModalStats = $('#hero-modal-stats');
   const heroModalDesc = $('#hero-modal-desc');
   const heroModalFacts = $('#hero-modal-facts');
+  const heroModalModeSwitcher = $('#hero-modal-mode-switcher');
+
+  const HERO_GIFS = {
+    hoodwink: 'images/hoodwink_dance.gif',
+    shadow_fiend: 'images/gifs/shadow_fiend.gif',
+    pudge: 'images/gifs/pudge.gif',
+    invoker: 'images/gifs/invoker.gif',
+    storm_spirit: 'images/gifs/storm_spirit.gif',
+    antimage: 'images/gifs/antimage.gif',
+    juggernaut: 'images/gifs/juggernaut.gif',
+    lina: 'images/gifs/lina.gif',
+    axe: 'images/gifs/axe.gif',
+    witch_doctor: 'images/gifs/witch_doctor.gif',
+    rubick: 'images/gifs/rubick.gif',
+    phantom_assassin: 'images/gifs/phantom_assassin.gif',
+    marci: 'images/gifs/marci.gif',
+    earthshaker: 'images/gifs/earthshaker.gif',
+    tinker: 'images/gifs/tinker.gif',
+    sniper: 'images/gifs/sniper.gif',
+    morphling: 'images/gifs/morphling.gif',
+    slark: 'images/gifs/slark.gif',
+    crystal_maiden: 'images/gifs/crystal_maiden.gif',
+    skeleton_king: 'images/gifs/skeleton_king.gif',
+    techies: 'images/gifs/techies.gif',
+    zuus: 'images/gifs/zuus.gif',
+    riki: 'images/gifs/riki.gif',
+    void_spirit: 'images/gifs/void_spirit.gif',
+    primal_beast: 'images/gifs/primal_beast.gif',
+    monkey_king: 'images/gifs/monkey_king.gif',
+    terrorblade: 'images/gifs/terrorblade.gif',
+    muerta: 'images/gifs/muerta.gif',
+    tusk: 'images/gifs/tusk.gif',
+    bristleback: 'images/gifs/bristleback.gif',
+    ogre_magi: 'images/gifs/ogre_magi.gif',
+    enigma: 'images/gifs/enigma.gif',
+    tidehunter: 'images/gifs/tidehunter.gif',
+    drow_ranger: 'images/gifs/drow_ranger.gif',
+    windrunner: 'images/gifs/windrunner.gif',
+    ursa: 'images/gifs/ursa.gif',
+    lion: 'images/gifs/lion.gif',
+    faceless_void: 'images/gifs/faceless_void.gif'
+  };
 
   const heroesData = window.DOTA_HEROES_DATA || [];
   const heroDossiers = window.HERO_DOSSIERS || {};
@@ -1471,7 +1513,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const attrName = ATTR_NAMES[attrKey] || 'Атрибут';
     const attrColor = ATTR_COLORS[attrKey] || '#0ea5e9';
 
-    // 1. Изображение слева — 100% ЛОКАЛЬНЫЙ РЕНДЕР НА ПК
+    // 1. Изображение слева — 100% ЛОКАЛЬНЫЙ РЕНДЕР / GIF НА ПК
     if (heroModalRender) {
       if (heroModalVideo) {
         heroModalVideo.hidden = true;
@@ -1481,18 +1523,61 @@ document.addEventListener('DOMContentLoaded', () => {
 
       heroModalRender.hidden = false;
 
-      // Приоритет локального рендера
-      if (shortName === 'hoodwink' && dossier && dossier.render) {
-        heroModalRender.src = dossier.render;
-      } else {
-        heroModalRender.src = `images/renders/${shortName}.png`;
-      }
+      const hasGif = Boolean(HERO_GIFS && HERO_GIFS[shortName]);
+      const defaultSrc = hasGif ? HERO_GIFS[shortName] : `images/renders/${shortName}.png`;
 
+      heroModalRender.src = defaultSrc;
       heroModalRender.alt = `${heroName} во весь рост`;
       heroModalRender.onerror = function() {
         this.onerror = null;
         this.src = `images/heroes/${shortName}.png`;
       };
+
+      // Интерактивный переключатель режимов (GIF / ZXC / 3D Рендер)
+      if (heroModalModeSwitcher) {
+        heroModalModeSwitcher.innerHTML = '';
+
+        if (shortName === 'shadow_fiend') {
+          // Эксклюзивный культовый набор для Shadow Fiend: ZXC Requiem, ZXCURSED, 3D Рендер
+          const sfModes = [
+            { label: '⚡ ZXC Requiem', src: 'images/gifs/shadow_fiend.gif', active: true },
+            { label: '💀 ZXCURSED', src: 'images/gifs/shadow_fiend_zxcursed.gif', active: false },
+            { label: '🖼 3D Рендер', src: 'images/renders/shadow_fiend.png', active: false }
+          ];
+
+          sfModes.forEach(mode => {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'hero-modal__mode-btn' + (mode.active ? ' hero-modal__mode-btn--active' : '');
+            btn.textContent = mode.label;
+            btn.addEventListener('click', () => {
+              heroModalRender.src = mode.src;
+              heroModalModeSwitcher.querySelectorAll('.hero-modal__mode-btn').forEach(b => b.classList.remove('hero-modal__mode-btn--active'));
+              btn.classList.add('hero-modal__mode-btn--active');
+            });
+            heroModalModeSwitcher.appendChild(btn);
+          });
+        } else if (hasGif) {
+          // Герои с анимацией GIF (включая Hoodwink с танцем)
+          const heroModes = [
+            { label: shortName === 'hoodwink' ? '💃 Танец белки' : '⚡ GIF Анимация', src: HERO_GIFS[shortName], active: true },
+            { label: '🖼 3D Рендер', src: `images/renders/${shortName}.png`, active: false }
+          ];
+
+          heroModes.forEach(mode => {
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.className = 'hero-modal__mode-btn' + (mode.active ? ' hero-modal__mode-btn--active' : '');
+            btn.textContent = mode.label;
+            btn.addEventListener('click', () => {
+              heroModalRender.src = mode.src;
+              heroModalModeSwitcher.querySelectorAll('.hero-modal__mode-btn').forEach(b => b.classList.remove('hero-modal__mode-btn--active'));
+              btn.classList.add('hero-modal__mode-btn--active');
+            });
+            heroModalModeSwitcher.appendChild(btn);
+          });
+        }
+      }
     }
 
     // Динамическая подсветка ауры в стиле Liquid Glass под атрибут героя
