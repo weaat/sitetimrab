@@ -108,21 +108,45 @@
        NAVIGATION — липкая навигация с переключателем темы
        и ссылкой на Telegram
        ============================================================ -->
-  <nav>
-    <ul>
-      <li><a href="#about">О турнире</a></li>
-      <li><a href="#heroes">Герои Dota 2</a></li>
-      <li><a href="#live">Live</a></li>
-      <li><a href="#program">Программа</a></li>
-      <li><a href="#teams">Команды</a></li>
-      <li><a href="#bracket">Сетка</a></li>
-      <li><a href="#rules">Правила</a></li>
-      <li><a href="#news">Новости</a></li>
-      <li><a href="#contacts">Контакты</a></li>
-      <li><a href="#registration" class="nav-cta">Регистрация</a></li>
-    </ul>
+  <nav class="site-nav-bar">
+    <!-- Левая часть: кнопка открытия бокового меню (гамбургер) -->
+    <div class="nav-brand-wrap">
+      <button type="button" id="nav-drawer-toggle" class="nav-drawer-toggle" aria-expanded="false" aria-controls="nav-drawer" aria-label="Открыть меню навигации" title="Меню навигации">
+        <span class="hamburger-box">
+          <span class="hamburger-inner"></span>
+        </span>
+        <span class="nav-drawer-toggle__text">Меню</span>
+      </button>
+    </div>
 
-    <!-- Инструменты в правой части навигации: крупный логотип Telegram и тема -->
+    <!-- Задний затемняющий фон для бокового меню -->
+    <div id="nav-drawer-backdrop" class="nav-drawer-backdrop" aria-hidden="true"></div>
+
+    <!-- Выдвижная боковая панель навигации (Offcanvas Drawer) со всеми кнопками -->
+    <div id="nav-drawer" class="nav-drawer" aria-hidden="true">
+      <div class="nav-drawer__head">
+        <div class="nav-drawer__title-wrap">
+          <img src="images/dota2_logo.png" alt="Dota 2" class="nav-drawer__logo" />
+          <span class="nav-drawer__title">Навигация</span>
+        </div>
+        <button type="button" id="nav-drawer-close" class="nav-drawer__close" aria-label="Закрыть меню" title="Закрыть (Esc)">✕</button>
+      </div>
+
+      <ul class="nav-drawer__list">
+        <li><a href="#about"><span class="nav-link__icon">📜</span> О турнире</a></li>
+        <li><a href="#heroes"><span class="nav-link__icon">⚔️</span> Герои Dota 2</a></li>
+        <li><a href="#live"><span class="nav-link__icon">🔴</span> Live</a></li>
+        <li><a href="#program"><span class="nav-link__icon">📅</span> Программа</a></li>
+        <li><a href="#teams"><span class="nav-link__icon">🛡️</span> Команды</a></li>
+        <li><a href="#bracket"><span class="nav-link__icon">🏆</span> Сетка</a></li>
+        <li><a href="#rules"><span class="nav-link__icon">⚖️</span> Правила</a></li>
+        <li><a href="#news"><span class="nav-link__icon">📰</span> Новости</a></li>
+        <li><a href="#contacts"><span class="nav-link__icon">📞</span> Контакты</a></li>
+        <li><a href="#registration" class="nav-cta"><span class="nav-link__icon">⚡</span> Регистрация</a></li>
+      </ul>
+    </div>
+
+    <!-- Инструменты в правой части навигации: тема, Войти и Telegram -->
     <div class="nav-tools">
       <!-- Переключатель тёмной / светлой темы (SVG) -->
       <button type="button" id="theme-toggle" class="theme-toggle"
@@ -140,6 +164,7 @@
           <line x1="21" y1="12" x2="23" y2="12"></line>
           <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
           <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+        </svg>
       </button>
 
       <!-- Кнопка входа в личный кабинет (Liquid Glass) -->
@@ -169,39 +194,15 @@
   <main>
 
     <!-- ========================================================
-         ВЫДВИЖНАЯ ПАНЕЛЬ СПРАВА: "О ТУРНИРЕ"
-         Плавающая плашка на правом краю экрана для удобного
-         вытаскивания и сворачивания информации о турнире
+         СЕКЦИЯ 1: О ТУРНИРЕ
          ======================================================== -->
-    <div id="about-drawer-backdrop" class="about-drawer-backdrop" aria-hidden="true"></div>
-
-    <button type="button" id="about-drawer-toggle" class="about-drawer-toggle" aria-expanded="false" aria-controls="about" title="О турнире (нажмите, чтобы вытащить или скрыть)">
-      <span class="drawer-toggle__badge">INFO</span>
-      <span class="drawer-toggle__icon">🏆</span>
-      <span class="drawer-toggle__text">О турнире</span>
-      <span class="drawer-toggle__arrow">◀</span>
-    </button>
-
-    <section id="about" class="about-drawer" aria-labelledby="about-drawer-title" aria-hidden="true">
-      <div class="about-drawer__header">
-        <div class="about-drawer__title-wrap">
-          <span class="about-drawer__tag">DotaArena 2026</span>
-          <h2 id="about-drawer-title">О турнире</h2>
-        </div>
-        <button type="button" id="about-drawer-close" class="about-drawer__close" aria-label="Закрыть панель о турнире" title="Закрыть (Esc)">
-          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <line x1="18" y1="6" x2="6" y2="18"></line>
-            <line x1="6" y1="6" x2="18" y2="18"></line>
-          </svg>
-        </button>
-      </div>
-
-      <div class="about-drawer__body">
-        <p class="about-drawer__desc">
-          DotaArena 2026 — ежегодный открытый турнир для лучших команд. В гранд-финал турнира
-          проходят 8 сильнейших составов, прошедших строгий отбор.
-          Призовой фонд — <strong>600 000 ₽</strong>. Регистрация открыта!
-        </p>
+    <section id="about">
+      <h2>О турнире</h2>
+      <p>
+        DotaArena 2026 — ежегодный открытый турнир для лучших команд. В гранд-финал турнира
+        проходят 8 сильнейших составов, прошедших строгий отбор.
+        Призовой фонд — <strong>600 000 ₽</strong>. Регистрация открыта!
+      </p>
 
         <!-- Блок из 4 числовых показателей -->
         <div class="stats-grid about-stats-grid">
@@ -261,8 +262,7 @@
             и до 2 запасных. Возраст участников — не менее 16 лет.
           </p>
         </aside>
-      </div>
-    </section>
+      </section>
 
     <!-- ========================================================
          СЕКЦИЯ 2: ГЕРОИ ТУРНИРА
