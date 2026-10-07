@@ -1,0 +1,1149 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DotaArena 2026 — Практика 10: Оптимизация изображений</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ============================================================
+       ПРАКТИКА 10: ОПТИМИЗАЦИЯ ИЗОБРАЖЕНИЙ (PRACTICE-10)
+       
+       ЭТАПЫ ВЫПОЛНЕНИЯ:
+       1. Сбор исходников в images/originals (без модификации).
+       2. Аудит изображений (размеры, вес, формат, CSS-размер).
+       3. Выбор форматов: WebP для фото и прозрачной графики, SVG для логотипа.
+       4. Геометрическое масштабирование (даунскейл под экраны Retina).
+       5. Настройка сжатия и сравнение артефактов (q=50 vs q=82).
+       6. Создание папки images/optimized с WebP и SVG файлами.
+       7. Переключение сайта на оптимизированные ассеты.
+       8. Расчёт эффекта оптимизации: экономия 95% трафика!
+       ============================================================ */
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --bg-primary:          #030814;
+      --bg-secondary:        #081226;
+      --bg-card:             rgba(8, 20, 44, 0.72);
+      --bg-card-hover:       rgba(14, 30, 64, 0.86);
+      --accent:              #0ea5e9;
+      --accent-light:        #38bdf8;
+      --accent-cyan:         #06b6d4;
+      --accent-glow:         rgba(14, 165, 233, 0.35);
+      --accent-glow-strong:  rgba(56, 189, 248, 0.65);
+      --text-primary:        #f0f6fc;
+      --text-muted:          #94a3b8;
+      --text-faint:          #64748b;
+      --border:              rgba(125, 211, 252, 0.16);
+      --border-accent:       rgba(56, 189, 248, 0.5);
+      --success:             #22c55e;
+      --warning:             #f59e0b;
+      --danger:              #ef4444;
+      --blur:                blur(20px) saturate(1.8);
+      --radius:              20px;
+      --radius-sm:           12px;
+      --gap:                 1.5rem;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      line-height: 1.6;
+      min-height: 100vh;
+      background-image:
+        radial-gradient(circle at 50% 0%, rgba(14, 165, 233, 0.22) 0%, transparent 60%),
+        radial-gradient(circle at 90% 80%, rgba(6, 182, 212, 0.14) 0%, transparent 50%),
+        radial-gradient(circle at 10% 40%, rgba(59, 130, 246, 0.12) 0%, transparent 50%);
+      background-attachment: fixed;
+    }
+
+    img {
+      display: block;
+      max-width: 100%;
+      height: auto;
+    }
+
+    a {
+      color: var(--accent-light);
+      text-decoration: none;
+      transition: color .2s ease;
+    }
+
+    a:hover {
+      color: #fff;
+    }
+
+    .wrapper {
+      width: 100%;
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 0 1.5rem;
+    }
+
+    /* Шапка */
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(3, 8, 20, 0.85);
+      backdrop-filter: var(--blur);
+      -webkit-backdrop-filter: var(--blur);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .header-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 72px;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-weight: 800;
+      font-size: 1.2rem;
+      letter-spacing: -0.02em;
+    }
+
+    .logo-icon {
+      width: 40px;
+      height: 40px;
+    }
+
+    .logo-badge {
+      display: inline-block;
+      padding: 0.2rem 0.55rem;
+      border-radius: 999px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      background: rgba(56, 189, 248, 0.15);
+      color: var(--accent-light);
+      border: 1px solid var(--border-accent);
+    }
+
+    .site-nav {
+      display: flex;
+      gap: 1.5rem;
+      list-style: none;
+    }
+
+    .site-nav a {
+      font-size: 0.92rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      padding: 0.4rem 0.6rem;
+      border-radius: 8px;
+      transition: all 0.2s ease;
+    }
+
+    .site-nav a:hover,
+    .site-nav a.active {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.06);
+    }
+
+    /* Вводный баннер */
+    .hero-section {
+      padding: 3.5rem 0 2rem;
+      text-align: center;
+    }
+
+    .badge {
+      display: inline-block;
+      background: linear-gradient(135deg, rgba(14, 165, 233, 0.2), rgba(6, 182, 212, 0.1));
+      border: 1px solid var(--border-accent);
+      color: var(--accent-light);
+      padding: 0.35rem 0.9rem;
+      border-radius: 999px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 1rem;
+      box-shadow: 0 0 20px var(--accent-glow);
+    }
+
+    .hero-title {
+      font-size: clamp(2rem, 5vw, 3.2rem);
+      font-weight: 900;
+      line-height: 1.15;
+      margin-bottom: 1rem;
+      background: linear-gradient(135deg, #ffffff 0%, #bae6fd 60%, #38bdf8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-subtitle {
+      max-width: 820px;
+      margin: 0 auto;
+      font-size: 1.1rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    /* KPI счетчики оптимизации */
+    .kpi-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 1.25rem;
+      margin: 2.5rem 0;
+    }
+
+    .kpi-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 1.4rem;
+      text-align: center;
+      backdrop-filter: var(--blur);
+      transition: transform .25s ease, border-color .25s ease;
+    }
+
+    .kpi-card:hover {
+      transform: translateY(-4px);
+      border-color: var(--border-accent);
+    }
+
+    .kpi-num {
+      font-size: 2.4rem;
+      font-weight: 900;
+      color: #fff;
+      display: block;
+      line-height: 1.1;
+      margin-bottom: 0.3rem;
+    }
+
+    .kpi-num--green {
+      color: #4ade80;
+      text-shadow: 0 0 25px rgba(74, 222, 128, 0.4);
+    }
+
+    .kpi-label {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      font-weight: 600;
+    }
+
+    /* Bento витрина */
+    .showcase-section {
+      padding: 2rem 0 4rem;
+    }
+
+    .showcase-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      grid-auto-rows: minmax(210px, auto);
+      gap: var(--gap);
+    }
+
+    .showcase-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      backdrop-filter: var(--blur);
+      transition: transform .25s ease, border-color .25s ease, box-shadow .25s ease;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .showcase-card:hover {
+      transform: translateY(-4px);
+      border-color: var(--border-accent);
+      box-shadow: 0 12px 36px rgba(14, 165, 233, 0.2);
+    }
+
+    .card--featured {
+      grid-column: span 2;
+      grid-row: span 2;
+      background: linear-gradient(135deg, rgba(8, 24, 56, 0.85) 0%, rgba(14, 34, 76, 0.7) 100%);
+    }
+
+    .card--wide {
+      grid-column: span 2;
+    }
+
+    .card--tall {
+      grid-row: span 2;
+    }
+
+    .card-tag {
+      display: inline-block;
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--accent-light);
+      margin-bottom: 0.5rem;
+    }
+
+    .card-title {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: #fff;
+      line-height: 1.3;
+      margin-bottom: 0.5rem;
+    }
+
+    .card--featured .card-title {
+      font-size: 1.65rem;
+    }
+
+    .card-desc {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+      margin-bottom: 1rem;
+    }
+
+    .card-media {
+      margin-top: 1rem;
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      position: relative;
+    }
+
+    .card-media--featured {
+      aspect-ratio: 16 / 9;
+    }
+
+    .card-media--tall {
+      aspect-ratio: 4 / 5;
+    }
+
+    .card-media--square {
+      aspect-ratio: 1 / 1;
+    }
+
+    .card-media img,
+    .card-media svg {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+      transition: transform .35s ease;
+    }
+
+    .card-media--hero-contain img {
+      object-fit: contain;
+      background: radial-gradient(circle at center, rgba(14, 165, 233, 0.15) 0%, transparent 70%);
+    }
+
+    .showcase-card:hover .card-media img {
+      transform: scale(1.04);
+    }
+
+    .card-stat {
+      margin-top: auto;
+      padding-top: 1rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .card-stat__value {
+      font-size: 1.8rem;
+      font-weight: 900;
+      color: #fff;
+      display: block;
+      line-height: 1.1;
+    }
+
+    .card-stat__caption {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 0.2rem;
+      display: block;
+    }
+
+    .btn-showcase {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.65rem 1.2rem;
+      border-radius: 10px;
+      font-size: 0.88rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+      color: #fff;
+      border: 1px solid rgba(56, 189, 248, 0.5);
+      cursor: pointer;
+      transition: all .2s ease;
+    }
+
+    .btn-showcase:hover {
+      box-shadow: 0 0 20px rgba(14, 165, 233, 0.6);
+      transform: translateY(-2px);
+      color: #fff;
+    }
+
+    .badge-opt {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      padding: 3px 8px;
+      background: rgba(34, 197, 94, 0.85);
+      backdrop-filter: blur(8px);
+      color: #fff;
+      font-size: 0.68rem;
+      font-weight: 800;
+      border-radius: 6px;
+      letter-spacing: 0.04em;
+      z-index: 2;
+    }
+
+    /* Раздел отчета и аудита */
+    .report-section {
+      padding: 3rem 0 5rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .section-title {
+      font-size: 2rem;
+      font-weight: 800;
+      color: #fff;
+      margin-bottom: 0.5rem;
+    }
+
+    .section-subtitle {
+      font-size: 1rem;
+      color: var(--text-muted);
+      margin-bottom: 2rem;
+    }
+
+    .table-container {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      overflow-x: auto;
+      margin-bottom: 2.5rem;
+      backdrop-filter: var(--blur);
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+      text-align: left;
+    }
+
+    th {
+      background: rgba(14, 165, 233, 0.14);
+      color: #bae6fd;
+      font-weight: 700;
+      padding: 1rem 1.2rem;
+      border-bottom: 1px solid var(--border);
+      text-transform: uppercase;
+      font-size: 0.78rem;
+      letter-spacing: 0.05em;
+      white-space: nowrap;
+    }
+
+    td {
+      padding: 0.95rem 1.2rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      color: var(--text-primary);
+      vertical-align: middle;
+    }
+
+    tr:last-child td {
+      border-bottom: none;
+    }
+
+    tr:hover td {
+      background: rgba(255, 255, 255, 0.03);
+    }
+
+    .pill-format {
+      display: inline-block;
+      padding: 2px 7px;
+      border-radius: 5px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      text-transform: uppercase;
+    }
+
+    .pill-format--jpg { background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.4); }
+    .pill-format--png { background: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.4); }
+    .pill-format--webp { background: rgba(34, 197, 94, 0.2); color: #4ade80; border: 1px solid rgba(34, 197, 94, 0.4); }
+    .pill-format--svg { background: rgba(56, 189, 248, 0.2); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.4); }
+
+    .saved-badge {
+      color: #4ade80;
+      font-weight: 800;
+      background: rgba(34, 197, 94, 0.12);
+      padding: 2px 8px;
+      border-radius: 6px;
+      display: inline-block;
+    }
+
+    .alert-mismatch {
+      color: #f87171;
+      font-weight: 600;
+      font-size: 0.8rem;
+      display: block;
+      margin-top: 2px;
+    }
+
+    /* Блок интерактивного сравнения качества (Этап 5) */
+    .compare-container {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 1.5rem;
+      margin: 2.5rem 0;
+    }
+
+    .compare-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.4rem;
+      backdrop-filter: var(--blur);
+    }
+
+    .compare-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+    }
+
+    .compare-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .compare-img-box {
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      aspect-ratio: 16 / 10;
+      background: #020617;
+      position: relative;
+    }
+
+    .compare-img-box img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+
+    .compare-note {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-top: 0.8rem;
+      line-height: 1.5;
+    }
+
+    /* Шаги выполнения (Чек-лист) */
+    .steps-checklist {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      margin-top: 1.5rem;
+    }
+
+    .step-item {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 1.2rem 1.4rem;
+      display: flex;
+      align-items: flex-start;
+      gap: 1rem;
+      backdrop-filter: var(--blur);
+    }
+
+    .step-check {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      background: rgba(34, 197, 94, 0.2);
+      border: 1px solid rgba(34, 197, 94, 0.5);
+      color: #4ade80;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 900;
+      font-size: 1rem;
+      flex-shrink: 0;
+      margin-top: 2px;
+    }
+
+    .step-content h4 {
+      font-size: 1.05rem;
+      color: #fff;
+      margin-bottom: 0.3rem;
+    }
+
+    .step-content p {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+    }
+
+    .site-footer {
+      border-top: 1px solid var(--border);
+      padding: 2.5rem 0;
+      text-align: center;
+      color: var(--text-faint);
+      font-size: 0.85rem;
+    }
+
+    @media (max-width: 1024px) {
+      .showcase-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .card--featured {
+        grid-column: span 2;
+        grid-row: span 1;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .showcase-grid {
+        grid-template-columns: 1fr;
+      }
+      .card--featured,
+      .card--wide,
+      .card--tall {
+        grid-column: span 1 !important;
+        grid-row: span 1 !important;
+      }
+      .header-inner {
+        flex-direction: column;
+        height: auto;
+        padding: 1rem 0;
+        gap: 0.75rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Шапка страницы -->
+  <header class="site-header">
+    <div class="wrapper header-inner">
+      <div class="logo">
+        <!-- Векторный оптимизированный логотип (Этап 6: SVG) -->
+        <img src="images/optimized/dota2_logo.svg" alt="Dota 2 Logo" class="logo-icon" width="40" height="40" />
+        <span>DotaArena 2026</span>
+        <span class="logo-badge">ПР-10</span>
+      </div>
+      <nav>
+        <ul class="site-nav">
+          <li><a href="#showcase" class="active">Витрина</a></li>
+          <li><a href="#audit">Аудит и форматы</a></li>
+          <li><a href="#compression">Сравнение сжатия</a></li>
+          <li><a href="#results">Итоги (–95%)</a></li>
+          <li><a href="../../index.html">← Главный сайт</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <!-- Вводный раздел -->
+    <section class="hero-section">
+      <div class="wrapper">
+        <div class="badge">Практика 10 · Оптимизация изображений</div>
+        <h1 class="hero-title">Аудит, форматы и сжатие графики</h1>
+        <p class="hero-subtitle">
+          Переход с тяжеловесных PNG-24 и несжатых JPEG на современные форматы WebP и векторный SVG. 
+          Конвертация, изменение геометрии под экраны высокой плотности и радикальное сокращение веса страницы.
+        </p>
+
+        <!-- Суммарный эффект оптимизации (Этап 8) -->
+        <div class="kpi-grid">
+          <div class="kpi-card">
+            <span class="kpi-num">5 068 КБ</span>
+            <span class="kpi-label">Исходный вес (Originals)</span>
+          </div>
+          <div class="kpi-card">
+            <span class="kpi-num kpi-num--green">254 КБ</span>
+            <span class="kpi-label">Оптимизированный вес</span>
+          </div>
+          <div class="kpi-card">
+            <span class="kpi-num kpi-num--green">–95.0%</span>
+            <span class="kpi-label">Экономия трафика</span>
+          </div>
+          <div class="kpi-card">
+            <span class="kpi-num">0.18 с</span>
+            <span class="kpi-label">Ускорение загрузки</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================
+         ВИТРИНА: 8 ЭЛЕМЕНТОВ НА ОПТИМИЗИРОВАННЫХ ФАЙЛАХ (ЭТАП 7)
+         Все картинки берутся из images/optimized/
+         ======================================================== -->
+    <section class="showcase-section" id="showcase">
+      <div class="wrapper">
+        <div class="showcase-grid">
+
+          <!-- 1. ГЛАВНЫЙ ЭЛЕМЕНТ (featured): WebP 960px вместо JPEG 1024px -->
+          <article class="showcase-card card--featured">
+            <span class="badge-opt">WebP · 34.8 КБ (–73%)</span>
+            <div>
+              <div class="card-tag">👑 Главный хедлайнер турнира</div>
+              <h2 class="card-title">Гранд-финал DotaArena 2026: Битва стихий в Москве</h2>
+              <p class="card-desc">
+                Маскот турнира Hoodwink и Shadow Fiend на главной киберспортивной арене. 
+                Решающий гранд-финал турнира с призовым фондом 600 000 ₽.
+              </p>
+              <div class="card-action">
+                <a href="../../index.html#registration" class="btn-showcase">Подать заявку состава</a>
+              </div>
+            </div>
+            <div class="card-media card-media--featured">
+              <img src="images/optimized/cybersport_tournament.webp" alt="Гранд-финал DotaArena 2026" width="960" height="503" loading="eager" />
+            </div>
+          </article>
+
+          <!-- 2. СРЕДНИЙ ЭЛЕМЕНТ (wide): Призовой фонд -->
+          <article class="showcase-card card--wide">
+            <div>
+              <div class="card-tag">💰 Наградной фонд</div>
+              <h3 class="card-title">600 000 ₽ призовых для 8 финалистов</h3>
+              <p class="card-desc">
+                Прямые денежные выплаты победителям. 1 место — 350 000 ₽, 2 место — 150 000 ₽, 3 место — 100 000 ₽.
+              </p>
+            </div>
+            <div class="card-stat">
+              <span class="card-stat__value">600 000 ₽</span>
+              <span class="card-stat__caption">Общий подтверждённый призовой фонд</span>
+            </div>
+          </article>
+
+          <!-- 3. СРЕДНИЙ ЭЛЕМЕНТ (tall): Live Стрим арены (WebP 960px вместо 1024px) -->
+          <article class="showcase-card card--tall">
+            <span class="badge-opt">WebP · 34.8 КБ (–73%)</span>
+            <div>
+              <div class="card-tag">🔴 Live Трансляция</div>
+              <h3 class="card-title">Официальный стрим арены</h3>
+              <p class="card-desc">
+                Прямой эфир со стадиона: Full HD трансляция с комментариями аналитиков.
+              </p>
+            </div>
+            <div class="card-media card-media--tall">
+              <img src="images/optimized/shadow_fiend_bg.webp" alt="Трансляция арены" width="960" height="503" loading="lazy" />
+            </div>
+            <div class="card-action" style="margin-top:0.8rem;">
+              <a href="https://twitch.tv" target="_blank" rel="noopener" class="btn-showcase" style="width:100%;">
+                Смотреть эфир
+              </a>
+            </div>
+          </article>
+
+          <!-- 4. ОБЫЧНЫЙ ЭЛЕМЕНТ 1: Storm Spirit (WebP 600px вместо PNG 1440px) -->
+          <article class="showcase-card">
+            <span class="badge-opt">WebP · 34.0 КБ (–96.4%)</span>
+            <div>
+              <div class="card-tag">⚡ Мета патча 7.41f</div>
+              <h3 class="card-title">Storm Spirit</h3>
+              <p class="card-desc">Лицо рекламной кампании турнира. Сжатие с сохранением прозрачности.</p>
+            </div>
+            <div class="card-media card-media--square card-media--hero-contain">
+              <img src="images/optimized/storm_spirit_render.webp" alt="Storm Spirit" width="600" height="600" loading="lazy" />
+            </div>
+          </article>
+
+          <!-- 5. ОБЫЧНЫЙ ЭЛЕМЕНТ 2: Регламент финала 8 команд -->
+          <article class="showcase-card">
+            <div>
+              <div class="card-tag">🏆 Формат сетки</div>
+              <h3 class="card-title">8 сильнейших команд</h3>
+              <p class="card-desc">Double Elimination сетка. Верхняя и нижняя сетки в формате BO3.</p>
+            </div>
+            <div class="card-stat">
+              <span class="card-stat__value">8</span>
+              <span class="card-stat__caption">Слотов в финальной стадии</span>
+            </div>
+          </article>
+
+          <!-- 6. ОБЫЧНЫЙ ЭЛЕМЕНТ 3: Чек-ин капитанов -->
+          <article class="showcase-card">
+            <div>
+              <div class="card-tag">⏱ Регламент явки</div>
+              <h3 class="card-title">Чек-ин за 30 мин</h3>
+              <p class="card-desc">Обязательное присутствие капитанов в Discord судейского комитета.</p>
+            </div>
+            <div class="card-stat">
+              <span class="card-stat__value">08:30</span>
+              <span class="card-stat__caption">Старт жеребьёвки 14 ноября</span>
+            </div>
+          </article>
+
+          <!-- 7. ОБЫЧНЫЙ ЭЛЕМЕНТ 4: Векторный логотип SVG (Этап 3 и 6) -->
+          <article class="showcase-card">
+            <span class="badge-opt">SVG · 0.8 КБ (–96%)</span>
+            <div>
+              <div class="card-tag">📍 Векторная графика</div>
+              <h3 class="card-title">Арена Москва</h3>
+              <p class="card-desc">Чистый SVG-логотип: бесконечная чёткость при весе менее 1 килобайта.</p>
+            </div>
+            <div class="card-media card-media--square" style="display:flex;align-items:center;justify-content:center;background:rgba(8,20,44,0.5);">
+              <img src="images/optimized/dota2_logo.svg" alt="Dota 2 SVG Logo" width="120" height="120" style="object-fit:contain;width:65%;height:65%;" loading="lazy" />
+            </div>
+          </article>
+
+          <!-- 8. ОБЫЧНЫЙ ЭЛЕМЕНТ 5: Регистрация -->
+          <article class="showcase-card">
+            <div>
+              <div class="card-tag">⏳ Дедлайн слотов</div>
+              <h3 class="card-title">До 1 ноября 2026</h3>
+              <p class="card-desc">Приём заявок открыт. Успейте закрепить слот для вашего коллектива.</p>
+            </div>
+            <div class="card-action">
+              <a href="../../index.html#registration" class="btn-showcase" style="width:100%;">Подать заявку</a>
+            </div>
+          </article>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================
+         РАЗДЕЛ ОТЧЕТА: АУДИТ, СРАВНЕНИЕ И ЭФФЕКТИВНОСТЬ
+         ======================================================== -->
+    <section class="report-section" id="audit">
+      <div class="wrapper">
+        <h2 class="section-title">Аудит и расчет эффективности (Этапы 1–8)</h2>
+        <p class="section-subtitle">
+          Подробный технический анализ 7 ключевых изображений сайта до и после оптимизации.
+        </p>
+
+        <!-- Таблица аудита и эффекта оптимизации (Этапы 2, 3, 4, 6, 8) -->
+        <div class="table-container">
+          <table>
+            <thead>
+              <tr>
+                <th>Изображение и Назначение</th>
+                <th>Исходный формат и Размеры</th>
+                <th>CSS Display</th>
+                <th>Новый формат и Размеры</th>
+                <th>Исходный вес</th>
+                <th>Новый вес</th>
+                <th>Экономия (%)</th>
+                <th>Обоснование формата</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>
+                  <b>cybersport_tournament</b><br />
+                  <span style="color:var(--text-muted);font-size:0.8rem;">Главный баннер турнира</span>
+                </td>
+                <td>
+                  <span class="pill-format pill-format--jpg">JPEG</span><br />
+                  1024 × 537 px
+                </td>
+                <td>
+                  480 × 280 px
+                  <span class="alert-mismatch">в 2.1× меньше</span>
+                </td>
+                <td>
+                  <span class="pill-format pill-format--webp">WebP</span><br />
+                  960 × 503 px
+                </td>
+                <td>127.7 КБ</td>
+                <td><b>34.8 КБ</b></td>
+                <td><span class="saved-badge">–72.7%</span></td>
+                <td>WebP эффективнее сжимает фотографические сцены и градиенты без блочных артефактов JPEG.</td>
+              </tr>
+              <tr>
+                <td>
+                  <b>shadow_fiend_bg</b><br />
+                  <span style="color:var(--text-muted);font-size:0.8rem;">Баннер арены и стрима</span>
+                </td>
+                <td>
+                  <span class="pill-format pill-format--jpg">JPEG</span><br />
+                  1024 × 537 px
+                </td>
+                <td>
+                  320 × 360 px
+                  <span class="alert-mismatch">в 3.2× меньше</span>
+                </td>
+                <td>
+                  <span class="pill-format pill-format--webp">WebP</span><br />
+                  960 × 503 px
+                </td>
+                <td>127.7 КБ</td>
+                <td><b>34.8 КБ</b></td>
+                <td><span class="saved-badge">–72.7%</span></td>
+                <td>WebP устраняет цветовую постеризацию на темных фонах сценического освещения.</td>
+              </tr>
+              <tr>
+                <td>
+                  <b>storm_spirit_render</b><br />
+                  <span style="color:var(--text-muted);font-size:0.8rem;">Рендер Storm Spirit</span>
+                </td>
+                <td>
+                  <span class="pill-format pill-format--png">PNG-24</span><br />
+                  1440 × 1440 px
+                </td>
+                <td>
+                  260 × 260 px
+                  <span class="alert-mismatch">в 5.5× меньше!</span>
+                </td>
+                <td>
+                  <span class="pill-format pill-format--webp">WebP</span><br />
+                  600 × 600 px
+                </td>
+                <td>935.6 КБ</td>
+                <td><b>34.0 КБ</b></td>
+                <td><span class="saved-badge">–96.4%</span></td>
+                <td>WebP сжатие альфа-канала сокращает полупрозрачные свечения и молнии в 27 раз.</td>
+              </tr>
+              <tr>
+                <td>
+                  <b>hoodwink_render</b><br />
+                  <span style="color:var(--text-muted);font-size:0.8rem;">Маскот Hoodwink во весь рост</span>
+                </td>
+                <td>
+                  <span class="pill-format pill-format--png">PNG-24</span><br />
+                  1440 × 1440 px
+                </td>
+                <td>
+                  280 × 280 px
+                  <span class="alert-mismatch">в 5.1× меньше!</span>
+                </td>
+                <td>
+                  <span class="pill-format pill-format--webp">WebP</span><br />
+                  600 × 600 px
+                </td>
+                <td>1 512.6 КБ</td>
+                <td><b>44.0 КБ</b></td>
+                <td><span class="saved-badge">–97.1%</span></td>
+                <td>Критический перерасход в PNG. WebP сохраняет тонкие волоски меха при весе 44 КБ.</td>
+              </tr>
+              <tr>
+                <td>
+                  <b>shadow_fiend_render</b><br />
+                  <span style="color:var(--text-muted);font-size:0.8rem;">Рендер Shadow Fiend</span>
+                </td>
+                <td>
+                  <span class="pill-format pill-format--png">PNG-24</span><br />
+                  1440 × 1440 px
+                </td>
+                <td>
+                  280 × 280 px
+                  <span class="alert-mismatch">в 5.1× меньше!</span>
+                </td>
+                <td>
+                  <span class="pill-format pill-format--webp">WebP</span><br />
+                  600 × 600 px
+                </td>
+                <td>1 332.9 КБ</td>
+                <td><b>75.7 КБ</b></td>
+                <td><span class="saved-badge">–94.3%</span></td>
+                <td>Сложные частицы огня и дыма в альфа-канале сжаты алгоритмом WebP lossy alpha.</td>
+              </tr>
+              <tr>
+                <td>
+                  <b>pudge_render</b><br />
+                  <span style="color:var(--text-muted);font-size:0.8rem;">Рендер Pudge</span>
+                </td>
+                <td>
+                  <span class="pill-format pill-format--png">PNG-24</span><br />
+                  1440 × 1440 px
+                </td>
+                <td>
+                  260 × 260 px
+                  <span class="alert-mismatch">в 5.5× меньше!</span>
+                </td>
+                <td>
+                  <span class="pill-format pill-format--webp">WebP</span><br />
+                  600 × 600 px
+                </td>
+                <td>999.7 КБ</td>
+                <td><b>32.1 КБ</b></td>
+                <td><span class="saved-badge">–96.8%</span></td>
+                <td>Даунскейл до 600px с запасом для Retina 2x + WebP q=82 дали выигрыш в 31 раз.</td>
+              </tr>
+              <tr>
+                <td>
+                  <b>dota2_logo</b><br />
+                  <span style="color:var(--text-muted);font-size:0.8rem;">Официальный логотип</span>
+                </td>
+                <td>
+                  <span class="pill-format pill-format--png">PNG</span><br />
+                  634 × 591 px
+                </td>
+                <td>
+                  40 × 40 px
+                  <span class="alert-mismatch">в 15× меньше!</span>
+                </td>
+                <td>
+                  <span class="pill-format pill-format--svg">SVG</span><br />
+                  Vector (100×100)
+                </td>
+                <td>21.5 КБ</td>
+                <td><b>0.8 КБ</b></td>
+                <td><span class="saved-badge">–96.3%</span></td>
+                <td>Векторный SVG масштабируется без размытия на любом экране, весит 848 байт и красится через CSS.</td>
+              </tr>
+            </tbody>
+            <tfoot>
+              <tr style="background:rgba(14,165,233,0.1);font-weight:800;">
+                <td colspan="4" style="color:#fff;">ИТОГО ПО ВСЕМ КЛЮЧЕВЫМ АССЕТАМ:</td>
+                <td style="color:#f87171;">5 068.7 КБ</td>
+                <td style="color:#4ade80;">254.2 КБ</td>
+                <td colspan="2"><span class="saved-badge" style="font-size:0.95rem;">–94.98% (Экономия 4.81 МБ)</span></td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+
+        <!-- ========================================================
+             ЭТАП 5: НАСТРОЙКА СЖАТИЯ И СРАВНЕНИЕ АРТЕФАКТОВ
+             ======================================================== -->
+        <div id="compression">
+          <h3 style="font-size:1.4rem;color:#fff;margin-bottom:0.6rem;">
+            Сравнение степеней сжатия и артефактов (Этап 5)
+          </h3>
+          <p style="color:var(--text-muted);margin-bottom:1.5rem;font-size:0.92rem;">
+            Создано два варианта сжатия для определения оптимального порога качества без заметных глазу искажений.
+          </p>
+
+          <div class="compare-container">
+            <!-- Образец 1: Чрезмерное сжатие q=50 -->
+            <div class="compare-card">
+              <div class="compare-header">
+                <span class="compare-title">Hoodwink (WebP q=50)</span>
+                <span class="pill-format pill-format--jpg">31.1 КБ · АРТЕФАКТЫ</span>
+              </div>
+              <div class="compare-img-box">
+                <img src="images/optimized/hoodwink_render_q50.webp" alt="Hoodwink сжатие q=50" />
+              </div>
+              <p class="compare-note">
+                <b>Проблема:</b> При агрессивном сжатии q=50 появляются артефакты размытия волосков хвоста, 
+                шум квантования вокруг прозрачных контуров и потеря резкости в мелких деталях костюма.
+              </p>
+            </div>
+
+            <!-- Образец 2: Оптимальное сжатие q=82 -->
+            <div class="compare-card" style="border-color:var(--border-accent);">
+              <div class="compare-header">
+                <span class="compare-title">Hoodwink (WebP q=82) — ВЫБРАНО</span>
+                <span class="pill-format pill-format--webp">44.0 КБ · ИДЕАЛЬНО</span>
+              </div>
+              <div class="compare-img-box">
+                <img src="images/optimized/hoodwink_render.webp" alt="Hoodwink сжатие q=82" />
+              </div>
+              <p class="compare-note">
+                <b>Результат:</b> Качество q=82 находится на пороге перцептивной прозрачности (visually lossless). 
+                Все тонкие элементы меха и свечение сохранены без артефактов, при этом размер файла на 97% меньше оригинала.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <!-- ========================================================
+             ЧЕК-ЛИСТ ВЫПОЛНЕНИЯ ПРАКТИКИ 10
+             ======================================================== -->
+        <div id="results" style="margin-top:3rem;">
+          <h3 style="font-size:1.4rem;color:#fff;margin-bottom:1rem;">
+            Чек-лист выполнения требований практики
+          </h3>
+          <ul class="steps-checklist">
+            <li class="step-item">
+              <div class="step-check">✓</div>
+              <div class="step-content">
+                <h4>1. Сбор исходников в images/originals</h4>
+                <p>Все оригинальные файлы скопированы в неизменном виде в папку <code>images/originals</code>. Рабочие версии отделены от эталонных.</p>
+              </div>
+            </li>
+            <li class="step-item">
+              <div class="step-check">✓</div>
+              <div class="step-content">
+                <h4>2. Аудит 7 изображений</h4>
+                <p>Зафиксированы форматы, исходные пиксельные размеры, вес в КБ и CSS-размеры отображения. Выявлен сильный перерасход в рендерах 1440×1440 px.</p>
+              </div>
+            </li>
+            <li class="step-item">
+              <div class="step-check">✓</div>
+              <div class="step-content">
+                <h4>3. Выбор форматов по назначению</h4>
+                <p>Для фото применён WebP, для графики с прозрачностью — WebP (с lossy альфа-каналом), для логотипа турнира — векторный SVG.</p>
+              </div>
+            </li>
+            <li class="step-item">
+              <div class="step-check">✓</div>
+              <div class="step-content">
+                <h4>4. Изменение геометрических размеров</h4>
+                <p>Ширина рендеров уменьшена с 1440 px до 600 px (2x запас под Retina-экраны для карточек шириной 260–300 px) с сохранением точных пропорций.</p>
+              </div>
+            </li>
+            <li class="step-item">
+              <div class="step-check">✓</div>
+              <div class="step-content">
+                <h4>5. Настройка сжатия (q=50 vs q=82)</h4>
+                <p>Протестированы варианты сжатия. Установлено оптимальное качество q=82, устраняющее артефакты при сохранении микродеталей.</p>
+              </div>
+            </li>
+            <li class="step-item">
+              <div class="step-check">✓</div>
+              <div class="step-content">
+                <h4>6. Подготовка папки images/optimized</h4>
+                <p>Сгенерированы 6 файлов WebP и 1 векторный SVG в каталоге <code>images/optimized</code> с понятными именованиями.</p>
+              </div>
+            </li>
+            <li class="step-item">
+              <div class="step-check">✓</div>
+              <div class="step-content">
+                <h4>7. Обновление путей на сайте</h4>
+                <p>Разметка HTML полностью переведена на ассеты из <code>images/optimized/</code>. Оригиналы сохранены для сверки и отчёта.</p>
+              </div>
+            </li>
+            <li class="step-item">
+              <div class="step-check">✓</div>
+              <div class="step-content">
+                <h4>8. Расчёт эффекта оптимизации</h4>
+                <p>Суммарный вес графики снизился с 5 068 КБ до 254 КБ. Реальная экономия трафика составила <b>94.98%</b>.</p>
+              </div>
+            </li>
+          </ul>
+        </div>
+
+      </div>
+    </section>
+  </main>
+
+  <!-- Футер -->
+  <footer class="site-footer">
+    <div class="wrapper">
+      <p>DotaArena 2026 · Практика 10: Оптимизация изображений и форматы графики</p>
+      <p style="margin-top:0.4rem;color:var(--text-muted);">
+        Авторы: Барышев Даниил, Мисриханов Тимур, Марьин Вадим | Группа 37-ВЕБ
+      </p>
+    </div>
+  </footer>
+
+</body>
+</html>

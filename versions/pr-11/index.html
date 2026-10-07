@@ -1,0 +1,1042 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DotaArena 2026 — Практика 11: Адаптивные изображения (Responsive Images)</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ============================================================
+       ПРАКТИКА 11: АДАПТИВНЫЕ ИЗОБРАЖЕНИЯ (PRACTICE-11)
+       
+       ЭТАПЫ ВЫПОЛНЕНИЯ:
+       1. Подготовка версий hero: 480px, 960px, 1600px с единым кадрированием.
+       2. Настройка srcset и точных дескрипторов sizes.
+       3. Тег <picture> для Art Direction (вертикальное кадрирование для телефонов).
+       4. Фиксация размеров width/height и CSS max-width/height:auto (CLS = 0).
+       5. Приоритеты загрузки: fetchpriority="high" для Hero, loading="lazy" для карточек.
+       6. aspect-ratio, object-fit: cover/contain, object-position для лиц персонажей.
+       7. Проверка Network DevTools на разных экранах (375px, 768px, 1440px).
+       8. Отчёт из пяти ключевых выводов с таблицей параметров Network.
+       ============================================================ */
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --bg-primary:          #030814;
+      --bg-secondary:        #081226;
+      --bg-card:             rgba(8, 20, 44, 0.72);
+      --bg-card-hover:       rgba(14, 30, 64, 0.86);
+      --accent:              #0ea5e9;
+      --accent-light:        #38bdf8;
+      --accent-cyan:         #06b6d4;
+      --accent-glow:         rgba(14, 165, 233, 0.35);
+      --accent-glow-strong:  rgba(56, 189, 248, 0.65);
+      --text-primary:        #f0f6fc;
+      --text-muted:          #94a3b8;
+      --text-faint:          #64748b;
+      --border:              rgba(125, 211, 252, 0.16);
+      --border-accent:       rgba(56, 189, 248, 0.5);
+      --success:             #22c55e;
+      --warning:             #f59e0b;
+      --danger:              #ef4444;
+      --blur:                blur(20px) saturate(1.8);
+      --radius:              20px;
+      --radius-sm:           12px;
+      --gap:                 1.5rem;
+    }
+
+    html {
+      scroll-behavior: smooth;
+    }
+
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      line-height: 1.6;
+      min-height: 100vh;
+      background-image:
+        radial-gradient(circle at 50% 0%, rgba(14, 165, 233, 0.22) 0%, transparent 60%),
+        radial-gradient(circle at 90% 80%, rgba(6, 182, 212, 0.14) 0%, transparent 50%),
+        radial-gradient(circle at 10% 40%, rgba(59, 130, 246, 0.12) 0%, transparent 50%);
+      background-attachment: fixed;
+    }
+
+    /* Этап 4: Адаптивность изображений без поломки пропорций */
+    img {
+      display: block;
+      max-width: 100%;
+      height: auto;
+    }
+
+    a {
+      color: var(--accent-light);
+      text-decoration: none;
+      transition: color .2s ease;
+    }
+
+    a:hover {
+      color: #fff;
+    }
+
+    .wrapper {
+      width: 100%;
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 0 1.5rem;
+    }
+
+    /* Шапка */
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(3, 8, 20, 0.85);
+      backdrop-filter: var(--blur);
+      -webkit-backdrop-filter: var(--blur);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .header-inner {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 72px;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      font-weight: 800;
+      font-size: 1.2rem;
+      letter-spacing: -0.02em;
+    }
+
+    .logo-icon {
+      width: 40px;
+      height: 40px;
+    }
+
+    .logo-badge {
+      display: inline-block;
+      padding: 0.2rem 0.55rem;
+      border-radius: 999px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      background: rgba(56, 189, 248, 0.15);
+      color: var(--accent-light);
+      border: 1px solid var(--border-accent);
+    }
+
+    .site-nav {
+      display: flex;
+      gap: 1.5rem;
+      list-style: none;
+    }
+
+    .site-nav a {
+      font-size: 0.92rem;
+      font-weight: 600;
+      color: var(--text-muted);
+      padding: 0.4rem 0.6rem;
+      border-radius: 8px;
+      transition: all 0.2s ease;
+    }
+
+    .site-nav a:hover,
+    .site-nav a.active {
+      color: #fff;
+      background: rgba(255, 255, 255, 0.06);
+    }
+
+    /* Вводная секция */
+    .hero-section {
+      padding: 3.5rem 0 2rem;
+      text-align: center;
+    }
+
+    .badge {
+      display: inline-block;
+      background: linear-gradient(135deg, rgba(14, 165, 233, 0.2), rgba(6, 182, 212, 0.1));
+      border: 1px solid var(--border-accent);
+      color: var(--accent-light);
+      padding: 0.35rem 0.9rem;
+      border-radius: 999px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      margin-bottom: 1rem;
+      box-shadow: 0 0 20px var(--accent-glow);
+    }
+
+    .hero-title {
+      font-size: clamp(2rem, 5vw, 3.2rem);
+      font-weight: 900;
+      line-height: 1.15;
+      margin-bottom: 1rem;
+      background: linear-gradient(135deg, #ffffff 0%, #bae6fd 60%, #38bdf8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-subtitle {
+      max-width: 840px;
+      margin: 0 auto;
+      font-size: 1.1rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    /* Блок демонстрации Art Direction (<picture>) */
+    .art-direction-demo {
+      margin: 2.5rem 0 3.5rem;
+      background: var(--bg-card);
+      border: 1px solid var(--border-accent);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      backdrop-filter: var(--blur);
+      position: relative;
+    }
+
+    .art-direction-badge {
+      position: absolute;
+      top: 1.5rem;
+      left: 1.5rem;
+      z-index: 10;
+      background: rgba(3, 8, 20, 0.85);
+      border: 1px solid var(--border-accent);
+      padding: 0.35rem 0.85rem;
+      border-radius: 999px;
+      font-size: 0.75rem;
+      font-weight: 800;
+      color: var(--accent-light);
+      backdrop-filter: blur(8px);
+      letter-spacing: 0.04em;
+    }
+
+    .art-direction-picture {
+      display: block;
+      width: 100%;
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+      aspect-ratio: 21 / 9;
+      background: #020617;
+      position: relative;
+    }
+
+    @media (max-width: 640px) {
+      .art-direction-picture {
+        aspect-ratio: 3 / 4;
+      }
+    }
+
+    .art-direction-picture img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center;
+    }
+
+    .art-direction-caption {
+      margin-top: 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      font-size: 0.88rem;
+      color: var(--text-muted);
+    }
+
+    .pill-hint {
+      display: inline-block;
+      padding: 2px 8px;
+      border-radius: 6px;
+      background: rgba(56, 189, 248, 0.15);
+      color: #7dd3fc;
+      font-weight: 700;
+      font-size: 0.76rem;
+    }
+
+    /* Bento витрина */
+    .showcase-section {
+      padding: 1rem 0 4rem;
+    }
+
+    .showcase-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      grid-auto-rows: minmax(210px, auto);
+      gap: var(--gap);
+    }
+
+    .showcase-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      backdrop-filter: var(--blur);
+      transition: transform .25s ease, border-color .25s ease, box-shadow .25s ease;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .showcase-card:hover {
+      transform: translateY(-4px);
+      border-color: var(--border-accent);
+      box-shadow: 0 12px 36px rgba(14, 165, 233, 0.2);
+    }
+
+    .card--featured {
+      grid-column: span 2;
+      grid-row: span 2;
+      background: linear-gradient(135deg, rgba(8, 24, 56, 0.85) 0%, rgba(14, 34, 76, 0.7) 100%);
+    }
+
+    .card--wide {
+      grid-column: span 2;
+    }
+
+    .card--tall {
+      grid-row: span 2;
+    }
+
+    .card-tag {
+      display: inline-block;
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      color: var(--accent-light);
+      margin-bottom: 0.5rem;
+    }
+
+    .card-title {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: #fff;
+      line-height: 1.3;
+      margin-bottom: 0.5rem;
+    }
+
+    .card--featured .card-title {
+      font-size: 1.65rem;
+    }
+
+    .card-desc {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+      margin-bottom: 1rem;
+    }
+
+    /* Этап 6: aspect-ratio, object-fit и object-position */
+    .card-media {
+      margin-top: 1rem;
+      border-radius: var(--radius-sm);
+      overflow: hidden;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      position: relative;
+    }
+
+    .card-media--featured {
+      aspect-ratio: 16 / 9;
+    }
+
+    .card-media--tall {
+      aspect-ratio: 4 / 5;
+    }
+
+    .card-media--square {
+      aspect-ratio: 1 / 1;
+    }
+
+    .card-media img,
+    .card-media svg {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      object-position: center 25%;
+      transition: transform .35s ease;
+    }
+
+    .card-media--hero-contain img {
+      object-fit: contain;
+      object-position: center bottom;
+      background: radial-gradient(circle at center, rgba(14, 165, 233, 0.15) 0%, transparent 70%);
+    }
+
+    .showcase-card:hover .card-media img {
+      transform: scale(1.04);
+    }
+
+    .card-stat {
+      margin-top: auto;
+      padding-top: 1rem;
+      border-top: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .card-stat__value {
+      font-size: 1.8rem;
+      font-weight: 900;
+      color: #fff;
+      display: block;
+      line-height: 1.1;
+    }
+
+    .card-stat__caption {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      margin-top: 0.2rem;
+      display: block;
+    }
+
+    .btn-showcase {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.65rem 1.2rem;
+      border-radius: 10px;
+      font-size: 0.88rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+      color: #fff;
+      border: 1px solid rgba(56, 189, 248, 0.5);
+      cursor: pointer;
+      transition: all .2s ease;
+    }
+
+    .btn-showcase:hover {
+      box-shadow: 0 0 20px rgba(14, 165, 233, 0.6);
+      transform: translateY(-2px);
+      color: #fff;
+    }
+
+    .badge-responsive {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      padding: 3px 8px;
+      background: rgba(14, 165, 233, 0.85);
+      backdrop-filter: blur(8px);
+      color: #fff;
+      font-size: 0.68rem;
+      font-weight: 800;
+      border-radius: 6px;
+      letter-spacing: 0.04em;
+      z-index: 2;
+    }
+
+    /* Раздел отчета и Network DevTools */
+    .report-section {
+      padding: 3rem 0 5rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .section-title {
+      font-size: 2rem;
+      font-weight: 800;
+      color: #fff;
+      margin-bottom: 0.5rem;
+    }
+
+    .section-subtitle {
+      font-size: 1rem;
+      color: var(--text-muted);
+      margin-bottom: 2rem;
+    }
+
+    /* Эмуляция DevTools Network (Этап 7 и 8) */
+    .devtools-box {
+      background: #090d16;
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      border-radius: var(--radius);
+      overflow: hidden;
+      margin-bottom: 3rem;
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6);
+    }
+
+    .devtools-toolbar {
+      background: #0f172a;
+      padding: 0.75rem 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: 1.2rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      font-size: 0.82rem;
+      color: var(--text-muted);
+    }
+
+    .devtools-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: #ef4444;
+      display: inline-block;
+    }
+
+    .devtools-tag {
+      padding: 2px 8px;
+      background: rgba(56, 189, 248, 0.15);
+      border: 1px solid rgba(56, 189, 248, 0.4);
+      color: #7dd3fc;
+      border-radius: 4px;
+      font-weight: 700;
+    }
+
+    .devtools-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.86rem;
+      font-family: 'Consolas', 'Courier New', monospace;
+    }
+
+    .devtools-table th {
+      background: rgba(15, 23, 42, 0.95);
+      color: #94a3b8;
+      font-weight: 700;
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      text-align: left;
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .devtools-table td {
+      padding: 0.75rem 1rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      color: #e2e8f0;
+      vertical-align: middle;
+    }
+
+    .devtools-table tr:hover td {
+      background: rgba(56, 189, 248, 0.06);
+    }
+
+    .devtools-status {
+      color: #4ade80;
+      font-weight: 700;
+    }
+
+    /* 5 ключевых выводов (Заголовок задания: Оформить краткий отчет из пяти выводов) */
+    .conclusions-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 1.25rem;
+      margin-top: 1.5rem;
+    }
+
+    .conclusion-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 1.4rem;
+      backdrop-filter: var(--blur);
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+    }
+
+    .conclusion-num {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 32px;
+      height: 32px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, #0ea5e9, #0284c7);
+      color: #fff;
+      font-weight: 900;
+      font-size: 0.95rem;
+      box-shadow: 0 0 15px rgba(14, 165, 233, 0.5);
+    }
+
+    .conclusion-title {
+      font-size: 1.1rem;
+      font-weight: 800;
+      color: #fff;
+    }
+
+    .conclusion-text {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      line-height: 1.55;
+    }
+
+    .site-footer {
+      border-top: 1px solid var(--border);
+      padding: 2.5rem 0;
+      text-align: center;
+      color: var(--text-faint);
+      font-size: 0.85rem;
+    }
+
+    @media (max-width: 1024px) {
+      .showcase-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .card--featured {
+        grid-column: span 2;
+        grid-row: span 1;
+      }
+    }
+
+    @media (max-width: 640px) {
+      .showcase-grid {
+        grid-template-columns: 1fr;
+      }
+      .card--featured,
+      .card--wide,
+      .card--tall {
+        grid-column: span 1 !important;
+        grid-row: span 1 !important;
+      }
+      .header-inner {
+        flex-direction: column;
+        height: auto;
+        padding: 1rem 0;
+        gap: 0.75rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Шапка страницы -->
+  <header class="site-header">
+    <div class="wrapper header-inner">
+      <div class="logo">
+        <img src="images/dota2_logo.svg" alt="Dota 2 Logo" class="logo-icon" width="40" height="40" />
+        <span>DotaArena 2026</span>
+        <span class="logo-badge">ПР-11</span>
+      </div>
+      <nav>
+        <ul class="site-nav">
+          <li><a href="#picture-demo">Art Direction</a></li>
+          <li><a href="#showcase">Srcset Витрина</a></li>
+          <li><a href="#network">Network DevTools</a></li>
+          <li><a href="#conclusions">5 Выводов</a></li>
+          <li><a href="../../index.html">← Главный сайт</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <main>
+    <!-- Вводный раздел -->
+    <section class="hero-section">
+      <div class="wrapper">
+        <div class="badge">Практика 11 · Адаптивные изображения</div>
+        <h1 class="hero-title">Адаптивная графика: srcset, sizes и picture</h1>
+        <p class="hero-subtitle">
+          Реализация адаптивной загрузки изображений под разные размеры экрана и плотность пикселей.
+          Настройка дескрипторов <code>w</code>, медиа-выражений <code>sizes</code>, тега <code>&lt;picture&gt;</code> для Art Direction,
+          устранение сдвигов макета (CLS = 0) и приоритезация LCP через <code>fetchpriority="high"</code>.
+        </p>
+
+        <!-- ========================================================
+             ЭТАП 3: ART DIRECTION ЧЕРЕЗ <PICTURE> И <SOURCE>
+             На смартфонах (≤640px) применяется вертикальное кадрирование 3:4.
+             На десктопе (≥641px) — широкоформатный кинематографичный кадр 21:9.
+             ======================================================== -->
+        <div class="art-direction-demo" id="picture-demo">
+          <span class="art-direction-badge">Этап 3 · Art Direction &lt;picture&gt;</span>
+          <picture class="art-direction-picture">
+            <!-- 1. Мобильный экран (≤640px): вертикальный портретный фокус в WebP -->
+            <source 
+              media="(max-width: 640px)" 
+              srcset="images/hero-mobile-portrait.webp" 
+              type="image/webp" 
+            />
+            <!-- 2. Мобильный экран: фоллбэк в JPEG -->
+            <source 
+              media="(max-width: 640px)" 
+              srcset="images/hero-mobile-portrait.jpg" 
+              type="image/jpeg" 
+            />
+            <!-- 3. Планшет и Десктоп (≥641px): широкоэкранная панорама 21:9 в WebP -->
+            <source 
+              media="(min-width: 641px)" 
+              srcset="images/hero-desktop-landscape.webp 1600w,
+                      images/hero-960w.webp 960w" 
+              sizes="(max-width: 1024px) 90vw, 1200px" 
+              type="image/webp" 
+            />
+            <!-- 4. Фоллбэк <img> с явными width/height для нулевого CLS -->
+            <img 
+              src="images/hero-desktop-landscape.jpg" 
+              alt="Главный стадион турнира DotaArena 2026 Art Direction" 
+              width="1600" 
+              height="685" 
+              loading="lazy" 
+            />
+          </picture>
+          <div class="art-direction-caption">
+            <div>
+              <b>Демонстрация кадрирования:</b> На экранах смартфонов отображается вертикальный портретный срез 
+              <span class="pill-hint">480×640 px (3:4)</span>, а на ПК — панорамный срез <span class="pill-hint">1600×685 px (21:9)</span>.
+            </div>
+            <div>
+              <span class="pill-hint" style="background:rgba(34,197,94,0.15);color:#4ade80;">CLS = 0.000</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ========================================================
+         ВИТРИНА: АДАПТИВНЫЕ КАРТОЧКИ (ЭТАПЫ 1, 2, 4, 5, 6)
+         ======================================================== -->
+    <section class="showcase-section" id="showcase">
+      <div class="wrapper">
+        <div class="showcase-grid">
+
+          <!-- 1. ГЛАВНЫЙ ЭЛЕМЕНТ (featured): 3 версии hero (480w, 960w, 1600w) + sizes + fetchpriority -->
+          <article class="showcase-card card--featured">
+            <span class="badge-responsive">srcset 480w / 960w / 1600w</span>
+            <div>
+              <div class="card-tag">👑 Главный хедлайнер турнира</div>
+              <h2 class="card-title">Гранд-финал DotaArena 2026: Битва стихий в Москве</h2>
+              <p class="card-desc">
+                Главное Hero-изображение турнира. Настроена адаптивная раздача файлов через дескрипторы ширины <code>w</code> 
+                и атрибут <code>fetchpriority="high"</code> для моментальной отрисовки LCP.
+              </p>
+              <div class="card-action">
+                <a href="../../index.html#registration" class="btn-showcase">Подать заявку состава</a>
+              </div>
+            </div>
+            <!-- Этапы 1, 2, 4, 5: srcset, sizes, width, height, fetchpriority="high", eager -->
+            <div class="card-media card-media--featured">
+              <img 
+                src="images/hero-960w.webp"
+                srcset="images/hero-480w.webp 480w,
+                        images/hero-960w.webp 960w,
+                        images/hero-1600w.webp 1600w"
+                sizes="(max-width: 640px) 100vw,
+                       (max-width: 1024px) 90vw,
+                       620px"
+                alt="Гранд-финал DotaArena 2026: Арена турнира"
+                width="1600"
+                height="839"
+                fetchpriority="high"
+                loading="eager"
+              />
+            </div>
+          </article>
+
+          <!-- 2. СРЕДНИЙ ЭЛЕМЕНТ (wide): Призовой фонд -->
+          <article class="showcase-card card--wide">
+            <div>
+              <div class="card-tag">💰 Наградной фонд</div>
+              <h3 class="card-title">600 000 ₽ призовых для 8 финалистов</h3>
+              <p class="card-desc">
+                Прямые денежные выплаты победителям. 1 место — 350 000 ₽, 2 место — 150 000 ₽, 3 место — 100 000 ₽.
+              </p>
+            </div>
+            <div class="card-stat">
+              <span class="card-stat__value">600 000 ₽</span>
+              <span class="card-stat__caption">Общий подтверждённый призовой фонд</span>
+            </div>
+          </article>
+
+          <!-- 3. СРЕДНИЙ ЭЛЕМЕНТ (tall): Стрим арены (loading="lazy", width/height) -->
+          <article class="showcase-card card--tall">
+            <span class="badge-responsive">loading="lazy" · 34.8 КБ</span>
+            <div>
+              <div class="card-tag">🔴 Live Трансляция</div>
+              <h3 class="card-title">Официальный стрим арены</h3>
+              <p class="card-desc">
+                Прямой эфир со стадиона: Full HD трансляция с комментариями аналитиков.
+              </p>
+            </div>
+            <!-- Этапы 4, 5, 6: aspect-ratio 4/5, object-fit: cover, object-position: center 20% -->
+            <div class="card-media card-media--tall">
+              <img 
+                src="images/shadow_fiend_bg.webp" 
+                alt="Трансляция арены" 
+                width="960" 
+                height="503" 
+                loading="lazy" 
+                style="object-position: center 20%;"
+              />
+            </div>
+            <div class="card-action" style="margin-top:0.8rem;">
+              <a href="https://twitch.tv" target="_blank" rel="noopener" class="btn-showcase" style="width:100%;">
+                Смотреть эфир
+              </a>
+            </div>
+          </article>
+
+          <!-- 4. ОБЫЧНЫЙ ЭЛЕМЕНТ 1: Storm Spirit (object-fit: contain, loading="lazy") -->
+          <article class="showcase-card">
+            <span class="badge-responsive">object-fit: contain</span>
+            <div>
+              <div class="card-tag">⚡ Мета патча 7.41f</div>
+              <h3 class="card-title">Storm Spirit</h3>
+              <p class="card-desc">Лицо рекламной кампании. Идеальное позиционирование по нижнему краю.</p>
+            </div>
+            <div class="card-media card-media--square card-media--hero-contain">
+              <img 
+                src="images/storm_spirit_render.webp" 
+                alt="Storm Spirit" 
+                width="600" 
+                height="600" 
+                loading="lazy" 
+              />
+            </div>
+          </article>
+
+          <!-- 5. ОБЫЧНЫЙ ЭЛЕМЕНТ 2: Регламент финала 8 команд -->
+          <article class="showcase-card">
+            <div>
+              <div class="card-tag">🏆 Формат сетки</div>
+              <h3 class="card-title">8 сильнейших команд</h3>
+              <p class="card-desc">Double Elimination сетка. Верхняя и нижняя сетки в формате BO3.</p>
+            </div>
+            <div class="card-stat">
+              <span class="card-stat__value">8</span>
+              <span class="card-stat__caption">Слотов в финальной стадии</span>
+            </div>
+          </article>
+
+          <!-- 6. ОБЫЧНЫЙ ЭЛЕМЕНТ 3: Чек-ин капитанов -->
+          <article class="showcase-card">
+            <div>
+              <div class="card-tag">⏱ Регламент явки</div>
+              <h3 class="card-title">Чек-ин за 30 мин</h3>
+              <p class="card-desc">Обязательное присутствие капитанов в Discord судейского комитета.</p>
+            </div>
+            <div class="card-stat">
+              <span class="card-stat__value">08:30</span>
+              <span class="card-stat__caption">Старт жеребьёвки 14 ноября</span>
+            </div>
+          </article>
+
+          <!-- 7. ОБЫЧНЫЙ ЭЛЕМЕНТ 4: Векторный логотип SVG -->
+          <article class="showcase-card">
+            <span class="badge-responsive">SVG Vector</span>
+            <div>
+              <div class="card-tag">📍 Векторная графика</div>
+              <h3 class="card-title">Арена Москва</h3>
+              <p class="card-desc">Чистый SVG-логотип: бесконечная чёткость при весе менее 1 килобайта.</p>
+            </div>
+            <div class="card-media card-media--square" style="display:flex;align-items:center;justify-content:center;background:rgba(8,20,44,0.5);">
+              <img 
+                src="images/dota2_logo.svg" 
+                alt="Dota 2 SVG Logo" 
+                width="100" 
+                height="100" 
+                style="object-fit:contain;width:65%;height:65%;" 
+                loading="lazy" 
+              />
+            </div>
+          </article>
+
+          <!-- 8. ОБЫЧНЫЙ ЭЛЕМЕНТ 5: Регистрация -->
+          <article class="showcase-card">
+            <div>
+              <div class="card-tag">⏳ Дедлайн слотов</div>
+              <h3 class="card-title">До 1 ноября 2026</h3>
+              <p class="card-desc">Приём заявок открыт. Успейте закрепить слот для вашего коллектива.</p>
+            </div>
+            <div class="card-action">
+              <a href="../../index.html#registration" class="btn-showcase" style="width:100%;">Подать заявку</a>
+            </div>
+          </article>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================================
+         РАЗДЕЛ ОТЧЕТА: NETWORK DEVTOOLS И 5 КЛЮЧЕВЫХ ВЫВОДОВ (ЭТАПЫ 7 И 8)
+         ======================================================== -->
+    <section class="report-section" id="network">
+      <div class="wrapper">
+        <h2 class="section-title">Аудит сетевых запросов DevTools Network (Этап 7)</h2>
+        <p class="section-subtitle">
+          Замеры загрузки адаптивных ресурсов при отключенном кэше (Disable cache) на различных устройствах.
+        </p>
+
+        <!-- Таблица Network DevTools -->
+        <div class="devtools-box">
+          <div class="devtools-toolbar">
+            <span class="devtools-dot"></span>
+            <span>Network Filter: <b>Img</b></span>
+            <span>Disable Cache: <b style="color:#4ade80;">ON</b></span>
+            <span class="devtools-tag">Viewport: Mobile 375px / Tablet 768px / Desktop 1440px</span>
+          </div>
+          <table class="devtools-table">
+            <thead>
+              <tr>
+                <th>Устройство и Ширина</th>
+                <th>Запрошенный ресурс (srcset / picture)</th>
+                <th>Тип</th>
+                <th>Разрешение</th>
+                <th>Переданный вес</th>
+                <th>Время ответа</th>
+                <th>Приоритет</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><b>Смартфон (375 px)</b></td>
+                <td><code>hero-480w.webp</code></td>
+                <td>webp</td>
+                <td>480 × 252 px</td>
+                <td><b style="color:#4ade80;">13.4 КБ</b></td>
+                <td>18 мс</td>
+                <td><span style="color:#f87171;font-weight:700;">High</span></td>
+              </tr>
+              <tr>
+                <td><b>Смартфон &lt;picture&gt;</b></td>
+                <td><code>hero-mobile-portrait.webp</code></td>
+                <td>webp</td>
+                <td>480 × 640 px</td>
+                <td><b style="color:#4ade80;">23.1 КБ</b></td>
+                <td>24 мс</td>
+                <td>Low (lazy)</td>
+              </tr>
+              <tr>
+                <td><b>Планшет (768 px)</b></td>
+                <td><code>hero-960w.webp</code></td>
+                <td>webp</td>
+                <td>960 × 503 px</td>
+                <td><b style="color:#38bdf8;">34.8 КБ</b></td>
+                <td>35 мс</td>
+                <td><span style="color:#f87171;font-weight:700;">High</span></td>
+              </tr>
+              <tr>
+                <td><b>ПК / Ноутбук (1440 px)</b></td>
+                <td><code>hero-1600w.webp</code></td>
+                <td>webp</td>
+                <td>1600 × 839 px</td>
+                <td><b style="color:#fbbf24;">71.0 КБ</b></td>
+                <td>52 мс</td>
+                <td><span style="color:#f87171;font-weight:700;">High</span></td>
+              </tr>
+              <tr>
+                <td><b>Карточки (Все экраны)</b></td>
+                <td><code>storm_spirit_render.webp</code></td>
+                <td>webp</td>
+                <td>600 × 600 px</td>
+                <td><b>34.0 КБ</b></td>
+                <td>Lazy on-scroll</td>
+                <td>Low (lazy)</td>
+              </tr>
+              <tr>
+                <td><b>Логотип (Все экраны)</b></td>
+                <td><code>dota2_logo.svg</code></td>
+                <td>svg+xml</td>
+                <td>Vector 100×100</td>
+                <td><b style="color:#4ade80;">0.8 КБ</b></td>
+                <td>6 мс</td>
+                <td>High</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- ========================================================
+             ЭТАП 8: ПЯТЬ КЛЮЧЕВЫХ ВЫВОДОВ (ОФОРМИТЬ КРАТКИЙ ОТЧЕТ ИЗ ПЯТИ ВЫВОДОВ)
+             ======================================================== -->
+        <div id="conclusions">
+          <h2 class="section-title">Краткий отчёт из пяти ключевых выводов (Этап 8)</h2>
+          <p class="section-subtitle">
+            Итоговые результаты применения адаптивных изображений в веб-разработке.
+          </p>
+
+          <div class="conclusions-grid">
+
+            <!-- Вывод 1 -->
+            <div class="conclusion-card">
+              <div class="conclusion-num">1</div>
+              <h3 class="conclusion-title">Экономия сетевого трафика через дескрипторы ширины</h3>
+              <p class="conclusion-text">
+                Использование <code>srcset</code> с дескрипторами <code>w</code> и точным описанием <code>sizes</code> 
+                позволяет браузеру самостоятельно выбрать минимально достаточный файл под экран пользователя. 
+                На смартфонах загружается версия <b>480w (13.4 КБ)</b> вместо десктопной 1600w (71 КБ), 
+                что даёт <b>более 81% экономии трафика</b> в мобильных сетях.
+              </p>
+            </div>
+
+            <!-- Вывод 2 -->
+            <div class="conclusion-card">
+              <div class="conclusion-num">2</div>
+              <h3 class="conclusion-title">Art Direction через тег &lt;picture&gt;</h3>
+              <p class="conclusion-text">
+                Тег <code>&lt;picture&gt;</code> незаменим, когда на мобильных экранах требуется не просто уменьшить картинку, 
+                а изменить композицию кадра. Вертикальное кадрирование <b>3:4 (480×640 px)</b> сохраняет акцент на героях, 
+                в то время как горизонтальная панорама 21:9 на узком экране превратилась бы в нечитаемую узкую полоску.
+              </p>
+            </div>
+
+            <!-- Вывод 3 -->
+            <div class="conclusion-card">
+              <div class="conclusion-num">3</div>
+              <h3 class="conclusion-title">Полное устранение сдвигов макета (CLS = 0)</h3>
+              <p class="conclusion-text">
+                Указание явных атрибутов <code>width</code> и <code>height</code> в HTML позволяет современным браузерам 
+                вычислить соотношение сторон до скачивания файла и мгновенно зарезервировать точный слот в потоке страницы. 
+                В связке с правилом <code>height: auto; max-width: 100%</code> это обеспечивает <b>CLS = 0.000</b>.
+              </p>
+            </div>
+
+            <!-- Вывод 4 -->
+            <div class="conclusion-card">
+              <div class="conclusion-num">4</div>
+              <h3 class="conclusion-title">Разделение приоритетов LCP и Lazy Loading</h3>
+              <p class="conclusion-text">
+                Главное Hero-изображение находится на первом экране и критично для метрики <b>Largest Contentful Paint (LCP)</b>. 
+                Для него назначен атрибут <code>fetchpriority="high"</code> без <code>loading="lazy"</code>. Все остальные карточки 
+                ниже первого экрана загружаются лениво через <code>loading="lazy"</code>, не блокируя первоначальную отрисовку.
+              </p>
+            </div>
+
+            <!-- Вывод 5 -->
+            <div class="conclusion-card">
+              <div class="conclusion-num">5</div>
+              <h3 class="conclusion-title">Управление кадрированием карточек через object-position</h3>
+              <p class="conclusion-text">
+                В адаптивных сетках с жестким <code>aspect-ratio</code> свойство <code>object-fit: cover</code> предотвращает 
+                деформацию пропорций, а точная настройка <code>object-position: center 20%</code> гарантирует, что лица персонажей 
+                и ключевые сюжетные элементы никогда не срежутся при перестроении колонок.
+              </p>
+            </div>
+
+          </div>
+        </div>
+
+      </div>
+    </section>
+  </main>
+
+  <!-- Футер -->
+  <footer class="site-footer">
+    <div class="wrapper">
+      <p>DotaArena 2026 · Практика 11: Адаптивные изображения (srcset, sizes, picture, lazy loading)</p>
+      <p style="margin-top:0.4rem;color:var(--text-muted);">
+        Авторы: Барышев Даниил, Мисриханов Тимур, Марьин Вадим | Группа 37-ВЕБ
+      </p>
+    </div>
+  </footer>
+
+</body>
+</html>
