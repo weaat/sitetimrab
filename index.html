@@ -169,74 +169,99 @@
   <main>
 
     <!-- ========================================================
-         СЕКЦИЯ 1: О ТУРНИРЕ
+         ВЫДВИЖНАЯ ПАНЕЛЬ СПРАВА: "О ТУРНИРЕ"
+         Плавающая плашка на правом краю экрана для удобного
+         вытаскивания и сворачивания информации о турнире
          ======================================================== -->
-    <section id="about">
-      <h2>О турнире</h2>
-      <p>
-        DotaArena 2026 — ежегодный открытый турнир для лучших команд. В гранд-финал турнира
-        проходят 8 сильнейших составов, прошедших строгий отбор.
-        Призовой фонд — <strong>600 000 ₽</strong>. Регистрация открыта!
-      </p>
+    <div id="about-drawer-backdrop" class="about-drawer-backdrop" aria-hidden="true"></div>
 
-      <!-- Блок из 4 числовых показателей -->
-      <div class="stats-grid">
-        <div class="stat-card">
-          <span class="stat-number">8</span>
-          <span class="stat-label">Команд-финалистов</span>
-        </div>
-        <div class="stat-card">
-          <span class="stat-number">600К ₽</span>
-          <span class="stat-label">Призовой фонд</span>
-        </div>
-        <div class="stat-card">
-          <span class="stat-number">3 дня</span>
-          <span class="stat-label">Матчи и шоу-игры</span>
-        </div>
-        <div class="stat-card">
-          <span class="stat-number">1200+</span>
-          <span class="stat-label">Зрителей трансляций</span>
-        </div>
-      </div>
+    <button type="button" id="about-drawer-toggle" class="about-drawer-toggle" aria-expanded="false" aria-controls="about" title="О турнире (нажмите, чтобы вытащить или скрыть)">
+      <span class="drawer-toggle__badge">INFO</span>
+      <span class="drawer-toggle__icon">🏆</span>
+      <span class="drawer-toggle__text">О турнире</span>
+      <span class="drawer-toggle__arrow">◀</span>
+    </button>
 
-      <!-- Callout с дедлайном и важным условием -->
-      <div class="callout">
-        <span class="callout-icon">
-          <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
-            <line x1="12" y1="9" x2="12" y2="13"></line>
-            <line x1="12" y1="17" x2="12.01" y2="17"></line>
+    <section id="about" class="about-drawer" aria-labelledby="about-drawer-title" aria-hidden="true">
+      <div class="about-drawer__header">
+        <div class="about-drawer__title-wrap">
+          <span class="about-drawer__tag">DotaArena 2026</span>
+          <h2 id="about-drawer-title">О турнире</h2>
+        </div>
+        <button type="button" id="about-drawer-close" class="about-drawer__close" aria-label="Закрыть панель о турнире" title="Закрыть (Esc)">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
           </svg>
-        </span>
-        <div class="callout-text">
-          <strong>Дедлайн регистрации — 1 ноября 2026 года</strong>
-          <p>Заявки принимаются только от составов с верифицированными аккаунтами.
-             После дедлайна добавление в турнир невозможно.</p>
-        </div>
+        </button>
       </div>
 
-      <!-- История турнира -->
-      <article>
-        <h3>История турнира</h3>
-        <p>
-          Турнир проводится с 2019 года и каждый год привлекает всё больше участников.
-          В прошлом сезоне приняли участие более 48 команд и 1200 зрителей онлайн.
-          Победители получают официальные сертификаты и памятные кубки.
+      <div class="about-drawer__body">
+        <p class="about-drawer__desc">
+          DotaArena 2026 — ежегодный открытый турнир для лучших команд. В гранд-финал турнира
+          проходят 8 сильнейших составов, прошедших строгий отбор.
+          Призовой фонд — <strong>600 000 ₽</strong>. Регистрация открыта!
         </p>
-        <p>
-          Организатором выступает некоммерческая ассоциация «DotaСпорт МСК» при поддержке
-          городского департамента по делам молодёжи.
-        </p>
-      </article>
 
-      <!-- Aside с важной информацией -->
-      <aside>
-        <h3>Важно знать</h3>
-        <p>
-          Для участия каждая команда должна состоять из 5 игроков (основной состав)
-          и до 2 запасных. Возраст участников — не менее 16 лет.
-        </p>
-      </aside>
+        <!-- Блок из 4 числовых показателей -->
+        <div class="stats-grid about-stats-grid">
+          <div class="stat-card">
+            <span class="stat-number">8</span>
+            <span class="stat-label">Команд-финалистов</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-number">600К ₽</span>
+            <span class="stat-label">Призовой фонд</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-number">3 дня</span>
+            <span class="stat-label">Матчи и шоу-игры</span>
+          </div>
+          <div class="stat-card">
+            <span class="stat-number">1200+</span>
+            <span class="stat-label">Зрителей трансляций</span>
+          </div>
+        </div>
+
+        <!-- Callout с дедлайном и важным условием -->
+        <div class="callout about-callout">
+          <span class="callout-icon">
+            <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path>
+              <line x1="12" y1="9" x2="12" y2="13"></line>
+              <line x1="12" y1="17" x2="12.01" y2="17"></line>
+            </svg>
+          </span>
+          <div class="callout-text">
+            <strong>Дедлайн регистрации — 1 ноября 2026 года</strong>
+            <p>Заявки принимаются только от составов с верифицированными аккаунтами.
+               После дедлайна добавление в турнир невозможно.</p>
+          </div>
+        </div>
+
+        <!-- История турнира -->
+        <article class="about-article">
+          <h3>История турнира</h3>
+          <p>
+            Турнир проводится с 2019 года и каждый год привлекает всё больше участников.
+            В прошлом сезоне приняли участие более 48 команд и 1200 зрителей онлайн.
+            Победители получают официальные сертификаты и памятные кубки.
+          </p>
+          <p>
+            Организатором выступает некоммерческая ассоциация «DotaСпорт МСК» при поддержке
+            городского департамента по делам молодёжи.
+          </p>
+        </article>
+
+        <!-- Aside с важной информацией -->
+        <aside class="about-aside">
+          <h3>Важно знать</h3>
+          <p>
+            Для участия каждая команда должна состоять из 5 игроков (основной состав)
+            и до 2 запасных. Возраст участников — не менее 16 лет.
+          </p>
+        </aside>
+      </div>
     </section>
 
     <!-- ========================================================

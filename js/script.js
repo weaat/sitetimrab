@@ -125,13 +125,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
   const highlightNav = rafThrottle(() => {
     let cur = '';
-    for (const sec of sections) {
-      const r = sec.getBoundingClientRect();
-      if (r.top <= 120 && r.bottom >= 120) cur = sec.id;
+    const aboutDrawerElem = document.getElementById('about');
+    const aboutIsOpen = aboutDrawerElem && aboutDrawerElem.classList.contains('about-drawer--open');
+
+    if (aboutIsOpen) {
+      cur = 'about';
+    } else {
+      for (const sec of sections) {
+        if (sec.id === 'about') continue; // offcanvas drawer
+        const r = sec.getBoundingClientRect();
+        if (r.top <= 120 && r.bottom >= 120) cur = sec.id;
+      }
+      if (!cur && window.innerHeight + window.scrollY >= document.body.offsetHeight - 50) {
+        cur = 'contacts';
+      }
     }
-    if (!cur && window.innerHeight + window.scrollY >= document.body.offsetHeight - 50) {
-      cur = 'contacts';
-    }
+
     for (const a of navLinks) {
       a.classList.toggle('active', a.getAttribute('href') === '#' + cur);
     }
@@ -141,6 +150,77 @@ document.addEventListener('DOMContentLoaded', () => {
   highlightNav();
 
   // ============================================================
+  //  2.1 ВЫДВИЖНАЯ ПАНЕЛЬ СПРАВА: "О ТУРНИРЕ" (OFFCANVAS DRAWER)
+  // ============================================================
+  const aboutDrawer = document.getElementById('about');
+  const aboutToggleBtn = document.getElementById('about-drawer-toggle');
+  const aboutCloseBtn = document.getElementById('about-drawer-close');
+  const aboutBackdrop = document.getElementById('about-drawer-backdrop');
+
+  function setAboutDrawerState(isOpen) {
+    if (!aboutDrawer) return;
+    if (isOpen) {
+      aboutDrawer.classList.add('about-drawer--open', 'active');
+      aboutDrawer.setAttribute('aria-hidden', 'false');
+      if (aboutToggleBtn) {
+        aboutToggleBtn.classList.add('drawer-open');
+        aboutToggleBtn.setAttribute('aria-expanded', 'true');
+        aboutToggleBtn.setAttribute('title', 'Свернуть информацию о турнире');
+      }
+      if (aboutBackdrop) {
+        aboutBackdrop.classList.add('active');
+        aboutBackdrop.setAttribute('aria-hidden', 'false');
+      }
+    } else {
+      aboutDrawer.classList.remove('about-drawer--open', 'active');
+      aboutDrawer.setAttribute('aria-hidden', 'true');
+      if (aboutToggleBtn) {
+        aboutToggleBtn.classList.remove('drawer-open');
+        aboutToggleBtn.setAttribute('aria-expanded', 'false');
+        aboutToggleBtn.setAttribute('title', 'О турнире (нажмите, чтобы вытащить)');
+      }
+      if (aboutBackdrop) {
+        aboutBackdrop.classList.remove('active');
+        aboutBackdrop.setAttribute('aria-hidden', 'true');
+      }
+    }
+    highlightNav();
+  }
+
+  function toggleAboutDrawer(force) {
+    if (!aboutDrawer) return;
+    const currentState = aboutDrawer.classList.contains('about-drawer--open');
+    const newState = (typeof force === 'boolean') ? force : !currentState;
+    setAboutDrawerState(newState);
+  }
+
+  if (aboutToggleBtn) {
+    aboutToggleBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      toggleAboutDrawer();
+    });
+  }
+
+  if (aboutCloseBtn) {
+    aboutCloseBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      setAboutDrawerState(false);
+    });
+  }
+
+  if (aboutBackdrop) {
+    aboutBackdrop.addEventListener('click', () => {
+      setAboutDrawerState(false);
+    });
+  }
+
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && aboutDrawer && aboutDrawer.classList.contains('about-drawer--open')) {
+      setAboutDrawerState(false);
+    }
+  });
+
+  // ============================================================
   //  3. ПЛАВНАЯ ПРОКРУТКА (одно делегирование на все ссылки)
   // ============================================================
   document.addEventListener('click', e => {
@@ -148,6 +228,11 @@ document.addEventListener('DOMContentLoaded', () => {
     if (!link) return;
     const id = link.getAttribute('href').slice(1);
     if (!id) return;
+    if (id === 'about') {
+      e.preventDefault();
+      toggleAboutDrawer(true);
+      return;
+    }
     const t = document.getElementById(id);
     if (!t) return;
     e.preventDefault();
