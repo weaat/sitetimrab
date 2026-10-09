@@ -105,67 +105,48 @@
   </header>
 
   <!-- ============================================================
-       NAVIGATION — липкая навигация с переключателем темы
-       и ссылкой на Telegram
+       ПЛАВАЮЩАЯ КНОПКА МЕНЮ (без горизонтальной полосы-плашки)
        ============================================================ -->
-  <nav class="site-nav-bar">
-    <!-- Левая часть: кнопка открытия бокового меню (гамбургер) -->
-    <div class="nav-brand-wrap">
-      <button type="button" id="nav-drawer-toggle" class="nav-drawer-toggle" aria-expanded="false" aria-controls="nav-drawer" aria-label="Открыть меню навигации" title="Меню навигации">
-        <span class="hamburger-box">
-          <span class="hamburger-inner"></span>
-        </span>
-        <span class="nav-drawer-toggle__text">Меню</span>
-      </button>
-    </div>
+  <button type="button" id="nav-drawer-toggle" class="nav-drawer-toggle" aria-expanded="false" aria-controls="nav-drawer" aria-label="Открыть меню навигации" title="Меню навигации">
+    <span class="hamburger-box">
+      <span class="hamburger-inner"></span>
+    </span>
+    <span class="nav-drawer-toggle__text">Меню</span>
+  </button>
 
-    <!-- Задний затемняющий фон для бокового меню -->
-    <div id="nav-drawer-backdrop" class="nav-drawer-backdrop" aria-hidden="true"></div>
+  <!-- Задний затемняющий фон для бокового меню -->
+  <div id="nav-drawer-backdrop" class="nav-drawer-backdrop" aria-hidden="true"></div>
 
-    <!-- Выдвижная боковая панель навигации (Offcanvas Drawer) со всеми кнопками -->
-    <div id="nav-drawer" class="nav-drawer" aria-hidden="true">
-      <div class="nav-drawer__head">
-        <div class="nav-drawer__title-wrap">
-          <img src="images/dota2_logo.png" alt="Dota 2" class="nav-drawer__logo" />
-          <span class="nav-drawer__title">Навигация</span>
-        </div>
-        <button type="button" id="nav-drawer-close" class="nav-drawer__close" aria-label="Закрыть меню" title="Закрыть (Esc)">✕</button>
+  <!-- ============================================================
+       ВЫДВИЖНАЯ БОКОВАЯ ПАНЕЛЬ (Offcanvas Drawer)
+       Содержит ВСЕ разделы сайта, кнопку «Войти», переключатель темы и Telegram
+       ============================================================ -->
+  <nav id="nav-drawer" class="nav-drawer" aria-hidden="true" aria-label="Боковое меню навигации">
+    <div class="nav-drawer__head">
+      <div class="nav-drawer__title-wrap">
+        <img src="images/dota2_logo.png" alt="Dota 2" class="nav-drawer__logo" />
+        <span class="nav-drawer__title">Навигация</span>
       </div>
-
-      <ul class="nav-drawer__list">
-        <li><a href="#about"><span class="nav-link__icon">📜</span> О турнире</a></li>
-        <li><a href="#heroes"><span class="nav-link__icon">⚔️</span> Герои Dota 2</a></li>
-        <li><a href="#live"><span class="nav-link__icon">🔴</span> Live</a></li>
-        <li><a href="#program"><span class="nav-link__icon">📅</span> Программа</a></li>
-        <li><a href="#teams"><span class="nav-link__icon">🛡️</span> Команды</a></li>
-        <li><a href="#bracket"><span class="nav-link__icon">🏆</span> Сетка</a></li>
-        <li><a href="#rules"><span class="nav-link__icon">⚖️</span> Правила</a></li>
-        <li><a href="#news"><span class="nav-link__icon">📰</span> Новости</a></li>
-        <li><a href="#contacts"><span class="nav-link__icon">📞</span> Контакты</a></li>
-        <li><a href="#registration" class="nav-cta"><span class="nav-link__icon">⚡</span> Регистрация</a></li>
-      </ul>
+      <button type="button" id="nav-drawer-close" class="nav-drawer__close" aria-label="Закрыть меню" title="Закрыть (Esc)">✕</button>
     </div>
 
-    <!-- Инструменты в правой части навигации: тема, Войти и Telegram -->
-    <div class="nav-tools">
-      <!-- Переключатель тёмной / светлой темы (SVG) -->
-      <button type="button" id="theme-toggle" class="theme-toggle"
-              aria-label="Переключить тему" title="Переключить тему">
-        <svg class="theme-svg theme-svg--moon" id="theme-svg-moon" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-        </svg>
-        <svg class="theme-svg theme-svg--sun" id="theme-svg-sun" viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none;">
-          <circle cx="12" cy="12" r="5"></circle>
-          <line x1="12" y1="1" x2="12" y2="3"></line>
-          <line x1="12" y1="21" x2="12" y2="23"></line>
-          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-          <line x1="1" y1="12" x2="3" y2="12"></line>
-          <line x1="21" y1="12" x2="23" y2="12"></line>
-          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
-        </svg>
-      </button>
+    <!-- Основные ссылки по разделам -->
+    <ul class="nav-drawer__list">
+      <li><a href="#about"><span class="nav-link__icon">📜</span> О турнире</a></li>
+      <li><a href="#heroes"><span class="nav-link__icon">⚔️</span> Герои Dota 2</a></li>
+      <li><a href="#live"><span class="nav-link__icon">🔴</span> Live</a></li>
+      <li><a href="#program"><span class="nav-link__icon">📅</span> Программа</a></li>
+      <li><a href="#teams"><span class="nav-link__icon">🛡️</span> Команды</a></li>
+      <li><a href="#bracket"><span class="nav-link__icon">🏆</span> Сетка</a></li>
+      <li><a href="#rules"><span class="nav-link__icon">⚖️</span> Правила</a></li>
+      <li><a href="#news"><span class="nav-link__icon">📰</span> Новости</a></li>
+      <li><a href="#contacts"><span class="nav-link__icon">📞</span> Контакты</a></li>
+      <li><a href="#registration" class="nav-cta"><span class="nav-link__icon">⚡</span> Регистрация</a></li>
+    </ul>
+
+    <!-- Блок инструментов управления: Личный кабинет (Войти), Смена темы, Telegram-канал -->
+    <div class="nav-drawer__tools">
+      <div class="nav-drawer__tools-title">Панель управления</div>
 
       <!-- Кнопка входа в личный кабинет (Liquid Glass) -->
       <a href="login.html" class="nav-login-btn" id="nav-login-btn" title="Войти в личный кабинет">
@@ -174,16 +155,38 @@
           <polyline points="10 17 15 12 10 7"></polyline>
           <line x1="15" y1="12" x2="3" y2="12"></line>
         </svg>
-        <span>Войти</span>
+        <span>Войти в аккаунт</span>
       </a>
 
-      <!-- Заметная крупная кнопка Telegram с официальным логотипом -->
+      <!-- Переключатель тёмной / светлой темы (SVG) -->
+      <button type="button" id="theme-toggle" class="nav-drawer__theme-btn"
+              aria-label="Переключить тему оформления" title="Переключить тему оформления">
+        <span class="nav-drawer__theme-text">Тема оформления</span>
+        <span class="nav-drawer__theme-icon">
+          <svg class="theme-svg theme-svg--moon" id="theme-svg-moon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+          </svg>
+          <svg class="theme-svg theme-svg--sun" id="theme-svg-sun" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display:none;">
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="12" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line>
+            <line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+          </svg>
+        </span>
+      </button>
+
+      <!-- Telegram-канал турнира -->
       <a href="https://t.me/dotaarena2026" target="_blank" rel="noopener"
          class="nav-tg-pill" aria-label="Telegram-канал турнира" title="Telegram-канал турнира">
         <svg class="nav-tg-pill__svg" viewBox="0 0 24 24" width="22" height="22" fill="currentColor">
           <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 0 0-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.75-.55 2.92-1.27 4.86-2.11 5.83-2.52 2.77-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .38z"/>
         </svg>
-        <span class="nav-tg-pill__label">Telegram</span>
+        <span class="nav-tg-pill__label">Telegram-канал</span>
       </a>
     </div>
   </nav>

@@ -501,63 +501,53 @@ ol {
 }
 
 /* ============================================================
-   13. NAVIGATION
+   13. FLOATING MENU TOGGLE (ПЛАВАЮЩАЯ КНОПКА МЕНЮ)
+   Горизонтальная плашка полностью убрана — меню открывается
+   через стильную парящую кнопку со стеклянным размытием
    ============================================================ */
-nav,
-.site-nav-bar {
-  background: rgba(4, 12, 28, .82);
-  backdrop-filter: blur(24px) saturate(2);
-  -webkit-backdrop-filter: blur(24px) saturate(2);
-  border-bottom: 1px solid var(--glass-border);
-  position: sticky;
-  top: 0;
-  z-index: 1000;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 1rem;
-  padding: .5rem var(--gap);
-  transition: background-color .3s ease;
-}
-
-:root[data-theme="light"] nav,
-:root[data-theme="light"] .site-nav-bar {
-  background: rgba(255, 255, 255, .9);
-}
-
-/* Кнопка-гамбургер «Меню» */
 .nav-drawer-toggle {
+  position: fixed;
+  top: 1.5rem;
+  left: 1.5rem;
+  z-index: 1200;
   display: inline-flex;
   align-items: center;
-  gap: .65rem;
-  padding: .5rem 1.15rem;
-  background: rgba(14, 165, 233, 0.12);
-  border: 1px solid rgba(56, 189, 248, 0.4);
+  gap: .7rem;
+  padding: .65rem 1.35rem;
+  background: rgba(4, 14, 34, 0.85);
+  border: 1px solid rgba(56, 189, 248, 0.45);
   border-radius: 50px;
   color: #fff;
   font-family: inherit;
-  font-size: .92rem;
+  font-size: .95rem;
   font-weight: 700;
   letter-spacing: .02em;
   cursor: pointer;
-  box-shadow: 0 4px 18px rgba(14, 165, 233, 0.25), inset 0 1px 0 rgba(255, 255, 255, 0.2);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 4px 22px rgba(0, 0, 0, 0.65), 0 0 18px rgba(14, 165, 233, 0.35);
+  backdrop-filter: blur(16px) saturate(1.8);
+  -webkit-backdrop-filter: blur(16px) saturate(1.8);
   transition: all .25s cubic-bezier(0.16, 1, 0.3, 1);
   user-select: none;
 }
 
 .nav-drawer-toggle:hover {
-  background: linear-gradient(135deg, rgba(14, 165, 233, 0.45) 0%, rgba(2, 132, 199, 0.6) 100%);
-  border-color: rgba(125, 211, 252, 0.85);
-  box-shadow: 0 8px 24px rgba(14, 165, 233, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.35);
-  transform: translateY(-2px);
+  background: linear-gradient(135deg, rgba(14, 165, 233, 0.5) 0%, rgba(2, 132, 199, 0.7) 100%);
+  border-color: rgba(125, 211, 252, 0.95);
+  box-shadow: 0 6px 28px rgba(14, 165, 233, 0.55), 0 0 25px rgba(56, 189, 248, 0.45);
+  transform: translateY(-2px) scale(1.03);
+}
+
+.nav-drawer-toggle.active {
+  opacity: 0;
+  pointer-events: none;
+  transform: scale(0.9);
 }
 
 :root[data-theme="light"] .nav-drawer-toggle {
-  background: rgba(2, 132, 199, 0.08);
-  border-color: rgba(2, 132, 199, 0.35);
+  background: rgba(255, 255, 255, 0.92);
+  border-color: rgba(2, 132, 199, 0.4);
   color: #0c4a6e;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12), 0 0 14px rgba(2, 132, 199, 0.2);
 }
 
 /* Иконка гамбургера */
@@ -795,101 +785,54 @@ nav a.nav-cta:hover {
 
 
 /* ============================================================
-   14. NAV TOOLS
+   14. DRAWER TOOLS (ПАНЕЛЬ ИНСТРУМЕНТОВ В БОКОВОМ МЕНЮ)
+   Кнопка «Войти», переключатель темы и Telegram перенесены
+   внутрь выдвижного бокового меню.
    ============================================================ */
-.nav-tools {
+.nav-drawer__tools {
+  margin-top: 1.5rem;
+  padding-top: 1.25rem;
+  border-top: 1px solid rgba(56, 189, 248, 0.25);
   display: flex;
-  align-items: center;
-  gap: .5rem;
+  flex-direction: column;
+  gap: .75rem;
   flex-shrink: 0;
 }
 
-.theme-toggle {
-  width: 40px;
-  height: 40px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  background: rgba(255, 255, 255, .08);
-  border: 1px solid var(--glass-border);
-  border-radius: 50%;
-  cursor: pointer;
-  color: #fff;
-  padding: 0;
-  transition: background .2s ease, transform .2s ease, border-color .2s ease;
+.nav-drawer__tools-title {
+  font-size: .75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  color: rgba(148, 163, 184, 0.85);
+  margin-bottom: .2rem;
+  padding-left: .25rem;
 }
 
-.theme-toggle:hover {
-  background: var(--accent-glow);
-  border-color: var(--accent);
-  transform: rotate(20deg) scale(1.05);
+:root[data-theme="light"] .nav-drawer__tools-title {
+  color: #64748b;
 }
 
-.theme-svg {
-  display: block;
-  width: 18px;
-  height: 18px;
-  stroke: currentColor;
-}
-
-:root[data-theme="light"] .theme-toggle {
-  background: rgba(0, 0, 0, .06);
-  color: #1a1a2e;
-}
-
-.nav-tg-pill {
-  height: 44px;
-  padding: 0 20px;
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
-  background: linear-gradient(135deg, #0088cc 0%, #29b6f6 100%);
-  border: 1.5px solid rgba(255, 255, 255, .4);
-  border-radius: 50px;
-  color: #fff;
-  font-weight: 800;
-  font-size: .95rem;
-  letter-spacing: .02em;
-  text-decoration: none;
-  box-shadow: 0 4px 20px rgba(0, 136, 204, .6), 0 0 12px rgba(41, 182, 246, .45);
-  transition: transform .2s ease, box-shadow .2s ease, filter .2s ease;
-  white-space: nowrap;
-}
-
-.nav-tg-pill:hover {
-  transform: translateY(-2px) scale(1.05);
-  box-shadow: 0 8px 30px rgba(0, 136, 204, .85), 0 0 22px rgba(41, 182, 246, .75);
-  filter: brightness(1.15);
-  color: #fff;
-  text-decoration: none;
-}
-
-.nav-tg-pill__svg {
-  display: block;
-  width: 26px;
-  height: 26px;
-  fill: #fff;
-  flex-shrink: 0;
-}
-
-/* Кнопка входа в личный кабинет (Liquid Glass Style) */
+/* Кнопка входа в личный кабинет (Liquid Glass Style) внутри меню */
 .nav-login-btn {
   display: inline-flex;
   align-items: center;
-  gap: .5rem;
-  padding: .5rem 1.15rem;
-  border-radius: 50px;
-  background: rgba(14, 165, 233, .12);
-  border: 1px solid var(--glass-border-accent);
+  justify-content: center;
+  gap: .65rem;
+  padding: .75rem 1.15rem;
+  border-radius: 14px;
+  background: rgba(14, 165, 233, .14);
+  border: 1px solid rgba(56, 189, 248, 0.45);
   color: #fff;
-  font-size: .88rem;
+  font-size: .95rem;
   font-weight: 700;
   text-decoration: none;
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
-  box-shadow: 0 4px 16px rgba(14, 165, 233, .25), inset 0 1px 0 rgba(255, 255, 255, .25);
+  box-shadow: 0 4px 18px rgba(14, 165, 233, .25), inset 0 1px 0 rgba(255, 255, 255, .25);
   transition: all .25s cubic-bezier(.16, 1, .3, 1);
   white-space: nowrap;
+  width: 100%;
 }
 
 .nav-login-btn:hover {
@@ -904,22 +847,123 @@ nav a.nav-cta:hover {
 .nav-login-btn svg {
   display: block;
   stroke: currentColor;
+  flex-shrink: 0;
   transition: transform .2s ease;
 }
 
 .nav-login-btn:hover svg {
-  transform: translateX(2px);
+  transform: translateX(3px);
 }
 
 :root[data-theme="light"] .nav-login-btn {
   color: #0369a1;
-  background: rgba(2, 132, 199, .08);
+  background: rgba(2, 132, 199, .1);
+  border-color: rgba(2, 132, 199, 0.35);
   box-shadow: 0 4px 14px rgba(2, 132, 199, .15);
 }
 
 :root[data-theme="light"] .nav-login-btn:hover {
   background: linear-gradient(135deg, var(--accent) 0%, var(--accent-h) 100%);
   color: #fff;
+}
+
+/* Переключатель тёмной / светлой темы внутри бокового меню */
+.nav-drawer__theme-btn {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: .7rem 1.15rem;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(56, 189, 248, 0.25);
+  color: rgba(255, 255, 255, 0.88);
+  font-family: inherit;
+  font-size: .92rem;
+  font-weight: 600;
+  cursor: pointer;
+  backdrop-filter: blur(12px);
+  transition: all .22s ease;
+}
+
+.nav-drawer__theme-btn:hover {
+  background: rgba(14, 165, 233, 0.18);
+  border-color: rgba(56, 189, 248, 0.55);
+  color: #fff;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 16px rgba(14, 165, 233, 0.2);
+}
+
+.nav-drawer__theme-icon {
+  width: 32px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(14, 165, 233, 0.15);
+  border-radius: 8px;
+  color: #38bdf8;
+  transition: transform .25s ease;
+}
+
+.nav-drawer__theme-btn:hover .nav-drawer__theme-icon {
+  transform: rotate(25deg) scale(1.1);
+}
+
+.theme-svg {
+  display: block;
+  width: 18px;
+  height: 18px;
+  stroke: currentColor;
+}
+
+:root[data-theme="light"] .nav-drawer__theme-btn {
+  background: rgba(0, 0, 0, 0.03);
+  border-color: rgba(2, 132, 199, 0.25);
+  color: #1e293b;
+}
+
+:root[data-theme="light"] .nav-drawer__theme-icon {
+  background: rgba(2, 132, 199, 0.12);
+  color: #0284c7;
+}
+
+/* Кнопка Telegram-канала */
+.nav-tg-pill {
+  height: 44px;
+  padding: 0 1.25rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background: linear-gradient(135deg, #0088cc 0%, #29b6f6 100%);
+  border: 1.5px solid rgba(255, 255, 255, .4);
+  border-radius: 14px;
+  color: #fff;
+  font-weight: 800;
+  font-size: .95rem;
+  letter-spacing: .02em;
+  text-decoration: none;
+  box-shadow: 0 4px 20px rgba(0, 136, 204, .6), 0 0 12px rgba(41, 182, 246, .45);
+  transition: transform .2s ease, box-shadow .2s ease, filter .2s ease;
+  white-space: nowrap;
+  width: 100%;
+}
+
+.nav-tg-pill:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(0, 136, 204, .85), 0 0 22px rgba(41, 182, 246, .75);
+  filter: brightness(1.15);
+  color: #fff;
+  text-decoration: none;
+}
+
+.nav-tg-pill__svg {
+  display: block;
+  width: 24px;
+  height: 24px;
+  fill: #fff;
+  flex-shrink: 0;
 }
 
 .deadline-counter {
@@ -4139,32 +4183,22 @@ footer > * + * {
     padding: 1.2rem 1rem 3rem;
   }
 
-  /* --- NAV --- */
-  nav {
-    flex-wrap: wrap;
-    padding: .4rem;
+  /* --- FLOATING MENU & DRAWER ADAPTATION --- */
+  .nav-drawer-toggle {
+    top: 1rem;
+    left: 1rem;
+    padding: .5rem 1.05rem;
+    font-size: .88rem;
   }
 
-  nav ul {
-    flex-wrap: nowrap;
-    overflow-x: auto;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-    order: 2;
-    flex-basis: 100%;
+  .nav-drawer {
+    width: min(320px, 88vw);
+    padding: 1.2rem 1rem 2.2rem;
   }
 
-  nav ul::-webkit-scrollbar {
-    display: none;
-  }
-
-  nav a.nav-cta {
-    margin-left: 0;
-  }
-
-  .nav-tools {
-    order: 1;
-    margin-left: auto;
+  .nav-drawer__list {
+    flex-direction: column !important;
+    overflow-x: visible !important;
   }
 
   /* --- HEADER --- */

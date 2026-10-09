@@ -14,3 +14,10 @@ test_heroes.html
 check_img.ps1
 test_dom.ps1
 screenshot.ps1
+
+# Archives (do not commit zip to github)
+*.zip
+*.tar.gz
+*.rar
+*.7z
+

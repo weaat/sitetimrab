@@ -121,7 +121,7 @@ document.addEventListener('DOMContentLoaded', () => {
   //  2. ПОДСВЕТКА АКТИВНОЙ ССЫЛКИ В NAV (rAF-троттлинг)
   // ============================================================
   const sections = $$('main section[id], footer[id]');
-  const navLinks = $$('nav a[href^="#"]');
+  const navLinks = $$('.nav-drawer a[href^="#"], nav a[href^="#"]');
 
   const highlightNav = rafThrottle(() => {
     let cur = '';
