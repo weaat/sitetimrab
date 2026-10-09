@@ -87,35 +87,11 @@ document.addEventListener('DOMContentLoaded', () => {
   //  1. ПЕРЕКЛЮЧАТЕЛЬ ТЕМЫ (тёмная / светлая)
   // ============================================================
   const html      = document.documentElement;
-  const themeBtn     = $('#theme-toggle');
-  const themeSvgMoon = $('#theme-svg-moon');
-  const themeSvgSun  = $('#theme-svg-sun');
-
-  function applyTheme(theme) {
-    html.setAttribute('data-theme', theme);
-    if (themeSvgMoon && themeSvgSun) {
-      if (theme === 'light') {
-        themeSvgMoon.style.display = 'none';
-        themeSvgSun.style.display  = 'block';
-      } else {
-        themeSvgMoon.style.display = 'block';
-        themeSvgSun.style.display  = 'none';
-      }
-    }
-    try { localStorage.setItem(THEME_KEY, theme); } catch {}
-  }
-
-  // Инициализация темы: localStorage > системная настройка > тёмная
-  const savedTheme = (() => {
-    try { return localStorage.getItem(THEME_KEY); } catch { return null; }
-  })();
-  const prefersLight = window.matchMedia('(prefers-color-scheme: light)').matches;
-  applyTheme(savedTheme || (prefersLight ? 'light' : 'dark'));
-
-  themeBtn?.addEventListener('click', () => {
-    const next = html.getAttribute('data-theme') === 'light' ? 'dark' : 'light';
-    applyTheme(next);
-  });
+  // ============================================================
+  //  1. ТЕМА ОФОРМЛЕНИЯ — ПРИНУДИТЕЛЬНО ТЁМНЫЙ КИБЕР-СТИЛЬ
+  // ============================================================
+  html.setAttribute('data-theme', 'dark');
+  try { localStorage.removeItem(THEME_KEY); } catch {}
 
   // ============================================================
   //  2. ПОДСВЕТКА АКТИВНОЙ ССЫЛКИ В NAV (rAF-троттлинг)
@@ -290,7 +266,7 @@ document.addEventListener('DOMContentLoaded', () => {
     wrap.setAttribute('role', 'timer');
     wrap.setAttribute('aria-live', 'polite');
     wrap.innerHTML = `
-      <span class="deadline-counter__label">🚀 Старт турнира через</span>
+      <span class="deadline-counter__label">Старт турнира через</span>
       <div class="deadline-counter__time">
         <span class="deadline-counter__unit"><b id="lt-days">00</b><i>дней</i></span>
         <span class="deadline-counter__sep">:</span>
@@ -406,45 +382,193 @@ document.addEventListener('DOMContentLoaded', () => {
     if (progressPct)  progressPct.textContent  = `${pct}%`;
     if (progressBar)  progressBar.style.width  = `${pct}%`;
 
-    // Статус сетки
-    if (bracketCount) bracketCount.textContent = total;
-
-    // Автозаполнение сетки при ≥ 8 команд
-    if (state.registered.length >= BRACKET_MIN) {
-      fillBracket(state.registered.slice(0, MAX_TEAMS));
-      createLaunchCounter();
-      updateLaunchCounter();
-    }
+    // Статус сетки и запуск симуляции
+    if (bracketCount) bracketCount.textContent = '8';
+    runTournamentSimulation();
   }
 
   // ============================================================
-  //  8. АВТОЗАПОЛНЕНИЕ ТУРНИРНОЙ СЕТКИ
+  //  8. ДИНАМИЧЕСКАЯ СИМУЛЯЦИЯ ТУРНИРНОЙ СЕТКИ (DOUBLE ELIMINATION, 8 КОМАНД)
   // ============================================================
-  // Порядок слотов — 16 команд распределяются по верхней и нижней сетке
-  const SLOT_ORDER = [
-    'U1-1a','U1-2b','U1-3a','U1-4b',
-    'U1-1b','U1-2a','U1-3b','U1-4a',
-    'L1-1a','L1-2b','L1-3a','L1-4b',
-    'L1-1b','L1-2a','L1-3b','L1-4a'
+  const DEFAULT_BRACKET_TEAMS = [
+    { name: 'Team Spirit',       tag: 'TS',  region: 'Москва',          mmr: 11200 },
+    { name: 'Gaimin Gladiators', tag: 'GG',  region: 'Санкт-Петербург', mmr: 10850 },
+    { name: 'Team Liquid',       tag: 'TL',  region: 'Екатеринбург',    mmr: 10900 },
+    { name: 'BetBoom Team',      tag: 'BB',  region: 'Казань',          mmr: 10600 },
+    { name: 'Xtreme Gaming',     tag: 'XG',  region: 'Новосибирск',     mmr: 10750 },
+    { name: 'Team Falcons',      tag: 'FLC', region: 'Самара',          mmr: 11050 },
+    { name: 'Tundra Esports',    tag: 'TUN', region: 'Ростов-на-Дону',  mmr: 10500 },
+    { name: 'Aurora Gaming',     tag: 'AUR', region: 'Москва',          mmr: 10400 }
   ];
 
-  /** Заполняет слоты сетки названиями команд */
-  function fillBracket(teams) {
-    SLOT_ORDER.forEach((slot, i) => {
-      const el = document.querySelector(`[data-slot="${slot}"]`);
-      if (!el) return;
-      if (teams[i]) {
-        el.textContent = teams[i].name;
-        el.classList.add('filled');
-        el.title = [
-          teams[i].name,
-          teams[i].region ? '· ' + teams[i].region : '',
-          teams[i].mmr    ? '· ' + teams[i].mmr + ' MMR' : ''
-        ].filter(Boolean).join(' ');
-      } else {
-        el.textContent = 'TBD';
-        el.classList.remove('filled');
+  /** Рассчитывает исход матча и счёт */
+  function simulateMatch(teamA, teamB, isBo5 = false) {
+    if (!teamA || !teamB) {
+      return { winner: teamA || teamB || { name: 'TBD' }, loser: { name: 'TBD' }, scoreA: 0, scoreB: 0, aWins: true };
+    }
+    const mmrA = teamA.mmr || 10000;
+    const mmrB = teamB.mmr || 10000;
+    const probA = 0.5 + (mmrA - mmrB) / 9000;
+    const aWins = Math.random() < Math.max(0.25, Math.min(0.75, probA));
+
+    let scoreA, scoreB;
+    if (isBo5) {
+      const loserScore = Math.floor(Math.random() * 3); // 0, 1 или 2
+      scoreA = aWins ? 3 : loserScore;
+      scoreB = aWins ? loserScore : 3;
+    } else {
+      const loserScore = Math.random() > 0.4 ? 1 : 0; // 2:1 или 2:0
+      scoreA = aWins ? 2 : loserScore;
+      scoreB = aWins ? loserScore : 2;
+    }
+
+    return {
+      winner: aWins ? teamA : teamB,
+      loser:  aWins ? teamB : teamA,
+      scoreA,
+      scoreB,
+      aWins
+    };
+  }
+
+  /** Отображает команду и её счёт в слоте сетки */
+  function renderSlot(slotId, team, score = null, isWinner = false, isLoser = false) {
+    const el = document.querySelector(`[data-slot="${slotId}"]`);
+    if (!el) return;
+    el.classList.remove('bracket-team--winner', 'bracket-team--loser', 'filled');
+    if (!team || team.name === 'TBD') {
+      el.innerHTML = '<span class="bracket-team__name">TBD</span>';
+      return;
+    }
+    el.classList.add('filled');
+    if (isWinner) el.classList.add('bracket-team--winner');
+    if (isLoser)  el.classList.add('bracket-team--loser');
+
+    const scoreHtml = (score !== null)
+      ? `<b class="bracket-team__score">${score}</b>`
+      : '';
+    el.innerHTML = `<span class="bracket-team__name">${team.name}</span>${scoreHtml}`;
+    el.title = [
+      team.name,
+      team.region ? '· ' + team.region : '',
+      team.mmr    ? '· ' + team.mmr + ' MMR' : ''
+    ].filter(Boolean).join(' ');
+  }
+
+  /** Обновляет таблицу группового этапа */
+  function updateGroupStageTable(teams) {
+    const tbody = document.getElementById('group-stage-body');
+    if (!tbody || !teams.length) return;
+    const top4 = teams.slice(0, 4);
+    const stats = [
+      { games: 3, wins: 3, loss: 0, pts: 9 },
+      { games: 3, wins: 2, loss: 1, pts: 6 },
+      { games: 3, wins: 1, loss: 2, pts: 3 },
+      { games: 3, wins: 0, loss: 3, pts: 0 }
+    ];
+    tbody.innerHTML = top4.map((t, idx) => {
+      const s = stats[idx];
+      return `<tr>
+        <td><strong>${t.name}</strong></td>
+        <td>${s.games}</td>
+        <td>${s.wins}</td>
+        <td>${s.loss}</td>
+        <td><strong>${s.pts}</strong></td>
+      </tr>`;
+    }).join('');
+  }
+
+  /** Полный расчёт турнирной сетки на 8 команд (Double Elimination) */
+  function runTournamentSimulation() {
+    const state = store.read();
+    // Объединяем зарегистрированные пользователем команды и стандартный топ-8
+    const pool = [...state.registered];
+    DEFAULT_BRACKET_TEAMS.forEach(dt => {
+      if (pool.length < 8 && !pool.some(p => p.name === dt.name)) {
+        pool.push(dt);
       }
+    });
+
+    // Случайный посев команд
+    const shuffled = [...pool.slice(0, 8)].sort(() => Math.random() - 0.5);
+
+    // ВЕРХНЯЯ СЕТКА — РАУНД 1 (4 матча, 8 команд)
+    const mU1_1 = simulateMatch(shuffled[0], shuffled[1]);
+    const mU1_2 = simulateMatch(shuffled[2], shuffled[3]);
+    const mU1_3 = simulateMatch(shuffled[4], shuffled[5]);
+    const mU1_4 = simulateMatch(shuffled[6], shuffled[7]);
+
+    renderSlot('U1-1a', shuffled[0], mU1_1.scoreA, mU1_1.aWins, !mU1_1.aWins);
+    renderSlot('U1-1b', shuffled[1], mU1_1.scoreB, !mU1_1.aWins, mU1_1.aWins);
+    renderSlot('U1-2a', shuffled[2], mU1_2.scoreA, mU1_2.aWins, !mU1_2.aWins);
+    renderSlot('U1-2b', shuffled[3], mU1_2.scoreB, !mU1_2.aWins, mU1_2.aWins);
+    renderSlot('U1-3a', shuffled[4], mU1_3.scoreA, mU1_3.aWins, !mU1_3.aWins);
+    renderSlot('U1-3b', shuffled[5], mU1_3.scoreB, !mU1_3.aWins, mU1_3.aWins);
+    renderSlot('U1-4a', shuffled[6], mU1_4.scoreA, mU1_4.aWins, !mU1_4.aWins);
+    renderSlot('U1-4b', shuffled[7], mU1_4.scoreB, !mU1_4.aWins, mU1_4.aWins);
+
+    // НИЖНЯЯ СЕТКА — РАУНД 1 (падают 4 проигравших из U1)
+    const mL1_1 = simulateMatch(mU1_1.loser, mU1_2.loser);
+    const mL1_2 = simulateMatch(mU1_3.loser, mU1_4.loser);
+
+    renderSlot('L1-1a', mU1_1.loser, mL1_1.scoreA, mL1_1.aWins, !mL1_1.aWins);
+    renderSlot('L1-1b', mU1_2.loser, mL1_1.scoreB, !mL1_1.aWins, mL1_1.aWins);
+    renderSlot('L1-2a', mU1_3.loser, mL1_2.scoreA, mL1_2.aWins, !mL1_2.aWins);
+    renderSlot('L1-2b', mU1_4.loser, mL1_2.scoreB, !mL1_2.aWins, mL1_2.aWins);
+
+    // ВЕРХНЯЯ СЕТКА — РАУНД 2 (полуфиналы)
+    const mU2_1 = simulateMatch(mU1_1.winner, mU1_2.winner);
+    const mU2_2 = simulateMatch(mU1_3.winner, mU1_4.winner);
+
+    renderSlot('U2-1a', mU1_1.winner, mU2_1.scoreA, mU2_1.aWins, !mU2_1.aWins);
+    renderSlot('U2-1b', mU1_2.winner, mU2_1.scoreB, !mU2_1.aWins, mU2_1.aWins);
+    renderSlot('U2-2a', mU1_3.winner, mU2_2.scoreA, mU2_2.aWins, !mU2_2.aWins);
+    renderSlot('U2-2b', mU1_4.winner, mU2_2.scoreB, !mU2_2.aWins, mU2_2.aWins);
+
+    // НИЖНЯЯ СЕТКА — РАУНД 2 (победители L1 играют с проигравшими из U2)
+    const mL2_1 = simulateMatch(mU2_1.loser, mL1_1.winner);
+    const mL2_2 = simulateMatch(mU2_2.loser, mL1_2.winner);
+
+    renderSlot('L2-1a', mU2_1.loser, mL2_1.scoreA, mL2_1.aWins, !mL2_1.aWins);
+    renderSlot('L2-1b', mL1_1.winner, mL2_1.scoreB, !mL2_1.aWins, mL2_1.aWins);
+    renderSlot('L2-2a', mU2_2.loser, mL2_2.scoreA, mL2_2.aWins, !mL2_2.aWins);
+    renderSlot('L2-2b', mL1_2.winner, mL2_2.scoreB, !mL2_2.aWins, mL2_2.aWins);
+
+    // НИЖНЯЯ СЕТКА — РАУНД 3
+    const mL3_1 = simulateMatch(mL2_1.winner, mL2_2.winner);
+    renderSlot('L3-1a', mL2_1.winner, mL3_1.scoreA, mL3_1.aWins, !mL3_1.aWins);
+    renderSlot('L3-1b', mL2_2.winner, mL3_1.scoreB, !mL3_1.aWins, mL3_1.aWins);
+
+    // ВЕРХНЯЯ СЕТКА — ФИНАЛ
+    const mUF = simulateMatch(mU2_1.winner, mU2_2.winner);
+    renderSlot('UF-a', mU2_1.winner, mUF.scoreA, mUF.aWins, !mUF.aWins);
+    renderSlot('UF-b', mU2_2.winner, mUF.scoreB, !mUF.aWins, mUF.aWins);
+
+    // НИЖНЯЯ СЕТКА — ФИНАЛ (проигравший UF против победителя L3)
+    const mLF = simulateMatch(mUF.loser, mL3_1.winner);
+    renderSlot('LF-a', mUF.loser, mLF.scoreA, mLF.aWins, !mLF.aWins);
+    renderSlot('LF-b', mL3_1.winner, mLF.scoreB, !mLF.aWins, mLF.aWins);
+
+    // ГРАНД-ФИНАЛ (BO5: победитель верхней vs победитель нижней)
+    const mGF = simulateMatch(mUF.winner, mLF.winner, true);
+    renderSlot('GF-a', mUF.winner, mGF.scoreA, mGF.aWins, !mGF.aWins);
+    renderSlot('GF-b', mLF.winner, mGF.scoreB, !mGF.aWins, mGF.aWins);
+
+    // Обновляем таблицу группового этапа
+    updateGroupStageTable(shuffled);
+
+    // Обновляем счётчик
+    const bCount = document.getElementById('bracket-count');
+    if (bCount) bCount.textContent = '8';
+  }
+
+  // Кнопка интерактивной пересимуляции сетки
+  const simBracketBtn = document.getElementById('btn-simulate-bracket');
+  if (simBracketBtn) {
+    simBracketBtn.addEventListener('click', () => {
+      runTournamentSimulation();
+      simBracketBtn.style.transform = 'scale(0.96)';
+      setTimeout(() => { simBracketBtn.style.transform = ''; }, 160);
     });
   }
 
@@ -525,7 +649,7 @@ document.addEventListener('DOMContentLoaded', () => {
       name: 'Storm Spirit',
       subtitle: 'Райдзин Громовержец · Дух бури и молний',
       render: 'images/storm_spirit_render.png',
-      badges: ['Mid Lane', 'Initiator', 'Escape', 'Сложность ★★★★☆'],
+      badges: ['Mid Lane', 'Initiator', 'Escape', 'Сложность: 4/5'],
       stats: [
         { label: 'Win Rate', val: '52.1%' },
         { label: 'Основной атрибут', val: 'Интеллект' },
@@ -544,7 +668,7 @@ document.addEventListener('DOMContentLoaded', () => {
       name: 'Hoodwink',
       subtitle: 'Проныра из чащи · Официальный талисман DotaArena 2026',
       render: 'images/hoodwink_dance.gif',
-      badges: ['Талисман турнира', 'Support', 'Nuker', 'Сложность ★★★☆☆'],
+      badges: ['Талисман турнира', 'Support', 'Nuker', 'Сложность: 3/5'],
       stats: [
         { label: 'Win Rate', val: '50.4%' },
         { label: 'Дальность выстрела', val: '3000' },
@@ -563,7 +687,7 @@ document.addEventListener('DOMContentLoaded', () => {
       name: 'Shadow Fiend',
       subtitle: 'Nevermore Повелитель Душ · Arcana 2026',
       render: 'images/shadow_fiend_render.png',
-      badges: ['Arcana 2026', 'Mid Lane', 'Hard Carry', 'Сложность ★★★★★'],
+      badges: ['Arcana 2026', 'Mid Lane', 'Hard Carry', 'Сложность: 5/5'],
       stats: [
         { label: 'Win Rate', val: '55.8%' },
         { label: 'Макс. душ', val: '36' },
@@ -582,7 +706,7 @@ document.addEventListener('DOMContentLoaded', () => {
       name: 'Invoker',
       subtitle: 'Карл Магистр Десяти Заклинаний',
       render: 'images/invoker_render.png',
-      badges: ['Mid Lane Solo', 'Nuker', 'Disabler', 'Сложность ★★★★★'],
+      badges: ['Mid Lane Solo', 'Nuker', 'Disabler', 'Сложность: 5/5'],
       stats: [
         { label: 'Win Rate', val: '54.2%' },
         { label: 'Сфер стихий', val: '3 (Quas, Wex, Exort)' },
@@ -601,7 +725,7 @@ document.addEventListener('DOMContentLoaded', () => {
       name: 'Pudge',
       subtitle: 'Мясник с Полей Вечной Резни',
       render: 'images/pudge_render.png',
-      badges: ['Культовый герой', 'Support', 'Roamer', 'Сложность ★★★☆☆'],
+      badges: ['Культовый герой', 'Support', 'Roamer', 'Сложность: 3/5'],
       stats: [
         { label: 'Win Rate', val: '48.7%' },
         { label: 'Pick Rate', val: '#1 за всю историю' },
@@ -620,7 +744,7 @@ document.addEventListener('DOMContentLoaded', () => {
       name: 'Anti-Mage',
       subtitle: 'Магина Истребитель Колдунов',
       render: 'images/antimage_render.png',
-      badges: ['Hard Carry', 'Escape', 'Фарм-машина', 'Сложность ★★★☆☆'],
+      badges: ['Hard Carry', 'Escape', 'Фарм-машина', 'Сложность: 3/5'],
       stats: [
         { label: 'Win Rate', val: '51.3%' },
         { label: 'Кулдаун Blink', val: '6 сек' },
@@ -639,7 +763,7 @@ document.addEventListener('DOMContentLoaded', () => {
       name: 'Juggernaut',
       subtitle: 'Юрнеро Последний воин Острова Масок',
       render: 'images/juggernaut_render.png',
-      badges: ['Hard Carry', 'Pusher', 'Инициатор', 'Сложность ★★☆☆☆'],
+      badges: ['Hard Carry', 'Pusher', 'Инициатор', 'Сложность: 2/5'],
       stats: [
         { label: 'Win Rate', val: '51.9%' },
         { label: 'Базовый интервал', val: '1.4 сек' },
@@ -658,7 +782,7 @@ document.addEventListener('DOMContentLoaded', () => {
       name: 'Lina',
       subtitle: 'Истребительница Огненных Недр',
       render: 'images/lina_render.png',
-      badges: ['Mid Lane', 'Fast Nuker', 'Carry', 'Сложность ★★★☆☆'],
+      badges: ['Mid Lane', 'Fast Nuker', 'Carry', 'Сложность: 3/5'],
       stats: [
         { label: 'Win Rate', val: '49.9%' },
         { label: 'Бонус Fiery Soul', val: '+300 скор. атаки' },
@@ -705,7 +829,7 @@ document.addEventListener('DOMContentLoaded', () => {
         this.classList.remove('error');
         if (phoneHint) {
           phoneHint.style.color = '#4ade80';
-          phoneHint.textContent = '✓ Номер распознан: ' + norm;
+          phoneHint.textContent = 'Номер распознан: ' + norm;
         }
       } else if (phoneHint) {
         phoneHint.style.color = '';
@@ -733,7 +857,7 @@ document.addEventListener('DOMContentLoaded', () => {
     try { localStorage.setItem(STEAM_KEY, nick); } catch {}
     if (steamNick) steamNick.textContent = nick;
     if (steamStatus) steamStatus.hidden = false;
-    steamLoginBtn.textContent = '✓ Steam подтверждён';
+    steamLoginBtn.textContent = 'Steam подтверждён';
     steamLoginBtn.style.background = 'linear-gradient(135deg, #22c55e, #15803d)';
   });
 
@@ -744,7 +868,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (steamNick) steamNick.textContent = savedNick;
       if (steamStatus) steamStatus.hidden = false;
       if (steamLoginBtn) {
-        steamLoginBtn.textContent = '✓ Steam подтверждён';
+        steamLoginBtn.textContent = 'Steam подтверждён';
         steamLoginBtn.style.background = 'linear-gradient(135deg, #22c55e, #15803d)';
       }
     }
@@ -768,7 +892,7 @@ document.addEventListener('DOMContentLoaded', () => {
     { pct: 55,  text: 'Обработка транзакции…' },
     { pct: 78,  text: 'Подтверждение банка…' },
     { pct: 95,  text: 'Финализация платежа…' },
-    { pct: 100, text: 'Платёж подтверждён ✓' }
+    { pct: 100, text: 'Платёж успешно подтверждён' }
   ];
 
   function openPaymentModal(teamData, callback) {
@@ -898,7 +1022,7 @@ document.addEventListener('DOMContentLoaded', () => {
       const btn = form.querySelector('button[type="submit"]');
       if (btn) {
         btn.disabled = true;
-        btn.textContent = '💳 Обработка оплаты…';
+        btn.textContent = 'Обработка оплаты…';
       }
 
       // Открываем модалку оплаты → после завершения:
@@ -936,7 +1060,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
           // 3) Меняем кнопку отправки
           if (btn) {
-            btn.textContent = '✓ Оплачено и отправлено';
+            btn.textContent = 'Оплачено и отправлено';
             btn.style.background = '#15803d';
           }
 
@@ -944,7 +1068,7 @@ document.addEventListener('DOMContentLoaded', () => {
           setTimeout(() => {
             form.reset();
             if (btn) {
-              btn.textContent = '💳 Оплатить и зарегистрироваться';
+              btn.textContent = 'Оплатить и зарегистрироваться';
               btn.disabled = false;
               btn.style.background = '';
             }
@@ -957,7 +1081,7 @@ document.addEventListener('DOMContentLoaded', () => {
     form.addEventListener('reset', () => {
       const btn = form.querySelector('button[type="submit"]');
       if (btn) {
-        btn.textContent = '💳 Оплатить и зарегистрироваться';
+        btn.textContent = 'Оплатить и зарегистрироваться';
         btn.disabled = false;
         btn.style.background = '';
       }
@@ -1614,9 +1738,9 @@ document.addEventListener('DOMContentLoaded', () => {
         if (shortName === 'shadow_fiend' || shortName === 'nevermore') {
           // Эксклюзивный культовый набор для Shadow Fiend: ZXC Requiem, ZXCURSED, 3D Рендер
           const sfModes = [
-            { label: '⚡ ZXC Requiem', src: 'images/gifs/shadow_fiend.gif', active: true },
-            { label: '💀 ZXCURSED', src: 'images/gifs/shadow_fiend_zxcursed.gif', active: false },
-            { label: '🖼 3D Рендер', src: 'images/renders/shadow_fiend.png', active: false }
+            { label: 'ZXC Requiem', src: 'images/gifs/shadow_fiend.gif', active: true },
+            { label: 'ZXCURSED', src: 'images/gifs/shadow_fiend_zxcursed.gif', active: false },
+            { label: '3D Рендер', src: 'images/renders/shadow_fiend.png', active: false }
           ];
 
           sfModes.forEach(mode => {
@@ -1634,8 +1758,8 @@ document.addEventListener('DOMContentLoaded', () => {
         } else {
           // Для каждого героя доступна GIF анимация (мемная / игровая / танец) и статичный 3D рендер
           const heroModes = [
-            { label: shortName === 'hoodwink' ? '💃 Танец белки' : '⚡ GIF Анимация', src: gifSrc, active: true },
-            { label: '🖼 3D Рендер', src: renderSrc, active: false }
+            { label: shortName === 'hoodwink' ? 'Танец белки' : 'GIF Анимация', src: gifSrc, active: true },
+            { label: '3D Рендер', src: renderSrc, active: false }
           ];
 
           heroModes.forEach(mode => {
@@ -1782,7 +1906,7 @@ document.addEventListener('DOMContentLoaded', () => {
         } catch(err) {}
       } else {
         document.body.style.overflow = '';
-        fsBtn.innerHTML = '<span class="fs-btn-icon">⛶</span> <span class="fs-btn-text">Открыть во весь экран ↗</span>';
+        fsBtn.innerHTML = '<span class="fs-btn-icon"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path></svg></span> <span class="fs-btn-text">Во весь экран</span>';
         fsBtn.classList.remove('active');
         try {
           if (document.fullscreenElement && document.exitFullscreen) {
@@ -1799,7 +1923,7 @@ document.addEventListener('DOMContentLoaded', () => {
       e.preventDefault();
       heroesSection.classList.remove('roster-fullscreen-mode');
       document.body.style.overflow = '';
-      fsBtn.innerHTML = '<span class="fs-btn-icon">⛶</span> <span class="fs-btn-text">Открыть во весь экран ↗</span>';
+      fsBtn.innerHTML = '<span class="fs-btn-icon"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path></svg></span> <span class="fs-btn-text">Во весь экран</span>';
       fsBtn.classList.remove('active');
       try {
         if (document.fullscreenElement && document.exitFullscreen) {
@@ -1819,7 +1943,7 @@ document.addEventListener('DOMContentLoaded', () => {
         heroesSection.classList.remove('roster-fullscreen-mode');
         document.body.style.overflow = '';
         if (fsBtn) {
-          fsBtn.innerHTML = '<span class="fs-btn-icon">⛶</span> <span class="fs-btn-text">Открыть во весь экран ↗</span>';
+          fsBtn.innerHTML = '<span class="fs-btn-icon"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path></svg></span> <span class="fs-btn-text">Во весь экран</span>';
           fsBtn.classList.remove('active');
         }
         try {
@@ -1837,7 +1961,7 @@ document.addEventListener('DOMContentLoaded', () => {
       heroesSection.classList.remove('roster-fullscreen-mode');
       document.body.style.overflow = '';
       if (fsBtn) {
-        fsBtn.innerHTML = '<span class="fs-btn-icon">⛶</span> <span class="fs-btn-text">Открыть во весь экран ↗</span>';
+        fsBtn.innerHTML = '<span class="fs-btn-icon"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 3H5a2 2 0 0 0-2 2v3m18 0V5a2 2 0 0 0-2-2h-3m0 18h3a2 2 0 0 0 2-2v-3M3 16v3a2 2 0 0 0 2 2h3"></path></svg></span> <span class="fs-btn-text">Во весь экран</span>';
         fsBtn.classList.remove('active');
       }
     }
