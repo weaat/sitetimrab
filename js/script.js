@@ -2377,6 +2377,109 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   } catch(e) {}
 
+  // ============================================================
+  //  ОФИЦИАЛЬНЫЙ МЕРЧ GAZBLOKI31.RU (ИНТЕРАКТИВ И МОДАЛКА)
+  // ============================================================
+  // 1. Переключение размера и вида карточек товара
+  $$('.merch-card').forEach(card => {
+    const sizeBtns = card.querySelectorAll('.size-btn');
+    sizeBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        sizeBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+      });
+    });
+
+    // 2. Кнопка переключения "Футболка / Крупный принт"
+    const toggleBtn = card.querySelector('.btn-toggle-print');
+    const tshirtImg = card.querySelector('.merch-img--tshirt');
+    const printImg  = card.querySelector('.merch-img--print');
+    const toggleTxt = card.querySelector('.toggle-print-text');
+
+    if (toggleBtn && tshirtImg && printImg) {
+      toggleBtn.addEventListener('click', () => {
+        const isShowingPrint = !printImg.hidden;
+        if (isShowingPrint) {
+          printImg.hidden = true;
+          tshirtImg.hidden = false;
+          if (toggleTxt) toggleTxt.textContent = 'Крупный принт';
+        } else {
+          printImg.hidden = false;
+          tshirtImg.hidden = true;
+          if (toggleTxt) toggleTxt.textContent = 'Футболка';
+        }
+      });
+    }
+  });
+
+  // 3. Модалка оформления заказа мерча
+  const merchModalBackdrop = $('#merch-modal-backdrop');
+  const merchModalClose    = $('#merch-modal-close');
+  const merchModalImg      = $('#merch-modal-img');
+  const merchModalTitle    = $('#merch-modal-title');
+  const merchModalPrice    = $('#merch-modal-price');
+  const merchOrderSize     = $('#merch-order-size');
+  const merchOrderForm     = $('#merch-order-form');
+  const merchOrderSuccess  = $('#merch-order-success');
+  const merchOrderId       = $('#merch-order-id');
+  const btnMerchDone       = $('#btn-merch-done');
+
+  function openMerchModal(name, price, imgSrc, selectedSize) {
+    if (!merchModalBackdrop) return;
+    if (merchModalImg)   merchModalImg.src = imgSrc || 'images/merch/tshirt1.png';
+    if (merchModalTitle) merchModalTitle.textContent = name;
+    if (merchModalPrice) merchModalPrice.textContent = `${price} ₽`;
+    if (merchOrderSize && selectedSize) merchOrderSize.value = selectedSize;
+
+    if (merchOrderForm)    merchOrderForm.hidden = false;
+    if (merchOrderSuccess) merchOrderSuccess.hidden = true;
+
+    merchModalBackdrop.hidden = false;
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeMerchModal() {
+    if (!merchModalBackdrop) return;
+    merchModalBackdrop.hidden = true;
+    document.body.style.overflow = '';
+  }
+
+  // Клик по кнопке "Купить" на карточке
+  $$('.btn-buy-merch').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const card = btn.closest('.merch-card');
+      const activeSizeBtn = card?.querySelector('.size-btn.active');
+      const selectedSize = activeSizeBtn ? activeSizeBtn.textContent.trim() : 'M';
+      const name  = btn.dataset.name  || 'Белая футболка gazbloki31.ru';
+      const price = btn.dataset.price || '1337';
+      const img   = btn.dataset.img   || 'images/merch/tshirt1.png';
+      openMerchModal(name, price, img, selectedSize);
+    });
+  });
+
+  // Закрытие модалки
+  merchModalClose?.addEventListener('click', closeMerchModal);
+  btnMerchDone?.addEventListener('click', closeMerchModal);
+  merchModalBackdrop?.addEventListener('click', (e) => {
+    if (e.target === merchModalBackdrop) closeMerchModal();
+  });
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && merchModalBackdrop && !merchModalBackdrop.hidden) {
+      closeMerchModal();
+    }
+  });
+
+  // Отправка формы заказа мерча
+  if (merchOrderForm) {
+    merchOrderForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const code = Math.floor(1000 + Math.random() * 9000);
+      if (merchOrderId) merchOrderId.textContent = `#GZ31-${code}`;
+      merchOrderForm.hidden = true;
+      if (merchOrderSuccess) merchOrderSuccess.hidden = false;
+    });
+  }
+
   initHeroPickGrid();
 
 });

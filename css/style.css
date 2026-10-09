@@ -4977,6 +4977,583 @@ footer > * + * {
 }
 
 /* ============================================================
+   СЕКЦИЯ: ОФИЦИАЛЬНЫЙ МЕРЧ GAZBLOKI31.RU (1 337 ₽)
+   ============================================================ */
+.merch-section {
+  margin: 3.5rem 0;
+  padding: 2.2rem;
+  border-radius: 24px;
+  background: linear-gradient(135deg, rgba(14, 165, 233, 0.08) 0%, rgba(2, 132, 199, 0.03) 100%);
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow: 0 16px 40px rgba(0, 0, 0, 0.4), 0 0 30px rgba(14, 165, 233, 0.15);
+  position: relative;
+  overflow: hidden;
+}
+
+.merch-section::before {
+  content: '';
+  position: absolute;
+  top: -80px;
+  right: -80px;
+  width: 250px;
+  height: 250px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(56, 189, 248, 0.25) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+.merch-section__header {
+  margin-bottom: 2rem;
+  max-width: 780px;
+}
+
+.merch-tag-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.85rem;
+  border-radius: 50px;
+  background: linear-gradient(135deg, rgba(14, 165, 233, 0.25), rgba(2, 132, 199, 0.5));
+  border: 1px solid rgba(125, 211, 252, 0.6);
+  color: #fff;
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  margin-bottom: 0.75rem;
+  box-shadow: 0 0 12px rgba(14, 165, 233, 0.4);
+}
+
+.merch-section h2 {
+  font-size: 1.85rem;
+  font-weight: 800;
+  color: #fff;
+  margin: 0.2rem 0 0.6rem;
+  text-shadow: 0 0 14px rgba(56, 189, 248, 0.5);
+}
+
+.merch-section__desc {
+  font-size: 0.95rem;
+  color: var(--text-muted);
+  line-height: 1.6;
+  margin: 0;
+}
+
+.merch-section__desc strong {
+  color: #38bdf8;
+  font-size: 1.05rem;
+}
+
+.merch-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.75rem;
+}
+
+@media (max-width: 1024px) {
+  .merch-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 680px) {
+  .merch-grid {
+    grid-template-columns: 1fr;
+  }
+  .merch-section {
+    padding: 1.4rem;
+  }
+}
+
+.merch-card {
+  display: flex;
+  flex-direction: column;
+  background: rgba(255, 255, 255, 0.035);
+  border: 1px solid rgba(56, 189, 248, 0.28);
+  border-radius: 20px;
+  overflow: hidden;
+  transition: all .3s cubic-bezier(0.16, 1, 0.3, 1);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.3);
+  position: relative;
+}
+
+.merch-card:hover {
+  transform: translateY(-7px);
+  border-color: rgba(125, 211, 252, 0.75);
+  box-shadow: 0 16px 36px rgba(14, 165, 233, 0.25), 0 0 25px rgba(56, 189, 248, 0.2);
+  background: rgba(14, 165, 233, 0.06);
+}
+
+.merch-card__media {
+  position: relative;
+  width: 100%;
+  height: 320px;
+  background: radial-gradient(circle at center, rgba(30, 41, 59, 0.7) 0%, rgba(15, 23, 42, 0.9) 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.25rem;
+  overflow: hidden;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.merch-card__badge {
+  position: absolute;
+  top: 14px;
+  left: 14px;
+  background: linear-gradient(135deg, rgba(14, 165, 233, 0.3), rgba(2, 132, 199, 0.6));
+  border: 1px solid rgba(125, 211, 252, 0.8);
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 800;
+  padding: 0.2rem 0.65rem;
+  border-radius: 50px;
+  backdrop-filter: blur(6px);
+  z-index: 2;
+  box-shadow: 0 0 10px rgba(14, 165, 233, 0.5);
+}
+
+.merch-image-wrapper {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.merch-img {
+  max-width: 92%;
+  max-height: 92%;
+  object-fit: contain;
+  transition: transform .35s ease, filter .35s ease;
+  filter: drop-shadow(0 12px 20px rgba(0, 0, 0, 0.45));
+}
+
+.merch-card:hover .merch-img {
+  transform: scale(1.06);
+}
+
+.merch-img--print {
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+}
+
+.btn-toggle-print {
+  position: absolute;
+  bottom: 12px;
+  right: 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.75rem;
+  background: rgba(15, 23, 42, 0.75);
+  border: 1px solid rgba(56, 189, 248, 0.5);
+  border-radius: 50px;
+  color: #e2e8f0;
+  font-family: inherit;
+  font-size: 0.75rem;
+  font-weight: 600;
+  cursor: pointer;
+  backdrop-filter: blur(8px);
+  transition: all .2s ease;
+  z-index: 2;
+}
+
+.btn-toggle-print:hover {
+  background: rgba(14, 165, 233, 0.3);
+  border-color: #38bdf8;
+  color: #fff;
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.4);
+}
+
+.merch-card__content {
+  padding: 1.4rem;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+}
+
+.merch-card__meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.76rem;
+  color: var(--text-muted);
+  margin-bottom: 0.4rem;
+}
+
+.merch-card__code {
+  color: #38bdf8;
+  font-weight: 700;
+}
+
+.merch-card__title {
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #fff;
+  margin: 0 0 0.5rem;
+  line-height: 1.35;
+}
+
+.merch-card__text {
+  font-size: 0.85rem;
+  color: #94a3b8;
+  line-height: 1.5;
+  margin: 0 0 1rem;
+}
+
+.merch-card__sizes {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  margin-bottom: 1.25rem;
+  flex-wrap: wrap;
+}
+
+.sizes-label {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  font-weight: 600;
+}
+
+.size-selector {
+  display: flex;
+  gap: 0.35rem;
+}
+
+.size-btn {
+  width: 32px;
+  height: 32px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #cbd5e1;
+  font-family: inherit;
+  font-size: 0.78rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all .18s ease;
+}
+
+.size-btn:hover {
+  background: rgba(14, 165, 233, 0.2);
+  border-color: rgba(56, 189, 248, 0.6);
+  color: #fff;
+}
+
+.size-btn.active {
+  background: linear-gradient(135deg, #0ea5e9, #0284c7);
+  border-color: #38bdf8;
+  color: #fff;
+  box-shadow: 0 0 10px rgba(14, 165, 233, 0.6);
+}
+
+.merch-card__footer {
+  margin-top: auto;
+  padding-top: 1rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.85rem;
+}
+
+.merch-price-box {
+  display: flex;
+  align-items: baseline;
+  gap: 0.45rem;
+}
+
+.merch-price-val {
+  font-size: 1.4rem;
+  font-weight: 900;
+  color: #38bdf8;
+  text-shadow: 0 0 10px rgba(56, 189, 248, 0.5);
+  letter-spacing: 0.3px;
+}
+
+.merch-price-old {
+  font-size: 0.82rem;
+  color: var(--text-muted);
+  text-decoration: line-through;
+}
+
+.btn-buy-merch {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.65rem 1.15rem;
+  border-radius: 50px;
+  background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+  border: 1px solid rgba(125, 211, 252, 0.75);
+  color: #fff;
+  font-family: inherit;
+  font-size: 0.85rem;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(14, 165, 233, 0.4);
+  transition: all .22s ease;
+  white-space: nowrap;
+}
+
+.btn-buy-merch:hover {
+  background: linear-gradient(135deg, #38bdf8 0%, #0ea5e9 100%);
+  box-shadow: 0 6px 22px rgba(14, 165, 233, 0.65);
+  transform: translateY(-2px);
+}
+
+/* МОДАЛКА ЗАКАЗА МЕРЧА */
+.merch-modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 10000;
+  background: rgba(5, 10, 20, 0.82);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+  overflow-y: auto;
+}
+
+.merch-modal-backdrop[hidden] {
+  display: none;
+}
+
+.merch-modal {
+  width: 100%;
+  max-width: 480px;
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.95), rgba(10, 15, 30, 0.98));
+  border: 1px solid rgba(56, 189, 248, 0.45);
+  border-radius: 22px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6), 0 0 30px rgba(14, 165, 233, 0.25);
+  padding: 1.85rem;
+  position: relative;
+  animation: modalIn .25s ease;
+}
+
+.merch-modal__close {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all .2s ease;
+}
+
+.merch-modal__close:hover {
+  background: rgba(14, 165, 233, 0.3);
+  transform: rotate(90deg);
+}
+
+.merch-modal__head {
+  display: flex;
+  align-items: center;
+  gap: 1.15rem;
+  padding-bottom: 1.25rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  margin-bottom: 1.25rem;
+}
+
+.merch-modal__thumb {
+  width: 80px;
+  height: 80px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  padding: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.merch-modal__thumb img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+
+.merch-modal__tag {
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: #38bdf8;
+  margin-bottom: 0.2rem;
+}
+
+.merch-modal__head h3 {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: #fff;
+  margin: 0 0 0.35rem;
+  line-height: 1.3;
+}
+
+.merch-modal__price-line {
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  margin: 0;
+}
+
+.merch-modal__price-line strong {
+  color: #38bdf8;
+  font-size: 1.1rem;
+}
+
+.merch-modal__form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+.merch-form-row {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.merch-form-row label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: #cbd5e1;
+}
+
+.merch-input,
+.merch-select {
+  padding: 0.7rem 0.95rem;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(56, 189, 248, 0.3);
+  color: #fff;
+  font-family: inherit;
+  font-size: 0.88rem;
+  outline: none;
+  transition: all .2s ease;
+}
+
+.merch-input:focus,
+.merch-select:focus {
+  border-color: #38bdf8;
+  background: rgba(14, 165, 233, 0.1);
+  box-shadow: 0 0 12px rgba(14, 165, 233, 0.35);
+}
+
+.merch-modal__total {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.85rem 0.2rem;
+  margin-top: 0.25rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.08);
+  font-size: 0.95rem;
+}
+
+.merch-modal__total span {
+  color: var(--text-muted);
+}
+
+.merch-modal__total b {
+  color: #38bdf8;
+  font-size: 1.3rem;
+  font-weight: 900;
+  text-shadow: 0 0 10px rgba(56, 189, 248, 0.5);
+}
+
+.btn-merch-submit {
+  width: 100%;
+  padding: 0.85rem;
+  border-radius: 50px;
+  background: linear-gradient(135deg, #0ea5e9, #0284c7);
+  border: 1px solid rgba(125, 211, 252, 0.8);
+  color: #fff;
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: 0 4px 18px rgba(14, 165, 233, 0.5);
+  transition: all .2s ease;
+}
+
+.btn-merch-submit:hover {
+  background: linear-gradient(135deg, #38bdf8, #0ea5e9);
+  box-shadow: 0 6px 26px rgba(14, 165, 233, 0.7);
+  transform: translateY(-2px);
+}
+
+.merch-modal__success {
+  text-align: center;
+  padding: 1.5rem 0 0.5rem;
+  animation: successIn .35s ease;
+}
+
+.merch-modal__success[hidden] {
+  display: none;
+}
+
+.merch-modal__check {
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #22c55e, #16a34a);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  margin-bottom: 0.85rem;
+  box-shadow: 0 0 20px rgba(34, 197, 94, 0.5);
+}
+
+.merch-modal__success b {
+  display: block;
+  font-size: 1.25rem;
+  color: #fff;
+  margin-bottom: 0.4rem;
+}
+
+.merch-modal__success p {
+  color: #cbd5e1;
+  font-size: 0.88rem;
+  margin: 0.2rem 0;
+}
+
+.merch-success-sub {
+  color: var(--text-muted) !important;
+  font-size: 0.8rem !important;
+  margin-top: 0.4rem !important;
+}
+
+.btn-merch-done {
+  margin-top: 1.25rem;
+  padding: 0.65rem 1.75rem;
+  border-radius: 50px;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #fff;
+  font-family: inherit;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all .2s ease;
+}
+
+.btn-merch-done:hover {
+  background: rgba(14, 165, 233, 0.3);
+  border-color: #38bdf8;
+}
+
+/* ============================================================
    ПРИНУДИТЕЛЬНОЕ ОТКЛЮЧЕНИЕ БЕЛОЙ ТЕМЫ
    Сайт навсегда зафиксирован в стильном сине-голубом Liquid Glass стиле
    ============================================================ */
