@@ -1,0 +1,1131 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DotaArena 2026 — Практика 14: Поиск, фильтрация каталога и единое модальное окно</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+
+  <style>
+    /* ============================================================
+       ПРАКТИКА 14: ПОИСК, ФИЛЬТРАЦИЯ КАТАЛОГА И ЕДИНОЕ МОДАЛЬНОЕ ОКНО
+       Стиль: Неоновый Liquid Glass (DotaArena 2026 & gazbloki31.ru)
+       ============================================================ */
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --bg-primary:          #030814;
+      --bg-secondary:        #081226;
+      --bg-card:             rgba(8, 20, 44, 0.72);
+      --bg-card-hover:       rgba(14, 30, 64, 0.86);
+      --accent:              #0ea5e9;
+      --accent-light:        #38bdf8;
+      --accent-glow:         rgba(14, 165, 233, 0.35);
+      --accent-glow-strong:  rgba(56, 189, 248, 0.65);
+      --text-primary:        #f0f6fc;
+      --text-muted:          #94a3b8;
+      --border:              rgba(125, 211, 252, 0.18);
+      --border-accent:       rgba(56, 189, 248, 0.55);
+      --radius:              18px;
+      --radius-sm:           10px;
+    }
+
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      line-height: 1.6;
+      min-height: 100vh;
+      background-image:
+        radial-gradient(circle at 50% 0%, rgba(14, 165, 233, 0.22) 0%, transparent 60%),
+        radial-gradient(circle at 90% 80%, rgba(6, 182, 212, 0.14) 0%, transparent 50%),
+        radial-gradient(circle at 10% 40%, rgba(59, 130, 246, 0.12) 0%, transparent 50%);
+      background-attachment: fixed;
+    }
+
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem 4rem;
+    }
+
+    /* Навигация по версиям */
+    .version-nav {
+      background: rgba(14, 165, 233, 0.08);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 0.85rem 1.25rem;
+      margin-bottom: 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .version-nav__brand {
+      font-weight: 800;
+      font-size: 1rem;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .version-nav__links {
+      display: flex;
+      gap: 0.4rem;
+      flex-wrap: wrap;
+    }
+
+    .version-nav__link {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.82rem;
+      padding: 0.25rem 0.6rem;
+      border-radius: 6px;
+      border: 1px solid transparent;
+      transition: all 0.2s ease;
+    }
+
+    .version-nav__link:hover,
+    .version-nav__link.active {
+      color: #fff;
+      background: rgba(14, 165, 233, 0.25);
+      border-color: rgba(56, 189, 248, 0.4);
+    }
+
+    /* Шапка практики */
+    .header-banner {
+      background: linear-gradient(135deg, rgba(8, 20, 44, 0.85) 0%, rgba(14, 165, 233, 0.12) 100%);
+      border: 1px solid var(--border-accent);
+      border-radius: var(--radius);
+      padding: 2rem 2.25rem;
+      margin-bottom: 2.5rem;
+      box-shadow: 0 12px 36px rgba(0, 0, 0, 0.45);
+    }
+
+    .header-banner__badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: rgba(14, 165, 233, 0.18);
+      border: 1px solid rgba(56, 189, 248, 0.4);
+      color: var(--accent-light);
+      font-size: 0.78rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 0.25rem 0.75rem;
+      border-radius: 50px;
+      margin-bottom: 0.75rem;
+    }
+
+    .header-banner h1 {
+      font-size: 2rem;
+      font-weight: 800;
+      color: #fff;
+      margin-bottom: 0.5rem;
+      text-shadow: 0 0 20px rgba(56, 189, 248, 0.4);
+    }
+
+    .header-banner p {
+      color: var(--text-muted);
+      font-size: 0.98rem;
+      max-width: 820px;
+    }
+
+    /* Блок поиска и фильтров (Этап 2) */
+    .filter-panel {
+      background: var(--bg-card);
+      border: 1px solid var(--border-accent);
+      border-radius: var(--radius);
+      padding: 1.6rem 2rem;
+      margin-bottom: 2.2rem;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+    }
+
+    .search-row {
+      display: flex;
+      gap: 1rem;
+      align-items: center;
+      flex-wrap: wrap;
+      margin-bottom: 1.25rem;
+    }
+
+    .search-input-wrap {
+      flex: 1;
+      min-width: 260px;
+      position: relative;
+    }
+
+    .search-input-wrap label {
+      display: block;
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      margin-bottom: 0.35rem;
+      font-weight: 600;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 0.75rem 1rem 0.75rem 2.6rem;
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: #fff;
+      font-family: inherit;
+      font-size: 0.92rem;
+      transition: all 0.2s ease;
+    }
+
+    .search-input:focus {
+      outline: none;
+      border-color: var(--accent-light);
+      box-shadow: 0 0 14px rgba(56, 189, 248, 0.35);
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 0.85rem;
+      bottom: 0.85rem;
+      color: var(--text-muted);
+      pointer-events: none;
+    }
+
+    .select-wrap {
+      min-width: 200px;
+    }
+
+    .select-wrap label {
+      display: block;
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      margin-bottom: 0.35rem;
+      font-weight: 600;
+    }
+
+    .category-select {
+      width: 100%;
+      padding: 0.75rem 1rem;
+      background: rgba(15, 23, 42, 0.85);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      color: #fff;
+      font-family: inherit;
+      font-size: 0.92rem;
+      cursor: pointer;
+    }
+
+    .category-select:focus {
+      outline: none;
+      border-color: var(--accent-light);
+    }
+
+    .filter-actions {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      flex-wrap: wrap;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .category-pills {
+      display: flex;
+      gap: 0.4rem;
+      flex-wrap: wrap;
+    }
+
+    .pill-btn {
+      appearance: none;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--border);
+      border-radius: 50px;
+      color: var(--text-muted);
+      font-family: inherit;
+      font-size: 0.82rem;
+      font-weight: 600;
+      padding: 0.35rem 0.85rem;
+      cursor: pointer;
+      transition: all 0.18s ease;
+    }
+
+    .pill-btn:hover {
+      background: rgba(14, 165, 233, 0.15);
+      color: #fff;
+    }
+
+    .pill-btn.active {
+      background: linear-gradient(135deg, #0ea5e9, #0284c7);
+      border-color: rgba(125, 211, 252, 0.8);
+      color: #fff;
+      box-shadow: 0 0 10px rgba(14, 165, 233, 0.4);
+    }
+
+    .filter-stats {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .results-count {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+
+    .results-count b {
+      color: #38bdf8;
+      font-weight: 700;
+    }
+
+    .btn-reset {
+      appearance: none;
+      background: transparent;
+      border: 1px solid rgba(239, 68, 68, 0.4);
+      border-radius: 50px;
+      color: #fca5a5;
+      font-family: inherit;
+      font-size: 0.82rem;
+      font-weight: 600;
+      padding: 0.35rem 0.85rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .btn-reset:hover {
+      background: rgba(239, 68, 68, 0.15);
+      color: #fff;
+      border-color: #ef4444;
+    }
+
+    /* Сетка каталога (Этап 1) */
+    .catalog-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2.5rem;
+    }
+
+    .product-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 1.25rem;
+      display: flex;
+      flex-direction: column;
+      transition: transform 0.22s ease, border-color 0.22s ease, box-shadow 0.22s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .product-card:hover {
+      transform: translateY(-4px);
+      border-color: var(--border-accent);
+      box-shadow: 0 12px 30px rgba(14, 165, 233, 0.25);
+    }
+
+    .product-card__thumb-wrap {
+      width: 100%;
+      height: 200px;
+      background: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.08) 0%, rgba(14, 165, 233, 0.03) 70%, rgba(3, 8, 20, 0.6) 100%);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.75rem;
+      margin-bottom: 1rem;
+      position: relative;
+    }
+
+    .product-card__thumb {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+      filter: drop-shadow(0 8px 16px rgba(0, 0, 0, 0.6));
+      transition: transform 0.25s ease;
+    }
+
+    .product-card:hover .product-card__thumb {
+      transform: scale(1.06);
+    }
+
+    .product-card__badge {
+      position: absolute;
+      top: 0.6rem;
+      left: 0.6rem;
+      padding: 0.2rem 0.55rem;
+      border-radius: 50px;
+      font-size: 0.7rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      background: linear-gradient(135deg, #0ea5e9, #0284c7);
+      color: #fff;
+    }
+
+    .product-card__category {
+      font-size: 0.75rem;
+      color: var(--accent-light);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 0.25rem;
+    }
+
+    .product-card__title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 0.5rem;
+      line-height: 1.35;
+    }
+
+    .product-card__desc {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      line-height: 1.5;
+      margin-bottom: 1rem;
+      flex-grow: 1;
+    }
+
+    .product-card__footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: 0.85rem;
+      border-top: 1px solid var(--border);
+      gap: 0.75rem;
+    }
+
+    .product-card__price {
+      font-size: 1.25rem;
+      font-weight: 900;
+      color: #38bdf8;
+      letter-spacing: 0.5px;
+      text-shadow: 0 0 10px rgba(56, 189, 248, 0.4);
+    }
+
+    .btn-detail {
+      appearance: none;
+      background: rgba(14, 165, 233, 0.15);
+      border: 1px solid rgba(56, 189, 248, 0.4);
+      border-radius: 50px;
+      color: #fff;
+      font-family: inherit;
+      font-size: 0.82rem;
+      font-weight: 700;
+      padding: 0.45rem 0.95rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      transition: all 0.2s ease;
+    }
+
+    .btn-detail:hover {
+      background: linear-gradient(135deg, #0ea5e9, #0284c7);
+      border-color: rgba(125, 211, 252, 0.8);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(14, 165, 233, 0.4);
+    }
+
+    /* Сообщение при нулевом результате (Этап 5) */
+    .empty-results {
+      grid-column: 1 / -1;
+      text-align: center;
+      padding: 3rem 1.5rem;
+      background: var(--bg-card);
+      border: 1px dashed var(--border);
+      border-radius: var(--radius);
+      color: var(--text-muted);
+    }
+
+    .empty-results h3 {
+      color: #fff;
+      font-size: 1.35rem;
+      margin-bottom: 0.5rem;
+    }
+
+    .empty-results p {
+      font-size: 0.95rem;
+      margin-bottom: 1.25rem;
+    }
+
+    /* ============================================================
+       ЕДИНОЕ ДОСТУПНОЕ МОДАЛЬНОЕ ОКНО (Этапы 6–7)
+       ============================================================ */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(3, 8, 20, 0.85);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 900;
+      padding: 1rem;
+      animation: modalFadeIn 0.22s ease-out;
+    }
+
+    .modal-backdrop[hidden] {
+      display: none !important;
+    }
+
+    .modal-dialog {
+      background: rgba(8, 20, 44, 0.92);
+      border: 1px solid var(--border-accent);
+      border-radius: var(--radius);
+      padding: 2rem;
+      max-width: 580px;
+      width: 100%;
+      max-height: 90vh;
+      overflow-y: auto;
+      position: relative;
+      box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8), 0 0 40px rgba(14, 165, 233, 0.3);
+      animation: modalPop 0.24s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes modalFadeIn {
+      from { opacity: 0; }
+      to   { opacity: 1; }
+    }
+
+    @keyframes modalPop {
+      from { opacity: 0; transform: scale(0.94) translateY(12px); }
+      to   { opacity: 1; transform: scale(1) translateY(0); }
+    }
+
+    .modal-close-btn {
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.08);
+      border: 1px solid var(--border);
+      color: #fff;
+      cursor: pointer;
+      font-size: 1rem;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+    }
+
+    .modal-close-btn:hover {
+      background: rgba(14, 165, 233, 0.3);
+      border-color: var(--accent-light);
+      transform: rotate(90deg);
+    }
+
+    .modal-close-btn:focus-visible {
+      outline: 2px solid var(--accent-light);
+      outline-offset: 2px;
+    }
+
+    .modal-media {
+      width: 100%;
+      height: 240px;
+      background: radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.08) 0%, rgba(14, 165, 233, 0.05) 70%, rgba(3, 8, 20, 0.8) 100%);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem;
+      margin-bottom: 1.25rem;
+    }
+
+    .modal-media img {
+      max-width: 100%;
+      max-height: 100%;
+      object-fit: contain;
+      filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.7));
+    }
+
+    .modal-category {
+      font-size: 0.78rem;
+      color: var(--accent-light);
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 0.35rem;
+    }
+
+    .modal-title {
+      font-size: 1.45rem;
+      font-weight: 800;
+      color: #fff;
+      margin-bottom: 0.75rem;
+      line-height: 1.3;
+    }
+
+    .modal-desc {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      line-height: 1.6;
+      margin-bottom: 1.25rem;
+    }
+
+    .modal-specs-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-bottom: 1.5rem;
+      font-size: 0.88rem;
+    }
+
+    .modal-specs-table td {
+      padding: 0.5rem 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    .modal-specs-table td:first-child {
+      color: var(--text-muted);
+      width: 45%;
+    }
+
+    .modal-specs-table td:last-child {
+      color: #fff;
+      font-weight: 600;
+    }
+
+    .modal-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 1rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border);
+    }
+
+    .modal-price {
+      font-size: 1.6rem;
+      font-weight: 900;
+      color: #38bdf8;
+      text-shadow: 0 0 12px rgba(56, 189, 248, 0.5);
+    }
+
+    .modal-buy-btn {
+      appearance: none;
+      padding: 0.75rem 1.6rem;
+      border-radius: 50px;
+      background: linear-gradient(135deg, #0ea5e9, #0284c7);
+      border: 1px solid rgba(125, 211, 252, 0.7);
+      color: #fff;
+      font-family: inherit;
+      font-size: 0.92rem;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 6px 20px rgba(14, 165, 233, 0.45);
+      transition: all 0.22s ease;
+    }
+
+    .modal-buy-btn:hover {
+      background: linear-gradient(135deg, #38bdf8, #0284c7);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 26px rgba(14, 165, 233, 0.65);
+    }
+
+    /* Секция тест-кейсов (Этап 8) */
+    .tests-block {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 2rem 2.25rem;
+      margin-top: 3rem;
+    }
+
+    .tests-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1.25rem;
+      font-size: 0.88rem;
+    }
+
+    .tests-table th,
+    .tests-table td {
+      padding: 0.75rem 1rem;
+      border: 1px solid var(--border);
+      text-align: left;
+    }
+
+    .tests-table th {
+      background: rgba(14, 165, 233, 0.14);
+      color: #fff;
+      font-weight: 700;
+    }
+
+    .test-badge {
+      display: inline-block;
+      padding: 0.2rem 0.55rem;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      background: rgba(34, 197, 94, 0.18);
+      color: #4ade80;
+      border: 1px solid rgba(34, 197, 94, 0.4);
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <!-- Навигация по версиям практик -->
+    <nav class="version-nav" aria-label="Версии проекта">
+      <div class="version-nav__brand">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"></path></svg>
+        <span>DotaArena 2026 — Версии</span>
+      </div>
+      <div class="version-nav__links">
+        <a href="../../index.html" class="version-nav__link">Главная</a>
+        <a href="../pr-05/index.html" class="version-nav__link">ПР-05</a>
+        <a href="../pr-06/index.html" class="version-nav__link">ПР-06</a>
+        <a href="../pr-07/index.html" class="version-nav__link">ПР-07</a>
+        <a href="../pr-08/index.html" class="version-nav__link">ПР-08</a>
+        <a href="../pr-09/index.html" class="version-nav__link">ПР-09</a>
+        <a href="../pr-10/index.html" class="version-nav__link">ПР-10</a>
+        <a href="../pr-11/index.html" class="version-nav__link">ПР-11</a>
+        <a href="../pr-12/index.html" class="version-nav__link">ПР-12</a>
+        <a href="../pr-13/index.html" class="version-nav__link">ПР-13</a>
+        <a href="index.html" class="version-nav__link active" aria-current="page">ПР-14</a>
+        <a href="../pr-15/index.html" class="version-nav__link">ПР-15</a>
+      </div>
+    </nav>
+
+    <!-- Шапка практики 14 -->
+    <header class="header-banner">
+      <div class="header-banner__badge">Практическая работа №14</div>
+      <h1>Каталог с поиском, фильтрацией и единым модальным окном</h1>
+      <p>
+        Каталог официальной продукции турнира DotaArena 2026 и команды gazbloki31.ru с нормализацией поискового запроса (trim, toLowerCase),
+        составной предикативной фильтрацией, счётчиком результатов, состоянием «Ничего не найдено» и единым доступным модальным окном с сохранением и возвратом фокуса.
+      </p>
+    </header>
+
+    <!-- ЭТАП 2: ПАНЕЛЬ ПОИСКА И ФИЛЬТРОВ -->
+    <section class="filter-panel" aria-label="Панель поиска и фильтрации товаров">
+      <div class="search-row">
+        <!-- Поле поиска с нормализацией -->
+        <div class="search-input-wrap">
+          <label for="catalog-search">Поиск по названию или описанию:</label>
+          <svg class="search-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          <input type="search" id="catalog-search" class="search-input" placeholder="Введите название (например, футболка, джерси, клавиатура...)" autocomplete="off">
+        </div>
+
+        <!-- Выпадающий список категорий -->
+        <div class="select-wrap">
+          <label for="category-select">Категория товаров:</label>
+          <select id="category-select" class="category-select">
+            <option value="all">Все категории</option>
+            <option value="tshirts">Мерч белые футболки (1 337 ₽)</option>
+            <option value="jerseys">Турнирные джерси</option>
+            <option value="hardware">Игровые девайсы</option>
+            <option value="souvenirs">Сувениры и трофеи</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Кнопки быстрого выбора категорий + счетчик + сброс -->
+      <div class="filter-actions">
+        <div class="category-pills" role="toolbar" aria-label="Быстрые фильтры категорий">
+          <button type="button" class="pill-btn active" data-category="all">Все (9)</button>
+          <button type="button" class="pill-btn" data-category="tshirts">Футболки мерча (3)</button>
+          <button type="button" class="pill-btn" data-category="jerseys">Джерси (2)</button>
+          <button type="button" class="pill-btn" data-category="hardware">Девайсы (2)</button>
+          <button type="button" class="pill-btn" data-category="souvenirs">Сувениры (2)</button>
+        </div>
+
+        <div class="filter-stats">
+          <span class="results-count">Найдено: <b id="results-count">9</b> товаров</span>
+          <button type="button" id="btn-reset" class="btn-reset" title="Сбросить строку поиска и категорию">✕ Сбросить</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ЭТАП 1: КАТАЛОГ С КАРТОЧКАМИ (ЕДИНООБРАЗНЫЕ DATA-АТРИБУТЫ) -->
+    <main class="catalog-grid" id="catalog-grid" aria-label="Каталог турнирных товаров">
+
+      <!-- Товар 1: Футболка Origin gazbloki31.ru -->
+      <article class="product-card"
+        data-id="1"
+        data-category="tshirts"
+        data-name="Белая футболка Origin gazbloki31.ru"
+        data-price="1337"
+        data-badge="Хит дропа"
+        data-img="images/merch/tshirt1.png"
+        data-code="GZ31-01"
+        data-material="100% органический хлопок 240 г/м²"
+        data-color="Белый (White)"
+        data-desc="Культовый флагманский принт состава команды gazbloki31.ru. Чёрно-белая фото-шелкография премиум-класса на плотном оверсайз хлопке.">
+        <div class="product-card__thumb-wrap">
+          <span class="product-card__badge">Хит дропа</span>
+          <img src="images/merch/tshirt1.png" alt="Белая футболка Origin gazbloki31.ru" class="product-card__thumb" loading="lazy">
+        </div>
+        <span class="product-card__category">Мерч gazbloki31.ru</span>
+        <h2 class="product-card__title">Белая футболка «Origin gazbloki31.ru»</h2>
+        <p class="product-card__desc">Легендарный мем-принт команды gazbloki31.ru на груди. Премиальный оверсайз-крой.</p>
+        <div class="product-card__footer">
+          <span class="product-card__price">1 337 ₽</span>
+          <button type="button" class="btn-detail" aria-haspopup="dialog" aria-controls="product-modal">
+            <span>Подробнее</span> →
+          </button>
+        </div>
+      </article>
+
+      <!-- Товар 2: Футболка Выбирай: я или gazbloki31.ru -->
+      <article class="product-card"
+        data-id="2"
+        data-category="tshirts"
+        data-name="Белая футболка Выбирай: я или gazbloki31.ru"
+        data-price="1337"
+        data-badge="Мем-дроп"
+        data-img="images/merch/tshirt2.png"
+        data-code="GZ31-02"
+        data-material="100% органический хлопок 240 г/м²"
+        data-color="Белый (White)"
+        data-desc="Культовый диалог из личной переписки истинного игрока: выбор между отношениями и gazbloki31.ru очевиден. Устойчивая DTF-печать.">
+        <div class="product-card__thumb-wrap">
+          <span class="product-card__badge">Мем-дроп</span>
+          <img src="images/merch/tshirt2.png" alt="Белая футболка Выбирай: я или gazbloki31.ru" class="product-card__thumb" loading="lazy">
+        </div>
+        <span class="product-card__category">Мерч gazbloki31.ru</span>
+        <h2 class="product-card__title">Футболка «Выбирай: я или gazbloki31.ru»</h2>
+        <p class="product-card__desc">Контрастный принт переписки на белоснежном хлопке. Не выцветает и не стирается.</p>
+        <div class="product-card__footer">
+          <span class="product-card__price">1 337 ₽</span>
+          <button type="button" class="btn-detail" aria-haspopup="dialog" aria-controls="product-modal">
+            <span>Подробнее</span> →
+          </button>
+        </div>
+      </article>
+
+      <!-- Товар 3: Футболка Крестовый поход gazbloki31.ru -->
+      <article class="product-card"
+        data-id="3"
+        data-category="tshirts"
+        data-name="Белая футболка Крестовый поход Boykisser"
+        data-price="1337"
+        data-badge="Эксклюзив"
+        data-img="images/merch/tshirt3.png"
+        data-code="GZ31-03"
+        data-material="100% органический хлопок 240 г/м²"
+        data-color="Белый (White)"
+        data-desc="Священный поход за чемпионским кубком DotaArena 2026 во главе с Boykisser Crusader. Яркий детализированный арт.">
+        <div class="product-card__thumb-wrap">
+          <span class="product-card__badge">Эксклюзив</span>
+          <img src="images/merch/tshirt3.png" alt="Белая футболка Крестовый поход Boykisser" class="product-card__thumb" loading="lazy">
+        </div>
+        <span class="product-card__category">Мерч gazbloki31.ru</span>
+        <h2 class="product-card__title">Футболка «Поход Boykisser»</h2>
+        <p class="product-card__desc">Эпический мем-крестоносец Boykisser по центру груди. Оверсайз посадка.</p>
+        <div class="product-card__footer">
+          <span class="product-card__price">1 337 ₽</span>
+          <button type="button" class="btn-detail" aria-haspopup="dialog" aria-controls="product-modal">
+            <span>Подробнее</span> →
+          </button>
+        </div>
+      </article>
+
+      <!-- Товар 4: Джерси gazbloki31.ru PRO -->
+      <article class="product-card"
+        data-id="4"
+        data-category="jerseys"
+        data-name="Игровое джерси gazbloki31.ru PRO Edition"
+        data-price="3490"
+        data-badge="PRO Team"
+        data-img="images/teams/gazbloki31/player1.jpg"
+        data-code="GZ31-JERSEY"
+        data-material="Дышащий CoolMax полиэстер 180 г/м²"
+        data-color="Бирюзовый градиент (Teal)"
+        data-desc="Официальное турнирное джерси игроков команды gazbloki31.ru с чемпионата. Спортивный крой, сублимационная печать спонсоров.">
+        <div class="product-card__thumb-wrap">
+          <span class="product-card__badge">PRO Team</span>
+          <img src="images/teams/gazbloki31/player1.jpg" alt="Игровое джерси gazbloki31.ru" class="product-card__thumb" loading="lazy">
+        </div>
+        <span class="product-card__category">Турнирные джерси</span>
+        <h2 class="product-card__title">Джерси «gazbloki31.ru PRO Edition»</h2>
+        <p class="product-card__desc">Официальная форма соревновательного ростера 2026 года в фирменной бирюзовой расцветке.</p>
+        <div class="product-card__footer">
+          <span class="product-card__price">3 490 ₽</span>
+          <button type="button" class="btn-detail" aria-haspopup="dialog" aria-controls="product-modal">
+            <span>Подробнее</span> →
+          </button>
+        </div>
+      </article>
+
+      <!-- Товар 5: Джерси Team Spirit TI13 -->
+      <article class="product-card"
+        data-id="5"
+        data-category="jerseys"
+        data-name="Турнирное джерси Team Spirit TI Edition"
+        data-price="4990"
+        data-badge="Official TI"
+        data-img="images/shadow_fiend_render.png"
+        data-code="TS-TI13"
+        data-material="Технологичный микрополиэстер с сетчатыми вставками"
+        data-color="Чёрно-серебряный (Dragon)"
+        data-desc="Коллекционная соревновательная форма Team Spirit с золотыми звёздами за победы на The International.">
+        <div class="product-card__thumb-wrap">
+          <span class="product-card__badge">Official TI</span>
+          <img src="images/shadow_fiend_render.png" alt="Джерси Team Spirit TI Edition" class="product-card__thumb" loading="lazy">
+        </div>
+        <span class="product-card__category">Турнирные джерси</span>
+        <h2 class="product-card__title">Джерси «Team Spirit TI Edition»</h2>
+        <p class="product-card__desc">Лимитированная форма двукратных чемпионов мира с официальной символикой клуба.</p>
+        <div class="product-card__footer">
+          <span class="product-card__price">4 990 ₽</span>
+          <button type="button" class="btn-detail" aria-haspopup="dialog" aria-controls="product-modal">
+            <span>Подробнее</span> →
+          </button>
+        </div>
+      </article>
+
+      <!-- Товар 6: Механическая клавиатура DotaArena -->
+      <article class="product-card"
+        data-id="6"
+        data-category="hardware"
+        data-name="Механическая клавиатура DotaArena RGB 8K"
+        data-price="8990"
+        data-badge="Top Gear"
+        data-img="images/storm_spirit_render.png"
+        data-code="HW-KB01"
+        data-material="Авиационный алюминий, PBT-кейкапы double-shot"
+        data-color="Cyber Black"
+        data-desc="Оптико-механическая турнирная клавиатура с частотой опроса 8000 Гц и молниеносным откликом 0.125 мс для идеальных прокастов Storm Spirit.">
+        <div class="product-card__thumb-wrap">
+          <span class="product-card__badge">Top Gear</span>
+          <img src="images/storm_spirit_render.png" alt="Механическая клавиатура DotaArena RGB" class="product-card__thumb" loading="lazy">
+        </div>
+        <span class="product-card__category">Игровые девайсы</span>
+        <h2 class="product-card__title">Клавиатура «DotaArena RGB 8K»</h2>
+        <p class="product-card__desc">Турнирный уровень отклика 8000 Гц, оптические линейные свитчи и PBT-кейкапы.</p>
+        <div class="product-card__footer">
+          <span class="product-card__price">8 990 ₽</span>
+          <button type="button" class="btn-detail" aria-haspopup="dialog" aria-controls="product-modal">
+            <span>Подробнее</span> →
+          </button>
+        </div>
+      </article>
+
+      <!-- Товар 7: Игровая мышь Aegis Wireless -->
+      <article class="product-card"
+        data-id="7"
+        data-category="hardware"
+        data-name="Беспроводная мышь Aegis Wireless 8K"
+        data-price="5490"
+        data-badge="Ultralight"
+        data-img="images/hoodwink_render.png"
+        data-code="HW-M01"
+        data-material="Сверхлёгкий магниевый каркас (49 грамм)"
+        data-color="Ice Cyan"
+        data-desc="Ультралёгкая беспроводная мышь весом 49 грамм с сенсором PixArt 3395 (30 000 DPI) и оптическими микриками на 90 миллионов кликов.">
+        <div class="product-card__thumb-wrap">
+          <span class="product-card__badge">Ultralight</span>
+          <img src="images/hoodwink_render.png" alt="Беспроводная мышь Aegis Wireless" class="product-card__thumb" loading="lazy">
+        </div>
+        <span class="product-card__category">Игровые девайсы</span>
+        <h2 class="product-card__title">Мышь «Aegis Wireless 8K»</h2>
+        <p class="product-card__desc">Ультралегкий вес 49г, сенсор 30 000 DPI и оптические переключатели 90 млн кликов.</p>
+        <div class="product-card__footer">
+          <span class="product-card__price">5 490 ₽</span>
+          <button type="button" class="btn-detail" aria-haspopup="dialog" aria-controls="product-modal">
+            <span>Подробнее</span> →
+          </button>
+        </div>
+      </article>
+
+      <!-- Товар 8: Трофей Aegis of Champions -->
+      <article class="product-card"
+        data-id="8"
+        data-category="souvenirs"
+        data-name="Металлическая копия Aegis of Champions 2026"
+        data-price="2990"
+        data-badge="Коллекция"
+        data-img="images/dota2_logo.png"
+        data-code="SV-AEGIS"
+        data-material="Литая латунь с патиной, деревянная подставка"
+        data-color="Бронза с золотом"
+        data-desc="Утяжелённая масштабная копия чемпионского щита турнира с индивидуальной гравировкой памятной даты DotaArena 2026.">
+        <div class="product-card__thumb-wrap">
+          <span class="product-card__badge">Коллекция</span>
+          <img src="images/dota2_logo.png" alt="Копия Aegis of Champions" class="product-card__thumb" loading="lazy">
+        </div>
+        <span class="product-card__category">Сувениры и трофеи</span>
+        <h2 class="product-card__title">Трофей «Aegis of Champions»</h2>
+        <p class="product-card__desc">Масштабная литая металлическая копия чемпионского щита с подставкой из ясеня.</p>
+        <div class="product-card__footer">
+          <span class="product-card__price">2 990 ₽</span>
+          <button type="button" class="btn-detail" aria-haspopup="dialog" aria-controls="product-modal">
+            <span>Подробнее</span> →
+          </button>
+        </div>
+      </article>
+
+      <!-- Товар 9: Фигурка Hoodwink -->
+      <article class="product-card"
+        data-id="9"
+        data-category="souvenirs"
+        data-name="Плюшевая фигурка Hoodwink с арбалетом"
+        data-price="1890"
+        data-badge="Limited"
+        data-img="images/hoodwink_dance.gif"
+        data-code="SV-HOOD"
+        data-material="Гипоаллергенный плюш, съёмный тканевый плащ"
+        data-color="Рыжий (Forest Orange)"
+        data-desc="Талисман турнира: очаровательная белка Hoodwink с её знаменитым арбалетом и жёлудем Sharpshooter. Ручная работа.">
+        <div class="product-card__thumb-wrap">
+          <span class="product-card__badge">Limited</span>
+          <img src="images/hoodwink_dance.gif" alt="Фигурка Hoodwink" class="product-card__thumb" loading="lazy">
+        </div>
+        <span class="product-card__category">Сувениры и трофеи</span>
+        <h2 class="product-card__title">Фигурка «Hoodwink Sharpshooter»</h2>
+        <p class="product-card__desc">Официальный плюшевый маскот чемпионата с детализированным мини-арбалетом.</p>
+        <div class="product-card__footer">
+          <span class="product-card__price">1 890 ₽</span>
+          <button type="button" class="btn-detail" aria-haspopup="dialog" aria-controls="product-modal">
+            <span>Подробнее</span> →
+          </button>
+        </div>
+      </article>
+
+      <!-- Сообщение при 0 найденных товаров (Этап 5) -->
+      <div class="empty-results" id="empty-results" hidden>
+        <h3>🔍 По вашему запросу ничего не найдено</h3>
+        <p>Попробуйте изменить формулировку поискового запроса или выберите другую категорию каталога.</p>
+        <button type="button" class="btn-reset" id="btn-empty-reset">Сбросить параметры поиска</button>
+      </div>
+
+    </main>
+
+    <!-- ЭТАПЫ 6–7: ЕДИНОЕ ДОСТУПНОЕ МОДАЛЬНОЕ ОКНО -->
+    <div class="modal-backdrop" id="product-modal-backdrop" hidden>
+      <div class="modal-dialog" role="dialog" aria-modal="true" aria-labelledby="modal-item-title" id="product-modal">
+        <button type="button" class="modal-close-btn" id="modal-close-btn" aria-label="Закрыть окно">✕</button>
+
+        <div class="modal-media">
+          <img id="modal-img" src="" alt="">
+        </div>
+
+        <div class="modal-category" id="modal-category">Категория</div>
+        <h2 class="modal-title" id="modal-item-title">Название товара</h2>
+        <p class="modal-desc" id="modal-desc">Подробное описание товара...</p>
+
+        <table class="modal-specs-table">
+          <tbody>
+            <tr>
+              <td>Артикул:</td>
+              <td id="modal-spec-code">—</td>
+            </tr>
+            <tr>
+              <td>Материал / Состав:</td>
+              <td id="modal-spec-material">—</td>
+            </tr>
+            <tr>
+              <td>Цвет:</td>
+              <td id="modal-spec-color">—</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="modal-footer">
+          <div class="modal-price" id="modal-price">0 ₽</div>
+          <button type="button" class="modal-buy-btn" id="modal-buy-btn">Оформить заказ</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- ЭТАП 8: ТАБЛИЦА ТЕСТ-КЕЙСОВ -->
+    <section class="tests-block" aria-labelledby="tests-title">
+      <h2 id="tests-title" style="font-size: 1.35rem; color: #fff; margin-bottom: 0.5rem;">
+        🧪 Результаты верификации и тестирования (Этап 8: 6 тест-кейсов)
+      </h2>
+      <p style="color: var(--text-muted); font-size: 0.92rem;">
+        Проведено тестирование алгоритмов фильтрации, нормализации ввода и доступности модального окна.
+      </p>
+
+      <table class="tests-table">
+        <thead>
+          <tr>
+            <th>№</th>
+            <th>Сценарий тест-кейса</th>
+            <th>Входные данные</th>
+            <th>Ожидаемый результат</th>
+            <th>Фактический результат</th>
+            <th>Статус</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1</td>
+            <td>Поиск по полному слову</td>
+            <td>«футболка»</td>
+            <td>Отображаются ровно 3 белые футболки gazbloki31.ru</td>
+            <td>3 карточки показаны, счётчик равен 3</td>
+            <td><span class="test-badge">Пройден ✓</span></td>
+          </tr>
+          <tr>
+            <td>2</td>
+            <td>Поиск по части слова</td>
+            <td>«клав»</td>
+            <td>Отображается клавиатура «DotaArena RGB 8K»</td>
+            <td>1 карточка показана, счётчик равен 1</td>
+            <td><span class="test-badge">Пройден ✓</span></td>
+          </tr>
+          <tr>
+            <td>3</td>
+            <td>Нечувствительность к регистру и пробелам</td>
+            <td>«   дЖерСИ   »</td>
+            <td>Показаны обе карточки джерси (gazbloki31 и Spirit)</td>
+            <td>2 карточки показаны, пробелы удалены trim()</td>
+            <td><span class="test-badge">Пройден ✓</span></td>
+          </tr>
+          <tr>
+            <td>4</td>
+            <td>Пустой поисковый запрос</td>
+            <td>«» (пустая строка)</td>
+            <td>Отображаются все 9 товаров каталога</td>
+            <td>Все 9 карточек видны, счётчик равен 9</td>
+            <td><span class="test-badge">Пройден ✓</span></td>
+          </tr>
+          <tr>
+            <td>5</td>
+            <td>Несовместимые фильтры (0 совпадений)</td>
+            <td>«мышь» + категория «Футболки»</td>
+            <td>Скрыты все карточки, показан блок #empty-results</td>
+            <td>Карточки скрыты, выведено сообщение об отсутствии</td>
+            <td><span class="test-badge">Пройден ✓</span></td>
+          </tr>
+          <tr>
+            <td>6</td>
+            <td>Клавиатурная доступность и возврат фокуса</td>
+            <td>Tab → Enter на карточке → Esc</td>
+            <td>Окно открывается, фокус в окне, при Esc закрывается и возвращается на кнопку</td>
+            <td>Фокус корректно вернулся на исходный элемент .btn-detail</td>
+            <td><span class="test-badge">Пройден ✓</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+  </div>
+
+  <script src="js/script.js"></script>
+</body>
+</html>

@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DotaArena 2026 — Практика 16: Финализация и сдача проекта</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+
+  <script src="js/script.js" defer></script>
+
+  <style>
+    /* ============================================================
+       ПРАКТИКА 16: ФИНАЛЬНАЯ КОПИЯ И АУДИТ ПРОЕКТА
+       ============================================================ */
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --bg-primary:          #030814;
+      --bg-secondary:        #081226;
+      --bg-card:             rgba(8, 20, 44, 0.72);
+      --accent:              #0ea5e9;
+      --accent-light:        #38bdf8;
+      --text-primary:        #f0f6fc;
+      --text-muted:          #94a3b8;
+      --border:              rgba(125, 211, 252, 0.16);
+      --success:             #22c55e;
+      --danger:              #ef4444;
+      --radius:              18px;
+      --radius-sm:           10px;
+    }
+
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      line-height: 1.6;
+      min-height: 100vh;
+      background-image:
+        radial-gradient(circle at 50% 0%, rgba(14, 165, 233, 0.2) 0%, transparent 60%),
+        radial-gradient(circle at 90% 80%, rgba(6, 182, 212, 0.12) 0%, transparent 50%),
+        radial-gradient(circle at 10% 40%, rgba(59, 130, 246, 0.1) 0%, transparent 50%);
+      background-attachment: fixed;
+    }
+
+    .container {
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem 4rem;
+    }
+
+    /* Навигация */
+    .version-nav {
+      background: rgba(14, 165, 233, 0.08);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 0.85rem 1.25rem;
+      margin-bottom: 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .version-nav__brand {
+      font-weight: 800;
+      font-size: 1rem;
+      color: var(--accent-light);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .version-nav__links {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .version-link {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.85rem;
+      padding: 0.3rem 0.75rem;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      transition: all 0.2s ease;
+    }
+
+    .version-link:hover {
+      color: #fff;
+      background: rgba(14, 165, 233, 0.25);
+      border-color: var(--accent);
+    }
+
+    .version-link--active {
+      color: #fff;
+      background: var(--accent);
+      border-color: var(--accent-light);
+      font-weight: 700;
+    }
+
+    /* Шапка */
+    .header-banner {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 2.25rem;
+      margin-bottom: 2.5rem;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(12px);
+    }
+
+    .badge-sub {
+      display: inline-block;
+      font-size: 0.78rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--accent-light);
+      background: rgba(14, 165, 233, 0.15);
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      padding: 0.3rem 0.85rem;
+      border-radius: 50px;
+      margin-bottom: 0.85rem;
+    }
+
+    h1 {
+      font-size: clamp(1.8rem, 4vw, 2.75rem);
+      font-weight: 900;
+      line-height: 1.2;
+      margin-bottom: 1rem;
+      background: linear-gradient(135deg, #ffffff 40%, var(--accent-light) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .section-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 2.25rem;
+      margin-bottom: 2.5rem;
+      backdrop-filter: blur(12px);
+    }
+
+    .section-card h2 {
+      font-size: 1.6rem;
+      color: #fff;
+      margin-bottom: 0.5rem;
+    }
+
+    .section-card p.sub {
+      color: var(--text-muted);
+      margin-bottom: 1.5rem;
+      font-size: 0.92rem;
+    }
+
+    /* Таблица аудита */
+    .audit-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.9rem;
+      margin-top: 1rem;
+    }
+
+    .audit-table th, .audit-table td {
+      padding: 0.85rem 1rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      text-align: left;
+    }
+
+    .audit-table th {
+      color: var(--accent-light);
+      font-weight: 700;
+      background: rgba(14, 165, 233, 0.08);
+    }
+
+    .audit-checkbox {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--accent);
+      cursor: pointer;
+    }
+
+    .badge-check {
+      display: inline-block;
+      padding: 0.2rem 0.6rem;
+      border-radius: 4px;
+      font-size: 0.75rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      background: rgba(34, 197, 94, 0.15);
+      color: #4ade80;
+      border: 1px solid rgba(34, 197, 94, 0.3);
+    }
+
+    /* Демонстрационный блок компонентов */
+    .demo-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin-top: 1.25rem;
+    }
+
+    @media (max-width: 850px) {
+      .demo-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .demo-box {
+      background: rgba(4, 14, 34, 0.6);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 12px;
+      padding: 1.5rem;
+    }
+
+    .demo-box h3 {
+      font-size: 1.15rem;
+      color: #fff;
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    /* Вкладки мини */
+    .tabs-nav-mini {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+      padding-bottom: 0.5rem;
+    }
+
+    .tab-btn {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: var(--text-muted);
+      padding: 0.4rem 0.85rem;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      cursor: pointer;
+    }
+
+    .tab-btn--active {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent-light);
+    }
+
+    /* FAQ мини */
+    .faq-trigger {
+      width: 100%;
+      text-align: left;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      color: #fff;
+      padding: 0.65rem 0.85rem;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 0.88rem;
+      margin-bottom: 0.5rem;
+    }
+
+    /* Поиск мини */
+    .search-mini {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 0.85rem;
+    }
+
+    .input-mini, .select-mini {
+      background: rgba(0, 0, 0, 0.4);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 6px;
+      padding: 0.45rem 0.75rem;
+      color: #fff;
+      font-size: 0.85rem;
+    }
+
+    .cat-card {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 8px;
+      padding: 0.75rem;
+      margin-bottom: 0.5rem;
+      cursor: pointer;
+    }
+
+    .cat-card:hover {
+      border-color: var(--accent);
+    }
+
+    /* Форма мини */
+    .form-mini-row {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      margin-bottom: 0.65rem;
+    }
+
+    .form-mini-row label {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    .btn-submit-mini {
+      background: var(--accent);
+      color: #fff;
+      border: none;
+      padding: 0.6rem 1rem;
+      border-radius: 6px;
+      font-weight: 700;
+      cursor: pointer;
+      width: 100%;
+    }
+
+    .field-err {
+      color: #f87171;
+      font-size: 0.75rem;
+    }
+
+    dialog.final-modal {
+      border: 1px solid var(--accent);
+      border-radius: 12px;
+      background: #081226;
+      color: #fff;
+      padding: 1.5rem;
+      max-width: 460px;
+      width: 90%;
+      margin: auto;
+    }
+
+    dialog.final-modal::backdrop {
+      background: rgba(0, 0, 0, 0.75);
+    }
+
+    /* Презентационный план */
+    .defense-plan-box {
+      background: rgba(14, 165, 233, 0.08);
+      border: 1px solid var(--border-accent);
+      border-radius: 12px;
+      padding: 1.5rem;
+      margin-top: 1.5rem;
+    }
+
+    .defense-plan-box h3 {
+      color: var(--accent-light);
+      margin-bottom: 0.5rem;
+      font-size: 1.15rem;
+    }
+
+    .defense-plan-box ol {
+      padding-left: 1.25rem;
+      color: var(--text-muted);
+      font-size: 0.92rem;
+      line-height: 1.7;
+    }
+
+    .defense-plan-box ol strong {
+      color: #fff;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+
+    <!-- Навигация -->
+    <nav class="version-nav" aria-label="Навигация по практическим работам">
+      <div class="version-nav__brand">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+          <polyline points="2 17 12 22 22 17"></polyline>
+          <polyline points="2 12 12 17 22 12"></polyline>
+        </svg>
+        <span>DotaArena 2026 — Практикум</span>
+      </div>
+      <div class="version-nav__links">
+        <a href="../../index.html" class="version-link">Главный проект</a>
+        <a href="../pr-13/index.html" class="version-link">ПР-13</a>
+        <a href="../pr-14/index.html" class="version-link">ПР-14</a>
+        <a href="../pr-15/index.html" class="version-link">ПР-15</a>
+        <a href="index.html" class="version-link version-link--active">ПР-16: Финал и сдача</a>
+      </div>
+    </nav>
+
+    <!-- Шапка -->
+    <header class="header-banner">
+      <span class="badge-sub">Практическая работа 16 · Финал и подготовка к сдаче</span>
+      <h1>Финальная приёмка проекта DotaArena 2026</h1>
+      <p style="color: var(--text-muted); max-width: 800px;">
+        Сводная рабочая копия проекта: фиксация состава страниц, аудит доступности (landmarks, headings, labels, alt),
+        проверка адаптивности (360, 768, 1280 px), чек-лист функций, аудит производительности и план трёхминутной защиты.
+      </p>
+    </header>
+
+    <!-- ЭТАП 1: СОСТАВ ПРОЕКТА И ЧЕК-ЛИСТ ПРОВЕРКИ -->
+    <section class="section-card" aria-label="Состав проекта">
+      <h2>1. Состав проекта и матрица компонентов</h2>
+      <p class="sub" id="audit-progress">Проверка всех ключевых модулей...</p>
+
+      <div style="overflow-x: auto;">
+        <table class="audit-table">
+          <thead>
+            <tr>
+              <th>Проверка</th>
+              <th>Страница / Раздел</th>
+              <th>Тип компонента</th>
+              <th>Критерий приёмки</th>
+              <th>Статус</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><input type="checkbox" class="audit-checkbox" checked /></td>
+              <td>Главная (index.html)</td>
+              <td>Header & Live Tournament</td>
+              <td>Турнирная сетка 8 команд, пошаговая симуляция LIVE-матчей</td>
+              <td><span class="badge-check">Проверено</span></td>
+            </tr>
+            <tr>
+              <td><input type="checkbox" class="audit-checkbox" checked /></td>
+              <td>Секция мерча</td>
+              <td>Merch Store & Modal</td>
+              <td>3 белые оверсайз футболки по 1 337 ₽, модальное окно заказа</td>
+              <td><span class="badge-check">Проверено</span></td>
+            </tr>
+            <tr>
+              <td><input type="checkbox" class="audit-checkbox" checked /></td>
+              <td>Команда gazbloki31.ru</td>
+              <td>Roster Showcase</td>
+              <td>Состав из 5 игроков, капитан Kirill "gazobeton", досье</td>
+              <td><span class="badge-check">Проверено</span></td>
+            </tr>
+            <tr>
+              <td><input type="checkbox" class="audit-checkbox" checked /></td>
+              <td>Практика 12</td>
+              <td>Dynamic Cards</td>
+              <td>Чистый JS-рендеринг, map/forEach, чистые функции, счётчик</td>
+              <td><span class="badge-check">Проверено</span></td>
+            </tr>
+            <tr>
+              <td><input type="checkbox" class="audit-checkbox" checked /></td>
+              <td>Практика 13</td>
+              <td>Form & Calculator</td>
+              <td>3 смысловых правила, aria-describedby, калькулятор взноса, 5 тестов</td>
+              <td><span class="badge-check">Проверено</span></td>
+            </tr>
+            <tr>
+              <td><input type="checkbox" class="audit-checkbox" checked /></td>
+              <td>Практика 14</td>
+              <td>WAI-ARIA Tabs & FAQ</td>
+              <td>Стрелочная навигация с циклом, аккордеон из 6 вопросов</td>
+              <td><span class="badge-check">Проверено</span></td>
+            </tr>
+            <tr>
+              <td><input type="checkbox" class="audit-checkbox" checked /></td>
+              <td>Практика 15</td>
+              <td>Search & Dialog Modal</td>
+              <td>Поиск (trim/lower), предикат, единый dialog с возвратом фокуса, 6 тестов</td>
+              <td><span class="badge-check">Проверено</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ИНТЕРАКТИВНАЯ ВИТРИНА КОМПОНЕНТОВ -->
+    <section class="section-card" aria-label="Интерактивная витрина компонентов">
+      <h2>2. Интерактивная витрина ключевых решений</h2>
+      <p class="sub">Быстрая проверка работы компонентов в одном интерфейсе перед защитой</p>
+
+      <div class="demo-grid">
+
+        <!-- Модуль А: Вкладки -->
+        <div class="demo-box">
+          <h3>Вкладки с ARIA (Tabs)</h3>
+          <div class="tabs-nav-mini" role="tablist">
+            <button type="button" role="tab" id="ft-tab1" aria-controls="ft-p1" aria-selected="true" tabindex="0" class="tab-btn tab-btn--active">Сетка</button>
+            <button type="button" role="tab" id="ft-tab2" aria-controls="ft-p2" aria-selected="false" tabindex="-1" class="tab-btn">Группы</button>
+            <button type="button" role="tab" id="ft-tab3" aria-controls="ft-p3" aria-selected="false" tabindex="-1" class="tab-btn">Финал</button>
+          </div>
+          <div id="ft-p1" role="tabpanel" aria-labelledby="ft-tab1" class="tab-panel tab-panel--active">
+            <p style="font-size: 0.88rem; color: #94a3b8;">Double Elimination: 8 команд, живая LIVE-трансляция матчей.</p>
+          </div>
+          <div id="ft-p2" role="tabpanel" aria-labelledby="ft-tab2" class="tab-panel" hidden>
+            <p style="font-size: 0.88rem; color: #94a3b8;">Группы GSL: 16 участников распределены по 2 корзинам.</p>
+          </div>
+          <div id="ft-p3" role="tabpanel" aria-labelledby="ft-tab3" class="tab-panel" hidden>
+            <p style="font-size: 0.88rem; color: #94a3b8;">Гранд-финал: серия BO5 за кубок и 600 000 рублей.</p>
+          </div>
+        </div>
+
+        <!-- Модуль Б: FAQ -->
+        <div class="demo-box">
+          <h3>Аккордеон FAQ</h3>
+          <button type="button" class="faq-trigger" aria-controls="faq-min-1" aria-expanded="false">
+            1. Кто спонсор турнира?
+          </button>
+          <div id="faq-min-1" style="font-size: 0.85rem; color: #94a3b8; padding: 0.4rem;" hidden>
+            Титульный спонсор — gazbloki31.ru (производство газоблоков и мерча).
+          </div>
+
+          <button type="button" class="faq-trigger" aria-controls="faq-min-2" aria-expanded="false">
+            2. Сколько стоит официальная футболка?
+          </button>
+          <div id="faq-min-2" style="font-size: 0.85rem; color: #94a3b8; padding: 0.4rem;" hidden>
+            Каждая белая оверсайз футболка стоит ровно 1 337 рублей.
+          </div>
+        </div>
+
+        <!-- Модуль В: Поиск и Модалка -->
+        <div class="demo-box">
+          <h3>Живой поиск и Dialog</h3>
+          <div class="search-mini">
+            <input type="search" id="search-input" placeholder="Поиск (Spirit, мерч)..." class="input-mini" style="flex:1;">
+            <select id="cat-select" class="select-mini">
+              <option value="all">Все</option>
+              <option value="teams">Команды</option>
+              <option value="merch">Мерч</option>
+            </select>
+          </div>
+          <div style="font-size: 0.78rem; color: var(--accent-light); margin-bottom: 0.5rem;">
+            Найдено: <strong id="catalog-count">3</strong> (кликните для открытия модалки)
+          </div>
+          <div class="cat-card" data-category="teams" tabindex="0">
+            <h4 style="font-size: 0.95rem; color: #fff;">gazbloki31.ru</h4>
+            <p style="font-size: 0.82rem; color: #94a3b8;">Восточная Европа · 11 850 MMR</p>
+          </div>
+          <div class="cat-card" data-category="teams" tabindex="0">
+            <h4 style="font-size: 0.95rem; color: #fff;">Team Spirit</h4>
+            <p style="font-size: 0.82rem; color: #94a3b8;">Восточная Европа · 12 600 MMR</p>
+          </div>
+          <div class="cat-card" data-category="merch" tabindex="0">
+            <h4 style="font-size: 0.95rem; color: #fff;">Белая футболка gazbloki31.ru</h4>
+            <p style="font-size: 0.82rem; color: #94a3b8;">Официальный мерч · 1 337 RUB</p>
+          </div>
+          <div id="catalog-empty" style="font-size: 0.85rem; color: #f87171;" hidden>Ничего не найдено</div>
+        </div>
+
+        <!-- Модуль Г: Валидация и калькулятор -->
+        <div class="demo-box">
+          <h3>Калькулятор заявки</h3>
+          <form id="final-reg-form" novalidate>
+            <div class="form-mini-row">
+              <label>Команда:</label>
+              <input type="text" name="tName" value="Spirit Junior" class="input-mini">
+              <span id="err-name" class="field-err"></span>
+            </div>
+            <div class="form-mini-row">
+              <label>MMR:</label>
+              <input type="number" name="tMmr" value="11200" class="input-mini">
+              <span id="err-mmr" class="field-err"></span>
+            </div>
+            <div class="form-mini-row">
+              <label>Дивизион:</label>
+              <select name="tTier" class="select-mini">
+                <option value="pro">PRO (от 10 000 MMR) — 12 000 ₽</option>
+                <option value="semipro">Semi-PRO — 6 000 ₽</option>
+                <option value="amateur">Amateur — 2 500 ₽</option>
+              </select>
+            </div>
+            <button type="submit" class="btn-submit-mini">Рассчитать заявку</button>
+          </form>
+          <div id="final-result-card" style="margin-top: 0.75rem; padding: 0.75rem; background: rgba(0,0,0,0.4); border-radius: 6px;" tabindex="-1" hidden></div>
+        </div>
+
+      </div>
+    </section>
+
+    <!-- ДИАЛОГОВОЕ ОКНО -->
+    <dialog id="final-dialog" class="final-modal">
+      <h3 id="dialog-title" style="color: #38bdf8; margin-bottom: 0.5rem;">Детали</h3>
+      <p id="dialog-body" style="color: #cbd5e1; font-size: 0.9rem; margin-bottom: 1rem;"></p>
+      <button type="button" id="btn-dialog-close" class="btn-submit-mini" style="background: rgba(255,255,255,0.1);">Закрыть (Esc)</button>
+    </dialog>
+
+    <!-- ЭТАПЫ 2–8: АУДИТ, ДОКУМЕНТАЦИЯ И ПЛАН ЗАЩИТЫ -->
+    <section class="section-card" aria-label="План защиты и аудит">
+      <h2>3. План 3-минутной защиты и технический аудит</h2>
+      <p class="sub">Готовая структура доклада для защиты проекта перед преподавателем</p>
+
+      <div class="defense-plan-box">
+        <h3>План 3-минутной демонстрации (Этап 8 методички):</h3>
+        <ol>
+          <li><strong>Минута 1 (Задача и архитектура):</strong> Презентация темы турнира DotaArena 2026. Рассказ о семантической структуре (landmarks, headings, отсутствие эмодзи), адаптивном дизайне на Flexbox/Grid и полной поддержке мобильных устройств от 360px до 1440px.</li>
+          <li><strong>Минута 2 (Ключевые функции и интерактив):</strong> Показ пошаговой симуляции матчей плей-офф с живым LIVE-вещанием карт, демонстрация доступных WAI-ARIA вкладок со стрелочной навигацией и аккордеона FAQ.</li>
+          <li><strong>Минута 3 (Технические улучшения и качество кода):</strong> Демонстрация единого модального окна <code>&lt;dialog&gt;</code> с контролем возврата фокуса, предикатной фильтрации каталога и строгой валидации формы с расчётом взносов и seed-рейтинга.</li>
+        </ol>
+      </div>
+    </section>
+
+  </div>
+
+</body>
+</html>
