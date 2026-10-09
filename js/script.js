@@ -89,10 +89,10 @@ document.addEventListener('DOMContentLoaded', () => {
           note: 'Сигнатурные герои: Axe, Centaur Warrunner'
         },
         {
-          name: 'Вадим «Vadim»',
+          name: 'Ксения «Ksenia»',
           role: 'Частичная поддержка (Позиция 4)',
           photo: 'images/teams/gazbloki31/player4.jpg',
-          note: 'Сигнатурные герои: Earthshaker, Rubick'
+          note: 'Сигнатурные герои: Crystal Maiden, Rubick'
         },
         {
           name: 'Пятый игрок (Слот открыт)',
