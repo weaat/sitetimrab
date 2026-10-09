@@ -5584,3 +5584,324 @@ html,
 html[data-theme="light"] {
   color-scheme: dark !important;
 }
+
+/* ============================================================
+   ПРАКТИКА 14: ДОСТУПНЫЕ ВКЛАДКИ РАСПИСАНИЯ (#program)
+   ============================================================ */
+.program-tabs-wrap {
+  margin-top: 1.5rem;
+}
+
+.program-tabs-wrap .tabs-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.65rem;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.08);
+  padding-bottom: 0.85rem;
+  margin-bottom: 1.5rem;
+}
+
+.program-tabs-wrap .tab-btn {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: var(--text-muted);
+  font-family: inherit;
+  font-size: 0.95rem;
+  font-weight: 600;
+  padding: 0.7rem 1.35rem;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all .22s ease;
+  user-select: none;
+}
+
+.program-tabs-wrap .tab-btn:hover {
+  color: #fff;
+  background: rgba(14, 165, 233, 0.16);
+  border-color: rgba(56, 189, 248, 0.4);
+}
+
+.program-tabs-wrap .tab-btn:focus-visible {
+  outline: 2px solid #38bdf8;
+  outline-offset: 3px;
+}
+
+.program-tabs-wrap .tab-btn--active {
+  background: linear-gradient(135deg, rgba(14, 165, 233, 0.35) 0%, rgba(2, 132, 199, 0.5) 100%);
+  color: #fff;
+  border-color: #38bdf8;
+  box-shadow: 0 0 16px rgba(14, 165, 233, 0.4);
+  font-weight: 700;
+}
+
+.program-tabs-wrap .tab-panel {
+  background: rgba(8, 20, 44, 0.55);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-sm);
+  padding: 1.75rem;
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+}
+
+.program-tabs-wrap .tab-panel:not([hidden]) {
+  animation: programTabFadeIn 0.3s ease-out;
+}
+
+@keyframes programTabFadeIn {
+  from { opacity: 0; transform: translateY(4px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* ============================================================
+   ПРАКТИКА 14: АККОРДЕОН FAQ В ПРАВИЛАХ (#rules)
+   ============================================================ */
+.rules-faq-wrap {
+  margin-top: 2.5rem;
+  padding-top: 2rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.rules-faq-wrap h3 {
+  font-size: 1.5rem;
+  color: #fff;
+  margin-bottom: 0.35rem;
+}
+
+.rules-faq-sub {
+  color: var(--text-muted);
+  font-size: 0.92rem;
+  margin-bottom: 1.5rem;
+}
+
+.rules-faq-wrap .faq-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.rules-faq-wrap .faq-item {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: var(--radius-sm);
+  background: rgba(8, 20, 44, 0.45);
+  overflow: hidden;
+  transition: border-color .2s ease;
+}
+
+.rules-faq-wrap .faq-item:hover {
+  border-color: rgba(56, 189, 248, 0.35);
+}
+
+.rules-faq-wrap .faq-trigger {
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  color: #fff;
+  font-family: inherit;
+  font-size: 1rem;
+  font-weight: 700;
+  padding: 1rem 1.25rem;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  transition: background .2s ease;
+}
+
+.rules-faq-wrap .faq-trigger:hover {
+  background: rgba(255, 255, 255, 0.03);
+}
+
+.rules-faq-wrap .faq-trigger:focus-visible {
+  outline: 2px solid #38bdf8;
+  outline-offset: -2px;
+}
+
+.rules-faq-wrap .faq-trigger svg {
+  transition: transform .25s ease;
+  color: #38bdf8;
+  flex-shrink: 0;
+}
+
+.rules-faq-wrap .faq-trigger[aria-expanded="true"] svg {
+  transform: rotate(180deg);
+}
+
+.rules-faq-wrap .faq-content {
+  padding: 0 1.25rem 1.15rem;
+  color: var(--text-muted);
+  font-size: 0.92rem;
+  line-height: 1.6;
+  border-top: 1px solid rgba(255, 255, 255, 0.04);
+  padding-top: 0.75rem;
+}
+
+/* ============================================================
+   ПРАКТИКА 15: ЕДИНОЕ МОДАЛЬНОЕ ОКНО <dialog> (#teams)
+   ============================================================ */
+dialog.team-dialog-modal {
+  border: 1px solid rgba(56, 189, 248, 0.6);
+  border-radius: var(--radius);
+  background: linear-gradient(135deg, rgba(8, 24, 56, 0.98) 0%, rgba(4, 12, 28, 0.99) 100%);
+  color: var(--text);
+  padding: 2rem;
+  max-width: 560px;
+  width: 90%;
+  margin: auto;
+  box-shadow: 0 0 50px rgba(14, 165, 233, 0.45);
+  position: fixed;
+  inset: 0;
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+}
+
+dialog.team-dialog-modal::backdrop {
+  background: rgba(3, 8, 20, 0.82);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+.team-dialog-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 1.25rem;
+  gap: 1rem;
+}
+
+.team-dialog-badge {
+  display: inline-block;
+  font-size: 0.72rem;
+  font-weight: 800;
+  padding: 0.2rem 0.55rem;
+  border-radius: 4px;
+  background: rgba(14, 165, 233, 0.2);
+  color: #38bdf8;
+  border: 1px solid rgba(56, 189, 248, 0.35);
+  margin-bottom: 0.4rem;
+}
+
+.team-dialog-title {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: #fff;
+  margin-bottom: 0.2rem;
+}
+
+.team-dialog-meta {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.team-dialog-close-btn {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  color: #fff;
+  font-size: 1.15rem;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all .2s ease;
+  flex-shrink: 0;
+}
+
+.team-dialog-close-btn:hover {
+  background: rgba(239, 68, 68, 0.3);
+  border-color: #ef4444;
+}
+
+.team-dialog-body {
+  font-size: 0.92rem;
+  line-height: 1.6;
+  color: var(--text-muted);
+}
+
+.team-dialog-roster-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.team-dialog-player-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.45rem 0.75rem;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.team-dialog-player-row strong {
+  color: #fff;
+}
+
+/* ============================================================
+   ПРАКТИКА 13: ОНЛАЙН-РАСЧЁТ ВЗНОСА В ФОРМЕ (#registration)
+   ============================================================ */
+.reg-calc-preview {
+  margin: 1.5rem 0 1.25rem;
+  padding: 1.25rem 1.5rem;
+  background: linear-gradient(135deg, rgba(8, 26, 60, 0.65) 0%, rgba(4, 14, 34, 0.8) 100%);
+  border: 1px solid rgba(56, 189, 248, 0.4);
+  border-radius: var(--radius-sm);
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+}
+
+.calc-preview-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.calc-preview-badge {
+  font-size: 0.75rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  color: #38bdf8;
+  letter-spacing: 0.5px;
+}
+
+#calc-seed-rating {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+#calc-seed-rating strong {
+  color: #f59e0b;
+}
+
+.calc-preview-total {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-top: 0.65rem;
+  border-top: 1px dashed rgba(255, 255, 255, 0.1);
+  font-size: 1rem;
+}
+
+.calc-preview-total strong {
+  font-size: 1.35rem;
+  color: #38bdf8;
+  font-weight: 800;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .program-tabs-wrap .tab-panel:not([hidden]) {
+    animation: none !important;
+  }
+  .rules-faq-wrap .faq-trigger svg {
+    transition: none !important;
+  }
+}

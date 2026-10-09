@@ -947,12 +947,114 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // ============================================================
-  //  10. МОДАЛЬНОЕ ОКНО ДЕТАЛЕЙ КОМАНДЫ
+  //  10. МОДАЛЬНОЕ ОКНО ДЕТАЛЕЙ КОМАНДЫ (НА ТИВНЫЙ <dialog> + FALLBACK)
   // ============================================================
   const modalBackdrop = $('#modal-backdrop');
   const modalClose    = $('#modal-close');
+  const teamDialog    = $('#team-details-dialog');
+  const teamDialogClose = $('#btn-team-dialog-close');
+  let lastTeamTriggerElement = null;
 
-  function openModal(team) {
+  function openTeamDialogModal(team, triggerEl) {
+    if (!teamDialog) return false;
+    lastTeamTriggerElement = triggerEl || document.activeElement;
+
+    const isGazbloki = (team.name || '').toLowerCase() === 'gazbloki31.ru';
+    const badgeEl = $('#team-dialog-badge');
+    const titleEl = $('#team-dialog-title');
+    const metaEl  = $('#team-dialog-meta');
+    const bodyEl  = $('#team-dialog-body');
+
+    if (badgeEl) {
+      badgeEl.textContent = isGazbloki ? 'ОФИЦИАЛЬНЫЙ РОСТЕР GAZBLOKI31.RU' : (team.division ? `Дивизион ${team.division}` : 'TOP-8 ТУРНИРНАЯ СЕТКА');
+    }
+    if (titleEl) {
+      titleEl.textContent = team.name || 'Команда';
+    }
+    if (metaEl) {
+      metaEl.textContent = [
+        team.region ? `Регион: ${team.region}` : '',
+        team.captain ? `Капитан: ${team.captain}` : '',
+        team.mmr ? `MMR: ${team.mmr}` : '',
+        team.payment ? `Взнос: ${formatMoney(team.payment)}` : ''
+      ].filter(Boolean).join(' · ');
+    }
+
+    if (bodyEl) {
+      const list = Array.isArray(team.members) && team.members.length ? team.members : ['Состав не указан'];
+      let html = '<div class="team-dialog-roster-list">';
+      list.forEach((m, idx) => {
+        if (typeof m === 'object' && m !== null) {
+          html += `
+            <div class="team-dialog-player-row">
+              <div style="display:flex;align-items:center;gap:.6rem;">
+                ${m.photo ? `<img src="${m.photo}" alt="${m.name}" style="width:28px;height:28px;border-radius:50%;object-fit:cover;">` : ''}
+                <strong>${m.name}</strong> ${m.role ? `<span style="color:var(--text-muted);font-size:.8rem;">(${m.role})</span>` : ''}
+              </div>
+              <span style="color:#38bdf8;font-size:.8rem;">${m.note || `Позиция ${idx + 1}`}</span>
+            </div>`;
+        } else {
+          html += `
+            <div class="team-dialog-player-row">
+              <strong>${m}</strong>
+              <span style="color:#38bdf8;font-size:.8rem;">Игрок ${idx + 1}</span>
+            </div>`;
+        }
+      });
+      html += '</div>';
+
+      if (team.achievements) {
+        html += `
+          <div style="margin-top:1rem;padding:.75rem 1rem;background:rgba(56,189,248,.08);border:1px solid rgba(56,189,248,.2);border-radius:8px;">
+            <div style="color:#38bdf8;font-weight:700;font-size:.85rem;margin-bottom:.25rem;">Достижения команды</div>
+            <div style="color:#e2e8f0;font-size:.88rem;">${team.achievements}</div>
+          </div>`;
+      }
+      bodyEl.innerHTML = html;
+    }
+
+    if (typeof teamDialog.showModal === 'function') {
+      try {
+        teamDialog.showModal();
+        return true;
+      } catch (err) {}
+    }
+    return false;
+  }
+
+  function closeTeamDialogModal() {
+    if (!teamDialog) return;
+    if (typeof teamDialog.close === 'function') {
+      teamDialog.close();
+    } else {
+      teamDialog.removeAttribute('open');
+    }
+    if (lastTeamTriggerElement && typeof lastTeamTriggerElement.focus === 'function') {
+      lastTeamTriggerElement.focus();
+    }
+  }
+
+  if (teamDialog) {
+    teamDialogClose?.addEventListener('click', closeTeamDialogModal);
+    teamDialog.addEventListener('click', (e) => {
+      const rect = teamDialog.getBoundingClientRect();
+      const inBox = (
+        rect.top <= e.clientY && e.clientY <= rect.top + rect.height &&
+        rect.left <= e.clientX && e.clientX <= rect.left + rect.width
+      );
+      if (!inBox) closeTeamDialogModal();
+    });
+    teamDialog.addEventListener('close', () => {
+      if (lastTeamTriggerElement && typeof lastTeamTriggerElement.focus === 'function') {
+        lastTeamTriggerElement.focus();
+      }
+    });
+  }
+
+  function openModal(team, triggerEl) {
+    if (teamDialog && openTeamDialogModal(team, triggerEl)) {
+      return;
+    }
     if (!modalBackdrop) return;
     const isGazbloki = (team.name || '').toLowerCase() === 'gazbloki31.ru';
     $('#modal-title').textContent        = team.name || '—';
@@ -2553,6 +2655,122 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // ============================================================
+  //  ПРАКТИКА 14: ДОСТУПНЫЕ WAI-ARIA ВКЛАДКИ РАСПИСАНИЯ (#program)
+  // ============================================================
+  function initSiteProgramTabs() {
+    const tabsWrap = document.querySelector('.program-tabs-wrap');
+    if (!tabsWrap) return;
+    const tabs = Array.from(tabsWrap.querySelectorAll('[role="tab"]'));
+    const panels = Array.from(tabsWrap.querySelectorAll('[role="tabpanel"]'));
+
+    function activateTab(tab, setFocus = true) {
+      tabs.forEach(t => {
+        const isSelected = t === tab;
+        t.setAttribute('aria-selected', isSelected ? 'true' : 'false');
+        t.setAttribute('tabindex', isSelected ? '0' : '-1');
+        t.classList.toggle('tab-btn--active', isSelected);
+      });
+
+      const targetPanelId = tab.getAttribute('aria-controls');
+      panels.forEach(p => {
+        const isTarget = p.id === targetPanelId;
+        p.hidden = !isTarget;
+        p.classList.toggle('tab-panel--active', isTarget);
+      });
+
+      if (setFocus) {
+        tab.focus();
+      }
+    }
+
+    tabs.forEach((tab, index) => {
+      tab.addEventListener('click', () => activateTab(tab, false));
+
+      tab.addEventListener('keydown', (e) => {
+        let targetIndex = null;
+        if (e.key === 'ArrowRight' || e.key === 'ArrowDown') {
+          targetIndex = (index + 1) % tabs.length;
+        } else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') {
+          targetIndex = (index - 1 + tabs.length) % tabs.length;
+        } else if (e.key === 'Home') {
+          targetIndex = 0;
+        } else if (e.key === 'End') {
+          targetIndex = tabs.length - 1;
+        }
+
+        if (targetIndex !== null) {
+          e.preventDefault();
+          activateTab(tabs[targetIndex], true);
+        }
+      });
+    });
+  }
+
+  // ============================================================
+  //  ПРАКТИКА 14: ИНТЕРАКТИВНЫЙ АККОРДЕОН РЕГЛАМЕНТА FAQ (#rules)
+  // ============================================================
+  function initSiteRulesFaq() {
+    const triggers = document.querySelectorAll('.rules-faq-wrap .faq-trigger');
+    triggers.forEach(trigger => {
+      trigger.addEventListener('click', () => {
+        const isExpanded = trigger.getAttribute('aria-expanded') === 'true';
+        const targetPanelId = trigger.getAttribute('aria-controls');
+        const panel = document.getElementById(targetPanelId);
+
+        trigger.setAttribute('aria-expanded', !isExpanded ? 'true' : 'false');
+        if (panel) {
+          panel.hidden = isExpanded;
+        }
+      });
+    });
+  }
+
+  // ============================================================
+  //  ПРАКТИКА 13: ОНЛАЙН-КАЛЬКУЛЯТОР ВЗНОСА И SEED RATING (#registration)
+  // ============================================================
+  function initSiteRegistrationCalculator() {
+    const form = document.querySelector('form');
+    const calcBox = document.getElementById('reg-calc-preview');
+    const seedRatingEl = document.getElementById('calc-seed-rating');
+    const feeAmountEl = document.getElementById('calc-fee-amount');
+    if (!calcBox || !form) return;
+
+    const mmrInput = document.getElementById('captain-mmr');
+    const divSelect = document.getElementById('discipline');
+
+    function updateCalc() {
+      // 1. Взнос из выбранного тарифа
+      const planInput = form.querySelector('input[name="payment_plan"]:checked');
+      const fee = planInput ? parseInt(planInput.value, 10) : 1000;
+      if (feeAmountEl) {
+        feeAmountEl.textContent = formatMoney(fee);
+      }
+
+      // 2. Рейтинг посева (Seed Rating) на основе MMR и дивизиона
+      const mmr = parseInt(mmrInput?.value, 10) || 5700;
+      const divVal = divSelect?.value || 'PRO';
+      const divMult = divVal === 'PRO' ? 1.25 : (divVal === 'SEMI' ? 1.0 : 0.85);
+      const seedRating = Math.round((mmr / 5) * divMult);
+
+      if (seedRatingEl) {
+        const formatted = String(seedRating).replace(/\B(?=(\d{3})+(?!\d))/g, ' ');
+        seedRatingEl.innerHTML = `Seed Rating: <strong>${formatted} pts</strong>`;
+      }
+    }
+
+    form.addEventListener('input', updateCalc);
+    form.addEventListener('change', updateCalc);
+    form.addEventListener('reset', () => {
+      setTimeout(updateCalc, 10);
+    });
+
+    updateCalc();
+  }
+
+  initSiteProgramTabs();
+  initSiteRulesFaq();
+  initSiteRegistrationCalculator();
   initHeroPickGrid();
 
 });

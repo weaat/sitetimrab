@@ -1074,60 +1074,84 @@
       <h2>Программа турнира</h2>
       <p>Три дня соревнований, мастер-классов и шоу-матчей от приглашённых игроков.</p>
 
-      <h3>День 1 — 14 ноября (Групповой этап)</h3>
-      <ul>
-        <li>09:00 — Регистрация и заезд команд</li>
-        <li>10:00 — Открытие турнира и жеребьёвка</li>
-        <li>11:00 — Начало групповых матчей Dota 2</li>
-        <li>15:00 — Шоу-матч Storm Spirit vs Hoodwink</li>
-        <li>19:00 — Итоги первого дня</li>
-      </ul>
+      <!-- Доступные WAI-ARIA вкладки расписания (Практика 14) -->
+      <div class="program-tabs-wrap">
+        <div class="tabs-nav" role="tablist" aria-label="Расписание по дням турнира">
+          <button type="button" role="tab" id="tab-day-1" aria-controls="panel-day-1" aria-selected="true" tabindex="0" class="tab-btn tab-btn--active">
+            <span>День 1 — 14 ноября</span>
+          </button>
+          <button type="button" role="tab" id="tab-day-2" aria-controls="panel-day-2" aria-selected="false" tabindex="-1" class="tab-btn">
+            <span>День 2 — 15 ноября</span>
+          </button>
+          <button type="button" role="tab" id="tab-day-3" aria-controls="panel-day-3" aria-selected="false" tabindex="-1" class="tab-btn">
+            <span>День 3 — Финалы (16 ноября)</span>
+          </button>
+        </div>
 
-      <h3>День 2 — 15 ноября (Плей-офф)</h3>
-      <ol>
-        <li>1/8 финала по всем дивизионам</li>
-        <li>Четвертьфинал</li>
-        <li>Мастер-класс от профессионального игрока</li>
-        <li>Полуфинал</li>
-        <li>Пресс-конференция участников</li>
-      </ol>
+        <!-- Панель 1: День 1 -->
+        <div id="panel-day-1" role="tabpanel" aria-labelledby="tab-day-1" tabindex="0" class="tab-panel tab-panel--active">
+          <h3>День 1 — 14 ноября (Групповой этап)</h3>
+          <ul>
+            <li>09:00 — Регистрация и заезд команд</li>
+            <li>10:00 — Открытие турнира и жеребьёвка</li>
+            <li>11:00 — Начало групповых матчей Dota 2</li>
+            <li>15:00 — Шоу-матч Storm Spirit vs Hoodwink</li>
+            <li>19:00 — Итоги первого дня</li>
+          </ul>
+        </div>
 
-      <h3>Расписание финальных матчей</h3>
-      <table>
-        <caption>Финальные матчи — 16 ноября 2026</caption>
-        <thead>
-          <tr>
-            <th>Время</th>
-            <th>Дивизион</th>
-            <th>Команда 1</th>
-            <th>Команда 2</th>
-            <th>Площадка</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td>12:00</td>
-            <td>Dota 2 — Дивизион B</td>
-            <td>TBD</td>
-            <td>TBD</td>
-            <td>Стрим-зал A</td>
-          </tr>
-          <tr>
-            <td>15:00</td>
-            <td>Dota 2 — Дивизион A</td>
-            <td>TBD</td>
-            <td>TBD</td>
-            <td>Стрим-зал B</td>
-          </tr>
-          <tr>
-            <td>18:00</td>
-            <td>Dota 2 — Гранд-финал</td>
-            <td>TBD</td>
-            <td>TBD</td>
-            <td>Главная сцена</td>
-          </tr>
-        </tbody>
-      </table>
+        <!-- Панель 2: День 2 -->
+        <div id="panel-day-2" role="tabpanel" aria-labelledby="tab-day-2" tabindex="0" class="tab-panel" hidden>
+          <h3>День 2 — 15 ноября (Плей-офф)</h3>
+          <ol>
+            <li>1/8 финала по всем дивизионам</li>
+            <li>Четвертьфинал</li>
+            <li>Мастер-класс от профессионального игрока</li>
+            <li>Полуфинал</li>
+            <li>Пресс-конференция участников</li>
+          </ol>
+        </div>
+
+        <!-- Панель 3: День 3 -->
+        <div id="panel-day-3" role="tabpanel" aria-labelledby="tab-day-3" tabindex="0" class="tab-panel" hidden>
+          <h3>Расписание финальных матчей — 16 ноября</h3>
+          <table>
+            <caption>Финальные матчи — 16 ноября 2026</caption>
+            <thead>
+              <tr>
+                <th>Время</th>
+                <th>Дивизион</th>
+                <th>Команда 1</th>
+                <th>Команда 2</th>
+                <th>Площадка</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>12:00</td>
+                <td>Dota 2 — Дивизион B</td>
+                <td>TBD</td>
+                <td>TBD</td>
+                <td>Стрим-зал A</td>
+              </tr>
+              <tr>
+                <td>15:00</td>
+                <td>Dota 2 — Дивизион A</td>
+                <td>TBD</td>
+                <td>TBD</td>
+                <td>Стрим-зал B</td>
+              </tr>
+              <tr>
+                <td>18:00</td>
+                <td>Dota 2 — Гранд-финал (BO5)</td>
+                <td>TBD</td>
+                <td>TBD</td>
+                <td>Главная сцена</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
     </section>
 
     <!-- ========================================================
@@ -1328,6 +1352,21 @@
           </p>
         </div>
       </div>
+
+      <!-- Единое доступное модальное окно <dialog> (Практика 15) -->
+      <dialog id="team-details-dialog" class="team-dialog-modal" aria-labelledby="team-dialog-title">
+        <div class="team-dialog-head">
+          <div>
+            <span id="team-dialog-badge" class="team-dialog-badge">TOP-8</span>
+            <h3 id="team-dialog-title" class="team-dialog-title">Название команды</h3>
+            <p id="team-dialog-meta" class="team-dialog-meta">Регион · MMR</p>
+          </div>
+          <button type="button" id="btn-team-dialog-close" class="team-dialog-close-btn" aria-label="Закрыть досье команды (Esc)">✕</button>
+        </div>
+        <div id="team-dialog-body" class="team-dialog-body">
+          <!-- Заполняется динамически -->
+        </div>
+      </dialog>
     </section>
 
     <!-- ========================================================
@@ -1762,6 +1801,86 @@
         <li>Дисквалификация команды с турнира.</li>
         <li>Внесение в чёрный список на последующие сезоны.</li>
       </ol>
+
+      <!-- Подраздел FAQ: Аккордеон из 6 вопросов регламента (Практика 14) -->
+      <div class="rules-faq-wrap">
+        <h3>Часто задаваемые вопросы (FAQ)</h3>
+        <p class="rules-faq-sub">Ответы о регламенте, призовых, серверах и мерче турнира</p>
+
+        <div class="faq-list">
+          <article class="faq-item">
+            <h4>
+              <button type="button" class="faq-trigger" id="site-faq-t-1" aria-controls="site-faq-p-1" aria-expanded="false">
+                <span>1. До какого числа открыта регистрация команд на турнир?</span>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>
+              </button>
+            </h4>
+            <div id="site-faq-p-1" class="faq-content" role="region" aria-labelledby="site-faq-t-1" hidden>
+              Регистрация открыта до 1 ноября 2026 года 23:59 МСК. После дедлайна списки участников закрываются и формируется сетка посева.
+            </div>
+          </article>
+
+          <article class="faq-item">
+            <h4>
+              <button type="button" class="faq-trigger" id="site-faq-t-2" aria-controls="site-faq-p-2" aria-expanded="false">
+                <span>2. Какой призовой фонд турнира и как он выплачивается?</span>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>
+              </button>
+            </h4>
+            <div id="site-faq-p-2" class="faq-content" role="region" aria-labelledby="site-faq-t-2" hidden>
+              Призовой фонд — 600 000 рублей: 350 000 ₽ за 1-е место, 150 000 ₽ за 2-е место, 60 000 ₽ за 3-е место и 40 000 ₽ за 4-е место.
+            </div>
+          </article>
+
+          <article class="faq-item">
+            <h4>
+              <button type="button" class="faq-trigger" id="site-faq-t-3" aria-controls="site-faq-p-3" aria-expanded="false">
+                <span>3. Сколько игроков должно быть в заявке команды?</span>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>
+              </button>
+            </h4>
+            <div id="site-faq-p-3" class="faq-content" role="region" aria-labelledby="site-faq-t-3" hidden>
+              Основной состав — 5 игроков. Дополнительно регламентом разрешено заявить до 2 запасных игроков (всего до 7 человек в ростере).
+            </div>
+          </article>
+
+          <article class="faq-item">
+            <h4>
+              <button type="button" class="faq-trigger" id="site-faq-t-4" aria-controls="site-faq-p-4" aria-expanded="false">
+                <span>4. На каких серверах проводятся матчи плей-офф?</span>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>
+              </button>
+            </h4>
+            <div id="site-faq-p-4" class="faq-content" role="region" aria-labelledby="site-faq-t-4" hidden>
+              Матчи проводятся на официальных выделенных серверах Valve (Стокгольм и Франкфурт) с контролем пинга и задержки.
+            </div>
+          </article>
+
+          <article class="faq-item">
+            <h4>
+              <button type="button" class="faq-trigger" id="site-faq-t-5" aria-controls="site-faq-p-5" aria-expanded="false">
+                <span>5. Как заказать официальный мерч (белые футболки gazbloki31.ru)?</span>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>
+              </button>
+            </h4>
+            <div id="site-faq-p-5" class="faq-content" role="region" aria-labelledby="site-faq-t-5" hidden>
+              Все 3 дизайна белых оверсайз футболок по 1 337 рублей доступны в секции «Мерч» сайта с быстрой доставкой по РФ.
+            </div>
+          </article>
+
+          <article class="faq-item">
+            <h4>
+              <button type="button" class="faq-trigger" id="site-faq-t-6" aria-controls="site-faq-p-6" aria-expanded="false">
+                <span>6. Как работает онлайн-симуляция матчей в турнирной сетке?</span>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="6 9 12 15 18 9"></polyline></svg>
+              </button>
+            </h4>
+            <div id="site-faq-p-6" class="faq-content" role="region" aria-labelledby="site-faq-t-6" hidden>
+              Сетка разыгрывается пошагово в реальном времени матч за матчем: отображаются карты, статус LIVE и продвижение команд.
+            </div>
+          </article>
+        </div>
+      </div>
     </section>
 
     <!-- ========================================================
@@ -1959,6 +2078,18 @@
             <label for="subscribe">Подписаться на новости и анонсы турнира</label>
           </div>
         </fieldset>
+
+        <!-- Блок моментального расчёта взноса и Seed Rating (Практика 13) -->
+        <div id="reg-calc-preview" class="reg-calc-preview" aria-live="polite" tabindex="-1">
+          <div class="calc-preview-head">
+            <span class="calc-preview-badge">Онлайн-расчёт заявки</span>
+            <span id="calc-seed-rating">Seed Rating: <strong>1 140 pts</strong></span>
+          </div>
+          <div class="calc-preview-total">
+            <span>Итоговый взнос к оплате:</span>
+            <strong id="calc-fee-amount">1 000 ₽</strong>
+          </div>
+        </div>
 
         <div class="form-actions">
           <button type="submit" id="submit-btn">
