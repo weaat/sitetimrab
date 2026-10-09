@@ -17,10 +17,10 @@ const catalogItems = [
     tag: 'GZ31',
     description: 'Официальный титульный ростер генерального спонсора турнира. Победители открытых квалификаций.',
     details: {
-      captain: 'Kirill "gazobeton" V.',
-      roster: '5 игроков основного состава + запас',
+      captain: 'Тимур "cursedkaneki???"',
+      roster: 'Тимур (Керри), Даниил (Мид), Женька (Оффлейн), Артур (Саппорт), Ксения (Саппорт)',
       achievements: '1-е место на Belgorod Open Cyber Cup 2026',
-      hero: 'Storm Spirit, Invoker, Hoodwink'
+      hero: 'Lifestealer, Storm Spirit, Viper, Enigma, Crystal Maiden'
     }
   },
   {

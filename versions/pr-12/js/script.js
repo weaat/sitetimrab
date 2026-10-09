@@ -35,7 +35,7 @@ const teamsData = [
     tag: 'GZ31',
     region: 'Восточная Европа',
     mmr: 11850,
-    captain: 'Kirill "gazobeton" V.',
+    captain: 'Тимур "cursedkaneki???"',
     rosterCount: 5,
     tier: 'PRO',
     foundedYear: 2024,

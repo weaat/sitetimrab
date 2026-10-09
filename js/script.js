@@ -54,51 +54,51 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // ============================================================
   //  ДАННЫЕ ПО УМОЛЧАНИЮ: 8 КОМАНД С СОСТАВАМИ
-  //  Включает gazbloki31.ru (5 человек, 4 фото + 5-й слот ожидает)
+  //  Включает gazbloki31.ru (5 человек, все 5 подтверждены)
   // ============================================================
   const DEFAULT_REGISTERED_TEAMS = [
     {
       id: 'team-gz31',
       name: 'gazbloki31.ru',
       tag: 'GZ31',
-      captain: 'Анна «Anya»',
+      captain: 'Тимур «cursedkaneki???»',
       region: 'Белгород (31 регион)',
       division: 'PRO',
       mmr: 11800,
       payment: 15000,
       ts: Date.now() - 1000000,
       achievements: 'Победители BelCyber Cup 2025 · Топ-1 квалификаций gazbloki31.ru',
-      logo: 'images/teams/gazbloki31/player1.jpg',
+      logo: 'images/teams/gazbloki31/player5.jpg',
       members: [
         {
-          name: 'Анна «Anya»',
+          name: 'Тимур «cursedkaneki???»',
           role: 'Керри / Капитан (Позиция 1)',
-          photo: 'images/teams/gazbloki31/player1.jpg',
-          note: 'Сигнатурные герои: Hoodwink, Drow Ranger'
-        },
-        {
-          name: 'Даниил «Danya»',
-          role: 'Мидлейнер (Позиция 2)',
           photo: 'images/teams/gazbloki31/player2.jpg',
-          note: 'Сигнатурные герои: Storm Spirit, Invoker'
+          note: 'Сигнатурные герои: Lifestealer, Phantom Lancer'
         },
         {
-          name: 'Тимур «Timur»',
+          name: 'Даниил «jewelxxet»',
+          role: 'Мидлейнер (Позиция 2)',
+          photo: 'images/teams/gazbloki31/player5.jpg',
+          note: 'Сигнатурные герои: Storm Spirit, Shadow Fiend'
+        },
+        {
+          name: 'Женька «skr1ch»',
           role: 'Оффлейнер (Позиция 3)',
-          photo: 'images/teams/gazbloki31/player3.jpg',
-          note: 'Сигнатурные герои: Axe, Centaur Warrunner'
-        },
-        {
-          name: 'Ксения «Ksenia»',
-          role: 'Частичная поддержка (Позиция 4)',
           photo: 'images/teams/gazbloki31/player4.jpg',
-          note: 'Сигнатурные герои: Crystal Maiden, Rubick'
+          note: 'Сигнатурные герои: Viper, Pudge'
         },
         {
-          name: 'Пятый игрок (Слот открыт)',
+          name: 'Артур «ar7yexe»',
+          role: 'Частичная поддержка (Позиция 4)',
+          photo: 'images/teams/gazbloki31/player3.jpg',
+          note: 'Сигнатурные герои: Enigma, Skywrath Mage'
+        },
+        {
+          name: 'Ксения «chyug»',
           role: 'Полная поддержка (Позиция 5)',
-          photo: '',
-          note: 'Будет добавлен позже'
+          photo: 'images/teams/gazbloki31/player1.jpg',
+          note: 'Сигнатурные герои: Crystal Maiden, Pugna'
         }
       ]
     },
@@ -262,7 +262,8 @@ document.addEventListener('DOMContentLoaded', () => {
               ...DEFAULT_REGISTERED_TEAMS[0],
               ...stored.registered[gzIdx],
               members: DEFAULT_REGISTERED_TEAMS[0].members,
-              logo: DEFAULT_REGISTERED_TEAMS[0].logo
+              logo: DEFAULT_REGISTERED_TEAMS[0].logo,
+              captain: DEFAULT_REGISTERED_TEAMS[0].captain
             };
           }
           return stored;
