@@ -52,13 +52,225 @@ document.addEventListener('DOMContentLoaded', () => {
     };
   }
 
+  // ============================================================
+  //  ДАННЫЕ ПО УМОЛЧАНИЮ: 8 КОМАНД С СОСТАВАМИ
+  //  Включает gazbloki31.ru (5 человек, 4 фото + 5-й слот ожидает)
+  // ============================================================
+  const DEFAULT_REGISTERED_TEAMS = [
+    {
+      id: 'team-gz31',
+      name: 'gazbloki31.ru',
+      tag: 'GZ31',
+      captain: 'Анна «Anya»',
+      region: 'Белгород (31 регион)',
+      division: 'PRO',
+      mmr: 11800,
+      payment: 15000,
+      ts: Date.now() - 1000000,
+      achievements: 'Победители BelCyber Cup 2025 · Топ-1 квалификаций gazbloki31.ru',
+      logo: 'images/teams/gazbloki31/player1.jpg',
+      members: [
+        {
+          name: 'Анна «Anya»',
+          role: 'Керри / Капитан (Позиция 1)',
+          photo: 'images/teams/gazbloki31/player1.jpg',
+          note: 'Сигнатурные герои: Hoodwink, Drow Ranger'
+        },
+        {
+          name: 'Даниил «Danya»',
+          role: 'Мидлейнер (Позиция 2)',
+          photo: 'images/teams/gazbloki31/player2.jpg',
+          note: 'Сигнатурные герои: Storm Spirit, Invoker'
+        },
+        {
+          name: 'Тимур «Timur»',
+          role: 'Оффлейнер (Позиция 3)',
+          photo: 'images/teams/gazbloki31/player3.jpg',
+          note: 'Сигнатурные герои: Axe, Centaur Warrunner'
+        },
+        {
+          name: 'Вадим «Vadim»',
+          role: 'Частичная поддержка (Позиция 4)',
+          photo: 'images/teams/gazbloki31/player4.jpg',
+          note: 'Сигнатурные герои: Earthshaker, Rubick'
+        },
+        {
+          name: 'Пятый игрок (Слот открыт)',
+          role: 'Полная поддержка (Позиция 5)',
+          photo: '',
+          note: 'Будет добавлен позже'
+        }
+      ]
+    },
+    {
+      id: 'team-ts',
+      name: 'Team Spirit',
+      tag: 'TS',
+      captain: 'Ярослав «Miposhka» Найдёнов',
+      region: 'Москва',
+      division: 'PRO',
+      mmr: 11200,
+      payment: 15000,
+      ts: Date.now() - 900000,
+      achievements: 'Двукратные чемпионы The International (TI10, TI12)',
+      members: [
+        { name: 'Илья «Yatoro» Мулярчук', role: 'Керри (Позиция 1)' },
+        { name: 'Денис «Larl» Сигитов', role: 'Мидлейнер (Позиция 2)' },
+        { name: 'Магомед «Collapse» Халилов', role: 'Оффлейнер (Позиция 3)' },
+        { name: 'Мирослав «Mira» Колпаков', role: 'Саппорт (Позиция 4)' },
+        { name: 'Ярослав «Miposhka» Найдёнов', role: 'Капитан / Саппорт (Позиция 5)' }
+      ]
+    },
+    {
+      id: 'team-gg',
+      name: 'Gaimin Gladiators',
+      tag: 'GG',
+      captain: 'Мельхиор «Seleri» Хилленкамп',
+      region: 'Санкт-Петербург',
+      division: 'PRO',
+      mmr: 10850,
+      payment: 15000,
+      ts: Date.now() - 800000,
+      achievements: 'Победители Riyadh Masters 2024, мейджоров 2023',
+      members: [
+        { name: 'Антон «dyrachyo» Шкредов', role: 'Керри (Позиция 1)' },
+        { name: 'Квин «Quinn» Каллахан', role: 'Мидлейнер (Позиция 2)' },
+        { name: 'Маркус «Ace» Хёлгард', role: 'Оффлейнер (Позиция 3)' },
+        { name: 'Эрик «tOfu» Энгель', role: 'Саппорт (Позиция 4)' },
+        { name: 'Мельхиор «Seleri» Хилленкамп', role: 'Капитан / Саппорт (Позиция 5)' }
+      ]
+    },
+    {
+      id: 'team-tl',
+      name: 'Team Liquid',
+      tag: 'TL',
+      captain: 'Айдин «iNSaNiA» Саркои',
+      region: 'Екатеринбург',
+      division: 'PRO',
+      mmr: 10900,
+      payment: 15000,
+      ts: Date.now() - 700000,
+      achievements: 'Чемпионы The International 2024 (TI13)',
+      members: [
+        { name: 'Майк «miCKe» Ву', role: 'Керри (Позиция 1)' },
+        { name: 'Михал «Nisha» Янковски', role: 'Мидлейнер (Позиция 2)' },
+        { name: 'Нета «33» Шапира', role: 'Оффлейнер (Позиция 3)' },
+        { name: 'Самуэль «Boxi» Сван', role: 'Саппорт (Позиция 4)' },
+        { name: 'Айдин «iNSaNiA» Саркои', role: 'Капитан / Саппорт (Позиция 5)' }
+      ]
+    },
+    {
+      id: 'team-bb',
+      name: 'BetBoom Team',
+      tag: 'BB',
+      captain: 'Виталий «Save-» Мельник',
+      region: 'Казань',
+      division: 'PRO',
+      mmr: 10600,
+      payment: 15000,
+      ts: Date.now() - 600000,
+      achievements: 'Топ-3 ESL One Birmingham 2024',
+      members: [
+        { name: 'Егор «Nightfall» Григоренко', role: 'Керри (Позиция 1)' },
+        { name: 'Данил «gpk~» Скутин', role: 'Мидлейнер (Позиция 2)' },
+        { name: 'Матвей «MieRo`» Васюнин', role: 'Оффлейнер (Позиция 3)' },
+        { name: 'Виталий «Save-» Мельник', role: 'Капитан / Саппорт (Позиция 4)' },
+        { name: 'Александр «TORONTOTOKYO» Хертек', role: 'Саппорт (Позиция 5)' }
+      ]
+    },
+    {
+      id: 'team-xg',
+      name: 'Xtreme Gaming',
+      tag: 'XG',
+      captain: 'Дин «Dy» Цун',
+      region: 'Новосибирск',
+      division: 'PRO',
+      mmr: 10750,
+      payment: 15000,
+      ts: Date.now() - 500000,
+      achievements: 'Победители Games of the Future 2024',
+      members: [
+        { name: 'Ван «Ame» Чуньюй', role: 'Керри (Позиция 1)' },
+        { name: 'Го «Xm» Хуншэн', role: 'Мидлейнер (Позиция 2)' },
+        { name: 'Линь «Xxs» Цзин', role: 'Оффлейнер (Позиция 3)' },
+        { name: 'Чжао «XinQ» Цзысин', role: 'Саппорт (Позиция 4)' },
+        { name: 'Дин «Dy» Цун', role: 'Капитан / Саппорт (Позиция 5)' }
+      ]
+    },
+    {
+      id: 'team-flc',
+      name: 'Team Falcons',
+      tag: 'FLC',
+      captain: 'Цзинцзюнь «Sneyking» У',
+      region: 'Самара',
+      division: 'PRO',
+      mmr: 11050,
+      payment: 15000,
+      ts: Date.now() - 400000,
+      achievements: 'Победители BetBoom Dacha Dubai 2024, DreamLeague S22',
+      members: [
+        { name: 'Оливер «skiter» Лепко', role: 'Керри (Позиция 1)' },
+        { name: 'Станислав «Malr1ne» Поторак', role: 'Мидлейнер (Позиция 2)' },
+        { name: 'Аммар «ATF» аль-Ассаф', role: 'Оффлейнер (Позиция 3)' },
+        { name: 'Андреас «Cr1t-» Нильсен', role: 'Саппорт (Позиция 4)' },
+        { name: 'Цзинцзюнь «Sneyking» У', role: 'Капитан / Саппорт (Позиция 5)' }
+      ]
+    },
+    {
+      id: 'team-tun',
+      name: 'Tundra Esports',
+      tag: 'TUN',
+      captain: 'Мартин «Saksa» Саздов',
+      region: 'Ростов-на-Дону',
+      division: 'PRO',
+      mmr: 10500,
+      payment: 15000,
+      ts: Date.now() - 300000,
+      achievements: 'Топ-3 The International 2024',
+      members: [
+        { name: 'Иван «Pure~» Москаленко', role: 'Керри (Позиция 1)' },
+        { name: 'Топиас «Topson» Таавитсайнен', role: 'Мидлейнер (Позиция 2)' },
+        { name: 'Роман «RAMZES666» Кушнарёв', role: 'Оффлейнер (Позиция 3)' },
+        { name: 'Мартин «Saksa» Саздов', role: 'Капитан / Саппорт (Позиция 4)' },
+        { name: 'Мэтью «Whitemon» Филмон', role: 'Саппорт (Позиция 5)' }
+      ]
+    }
+  ];
+
+  const DEFAULT_BRACKET_TEAMS = DEFAULT_REGISTERED_TEAMS.map(t => ({
+    name: t.name,
+    tag: t.tag,
+    region: t.region,
+    mmr: t.mmr,
+    captain: t.captain,
+    division: t.division
+  }));
+
   /** Хранилище команд (pending / registered) */
   const store = {
     read() {
       try {
-        return JSON.parse(localStorage.getItem(STORAGE_KEY))
-          || { pending: [], registered: [] };
-      } catch { return { pending: [], registered: [] }; }
+        const stored = JSON.parse(localStorage.getItem(STORAGE_KEY));
+        if (stored && Array.isArray(stored.registered) && stored.registered.length) {
+          // Гарантируем присутствие gazbloki31.ru с актуальным составом
+          const gzIdx = stored.registered.findIndex(t => (t.name || '').toLowerCase() === 'gazbloki31.ru');
+          if (gzIdx === -1) {
+            stored.registered.unshift(DEFAULT_REGISTERED_TEAMS[0]);
+            try { localStorage.setItem(STORAGE_KEY, JSON.stringify(stored)); } catch {}
+          } else {
+            stored.registered[gzIdx] = {
+              ...DEFAULT_REGISTERED_TEAMS[0],
+              ...stored.registered[gzIdx],
+              members: DEFAULT_REGISTERED_TEAMS[0].members,
+              logo: DEFAULT_REGISTERED_TEAMS[0].logo
+            };
+          }
+          return stored;
+        }
+      } catch {}
+      const initData = { pending: [], registered: [...DEFAULT_REGISTERED_TEAMS] };
+      try { localStorage.setItem(STORAGE_KEY, JSON.stringify(initData)); } catch {}
+      return initData;
     },
     write(d) {
       try { localStorage.setItem(STORAGE_KEY, JSON.stringify(d)); } catch {}
@@ -335,10 +547,35 @@ document.addEventListener('DOMContentLoaded', () => {
   function makeTeamLi(team) {
     const li = document.createElement('li');
     li.dataset.teamId = team.id;
+    const isGazbloki = (team.name || '').toLowerCase() === 'gazbloki31.ru';
+    if (isGazbloki) {
+      li.classList.add('team-li--gazbloki');
+    }
+
+    const titleWrap = document.createElement('div');
+    titleWrap.className = 'team-name-wrap';
+
+    if (isGazbloki) {
+      const avatarMini = document.createElement('img');
+      avatarMini.src = 'images/teams/gazbloki31/player1.jpg';
+      avatarMini.alt = team.name;
+      avatarMini.className = 'team-mini-avatar';
+      titleWrap.appendChild(avatarMini);
+    }
 
     const nameNode = document.createElement('span');
+    nameNode.className = 'team-name-text';
     nameNode.textContent = team.name;
-    li.appendChild(nameNode);
+    titleWrap.appendChild(nameNode);
+
+    if (isGazbloki) {
+      const badge = document.createElement('span');
+      badge.className = 'team-special-badge';
+      badge.textContent = '5 ИГРОКОВ (РОСТЕР)';
+      titleWrap.appendChild(badge);
+    }
+
+    li.appendChild(titleWrap);
 
     const meta = document.createElement('span');
     meta.className = 'team-meta';
@@ -390,16 +627,6 @@ document.addEventListener('DOMContentLoaded', () => {
   // ============================================================
   //  8. ДИНАМИЧЕСКАЯ СИМУЛЯЦИЯ ТУРНИРНОЙ СЕТКИ (DOUBLE ELIMINATION, 8 КОМАНД)
   // ============================================================
-  const DEFAULT_BRACKET_TEAMS = [
-    { name: 'Team Spirit',       tag: 'TS',  region: 'Москва',          mmr: 11200 },
-    { name: 'Gaimin Gladiators', tag: 'GG',  region: 'Санкт-Петербург', mmr: 10850 },
-    { name: 'Team Liquid',       tag: 'TL',  region: 'Екатеринбург',    mmr: 10900 },
-    { name: 'BetBoom Team',      tag: 'BB',  region: 'Казань',          mmr: 10600 },
-    { name: 'Xtreme Gaming',     tag: 'XG',  region: 'Новосибирск',     mmr: 10750 },
-    { name: 'Team Falcons',      tag: 'FLC', region: 'Самара',          mmr: 11050 },
-    { name: 'Tundra Esports',    tag: 'TUN', region: 'Ростов-на-Дону',  mmr: 10500 },
-    { name: 'Aurora Gaming',     tag: 'AUR', region: 'Москва',          mmr: 10400 }
-  ];
 
   /** Рассчитывает исход матча и счёт */
   function simulateMatch(teamA, teamB, isBo5 = false) {
@@ -438,6 +665,8 @@ document.addEventListener('DOMContentLoaded', () => {
     el.classList.remove('bracket-team--winner', 'bracket-team--loser', 'filled');
     if (!team || team.name === 'TBD') {
       el.innerHTML = '<span class="bracket-team__name">TBD</span>';
+      el.onclick = null;
+      el.style.cursor = '';
       return;
     }
     el.classList.add('filled');
@@ -451,8 +680,18 @@ document.addEventListener('DOMContentLoaded', () => {
     el.title = [
       team.name,
       team.region ? '· ' + team.region : '',
-      team.mmr    ? '· ' + team.mmr + ' MMR' : ''
+      team.mmr    ? '· ' + team.mmr + ' MMR' : '',
+      '· Нажмите для просмотра состава'
     ].filter(Boolean).join(' ');
+    el.style.cursor = 'pointer';
+
+    el.onclick = () => {
+      const state = store.read();
+      const found = state.registered.find(t => (t.name || '').toLowerCase() === (team.name || '').toLowerCase())
+        || DEFAULT_REGISTERED_TEAMS.find(t => (t.name || '').toLowerCase() === (team.name || '').toLowerCase())
+        || team;
+      openModal(found);
+    };
   }
 
   /** Обновляет таблицу группового этапа */
@@ -562,13 +801,52 @@ document.addEventListener('DOMContentLoaded', () => {
     if (bCount) bCount.textContent = '8';
   }
 
-  // Кнопка интерактивной пересимуляции сетки
+  // ============================================================
+  //  АВТОМАТИЧЕСКАЯ ГЕНЕРАЦИЯ РЕЗУЛЬТАТОВ МАТЧЕЙ (LIVE ТАЙМЕР)
+  //  Матчи генерируются автоматически сами без нажатия кнопки.
+  // ============================================================
+  const AUTO_SIM_INTERVAL_SEC = 20;
+  let autoSimCountdown = AUTO_SIM_INTERVAL_SEC;
+  const timerEl = document.getElementById('auto-sim-timer');
+
+  function triggerTournamentAutoSim() {
+    const bracketEl = document.querySelector('.tournament-bracket');
+    if (bracketEl) {
+      bracketEl.classList.add('bracket--updating');
+      setTimeout(() => bracketEl.classList.remove('bracket--updating'), 650);
+    }
+    runTournamentSimulation();
+    autoSimCountdown = AUTO_SIM_INTERVAL_SEC;
+    if (timerEl) timerEl.textContent = autoSimCountdown;
+  }
+
+  // Запуск фонового тикера автогенерации (каждую секунду)
+  setInterval(() => {
+    autoSimCountdown--;
+    if (autoSimCountdown <= 0) {
+      triggerTournamentAutoSim();
+    } else {
+      if (timerEl) timerEl.textContent = autoSimCountdown;
+    }
+  }, 1000);
+
+  // Кнопка интерактивной пересимуляции сетки (позволяет пересчитать мгновенно)
   const simBracketBtn = document.getElementById('btn-simulate-bracket');
   if (simBracketBtn) {
     simBracketBtn.addEventListener('click', () => {
-      runTournamentSimulation();
-      simBracketBtn.style.transform = 'scale(0.96)';
+      triggerTournamentAutoSim();
+      simBracketBtn.style.transform = 'scale(0.95)';
       setTimeout(() => { simBracketBtn.style.transform = ''; }, 160);
+    });
+  }
+
+  // Кнопка досье команды gazbloki31.ru из презентационного блока
+  const btnGazblokiDossier = document.getElementById('btn-gazbloki-dossier');
+  if (btnGazblokiDossier) {
+    btnGazblokiDossier.addEventListener('click', () => {
+      const state = store.read();
+      const gz = state.registered.find(t => (t.name || '').toLowerCase() === 'gazbloki31.ru') || DEFAULT_REGISTERED_TEAMS[0];
+      openModal(gz);
     });
   }
 
@@ -603,6 +881,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function openModal(team) {
     if (!modalBackdrop) return;
+    const isGazbloki = (team.name || '').toLowerCase() === 'gazbloki31.ru';
     $('#modal-title').textContent        = team.name || '—';
     $('#modal-subtitle').textContent     = [team.region, team.division ? `Дивизион ${team.division}` : ''].filter(Boolean).join(' · ') || '—';
     $('#modal-captain').textContent      = team.captain || '—';
@@ -610,14 +889,48 @@ document.addEventListener('DOMContentLoaded', () => {
     $('#modal-payment').textContent      = team.payment ? formatMoney(team.payment) : '—';
     $('#modal-achievements').textContent = team.achievements || '—';
 
+    const avatarBox = $('#modal-avatar');
+    if (avatarBox) {
+      if (isGazbloki || team.logo) {
+        avatarBox.innerHTML = `<img src="${team.logo || 'images/teams/gazbloki31/player1.jpg'}" alt="${team.name}" style="width:100%;height:100%;object-fit:cover;border-radius:14px;">`;
+      } else {
+        avatarBox.innerHTML = `<svg viewBox="0 0 24 24" width="28" height="28" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path></svg>`;
+      }
+    }
+
     const membersUl = $('#modal-members');
     membersUl.innerHTML = '';
     const list = Array.isArray(team.members) && team.members.length
       ? team.members
       : ['Состав не указан'];
+
     list.forEach(m => {
       const li = document.createElement('li');
-      li.textContent = m;
+      if (typeof m === 'object' && m !== null) {
+        li.className = 'team-player-card';
+        if (!m.photo) {
+          li.classList.add('team-player-card--placeholder');
+        }
+        li.innerHTML = `
+          <div class="team-player-card__avatar">
+            ${m.photo 
+              ? `<img src="${m.photo}" alt="${m.name}" loading="lazy">` 
+              : `<div class="team-player-card__empty-avatar" title="Слот открыт">
+                   <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2">
+                     <path d="M12 5v14M5 12h14"></path>
+                   </svg>
+                 </div>`
+            }
+          </div>
+          <div class="team-player-card__info">
+            <div class="team-player-card__name">${m.name}</div>
+            ${m.role ? `<div class="team-player-card__role">${m.role}</div>` : ''}
+            ${m.note ? `<div class="team-player-card__note">${m.note}</div>` : ''}
+          </div>
+        `;
+      } else {
+        li.textContent = m;
+      }
       membersUl.appendChild(li);
     });
 

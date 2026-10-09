@@ -1081,6 +1081,7 @@
 
         <select id="filter-region" class="filter-select">
           <option value="">Все регионы</option>
+          <option>Белгород</option>
           <option>Москва</option>
           <option>Санкт-Петербург</option>
           <option>Екатеринбург</option>
@@ -1127,6 +1128,109 @@
         и <abbr title="Best of One — одна решающая карта">BO1</abbr> в групповом этапе.
       </p>
 
+      <!-- ========================================================
+           ОФИЦИАЛЬНАЯ КОМАНДА: GAZBLOKI31.RU (СОСТАВ 5 ЧЕЛОВЕК)
+           ======================================================== -->
+      <div class="team-showcase-card" id="gazbloki-showcase">
+        <div class="team-showcase-header">
+          <div class="team-showcase-brand">
+            <div class="team-showcase-logo">
+              <span class="team-showcase-logo-text">GB31</span>
+            </div>
+            <div>
+              <div class="team-showcase-badges">
+                <span class="team-showcase-badge">Официальная команда турнира</span>
+                <span class="team-showcase-badge team-showcase-badge--verified">Сетка Top-8</span>
+              </div>
+              <h3 class="team-showcase-title">gazbloki31.ru</h3>
+              <p class="team-showcase-meta">Белгород · Дивизион 1 · 11 400 MMR · Спонсор: gazbloki31.ru</p>
+            </div>
+          </div>
+          <button type="button" class="btn-team-dossier" id="btn-gazbloki-dossier" title="Открыть подробное досье команды и состав">
+            <span>Досье команды</span>
+          </button>
+        </div>
+
+        <div class="team-roster-headline">
+          <h4>Основной состав команды (5 игроков)</h4>
+          <span class="roster-status-badge">4 подтверждены · 1 слот ожидает</span>
+        </div>
+
+        <div class="team-roster-grid">
+          <!-- Игрок 1 -->
+          <article class="roster-player-card">
+            <div class="roster-player-photo-wrap">
+              <img src="images/teams/gazbloki31/player1.jpg" alt="Игрок 1 — gazbloki31.ru" class="roster-player-photo" loading="lazy">
+              <span class="roster-pos-pill">Pos 1</span>
+            </div>
+            <div class="roster-player-details">
+              <span class="roster-player-tag">GB31 · Игрок #1</span>
+              <b class="roster-player-role">Carry / Керри</b>
+              <span class="roster-player-status">В основном составе</span>
+            </div>
+          </article>
+
+          <!-- Игрок 2 -->
+          <article class="roster-player-card">
+            <div class="roster-player-photo-wrap">
+              <img src="images/teams/gazbloki31/player2.jpg" alt="Игрок 2 — gazbloki31.ru" class="roster-player-photo" loading="lazy">
+              <span class="roster-pos-pill">Pos 2</span>
+            </div>
+            <div class="roster-player-details">
+              <span class="roster-player-tag">GB31 · Игрок #2</span>
+              <b class="roster-player-role">Midlaner / Мид</b>
+              <span class="roster-player-status">В основном составе</span>
+            </div>
+          </article>
+
+          <!-- Игрок 3 -->
+          <article class="roster-player-card">
+            <div class="roster-player-photo-wrap">
+              <img src="images/teams/gazbloki31/player3.jpg" alt="Игрок 3 — gazbloki31.ru" class="roster-player-photo" loading="lazy">
+              <span class="roster-pos-pill">Pos 3</span>
+            </div>
+            <div class="roster-player-details">
+              <span class="roster-player-tag">GB31 · Игрок #3</span>
+              <b class="roster-player-role">Offlaner / Оффлейн</b>
+              <span class="roster-player-status">В основном составе</span>
+            </div>
+          </article>
+
+          <!-- Игрок 4 -->
+          <article class="roster-player-card">
+            <div class="roster-player-photo-wrap">
+              <img src="images/teams/gazbloki31/player4.jpg" alt="Игрок 4 — gazbloki31.ru" class="roster-player-photo" loading="lazy">
+              <span class="roster-pos-pill">Pos 4</span>
+            </div>
+            <div class="roster-player-details">
+              <span class="roster-player-tag">GB31 · Игрок #4</span>
+              <b class="roster-player-role">Support / Семи-саппорт</b>
+              <span class="roster-player-status">В основном составе</span>
+            </div>
+          </article>
+
+          <!-- Игрок 5 (TBD - Слот #5) -->
+          <article class="roster-player-card roster-player-card--tbd">
+            <div class="roster-player-photo-wrap roster-player-photo-wrap--tbd">
+              <div class="tbd-avatar-placeholder">
+                <svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                  <circle cx="8.5" cy="7" r="4"></circle>
+                  <line x1="20" y1="8" x2="20" y2="14"></line>
+                  <line x1="23" y1="11" x2="17" y2="11"></line>
+                </svg>
+              </div>
+              <span class="roster-pos-pill roster-pos-pill--tbd">Pos 5</span>
+            </div>
+            <div class="roster-player-details">
+              <span class="roster-player-tag">Слот #5 (TBD)</span>
+              <b class="roster-player-role">Hard Support / Полная поддержка</b>
+              <span class="roster-player-status roster-player-status--pending">Будет объявлен позже</span>
+            </div>
+          </article>
+        </div>
+      </div>
+
       <!-- Вкладки: Зарегистрированные / На рассмотрении -->
       <div class="tabs-container">
         <div class="tabs-header">
@@ -1171,16 +1275,22 @@
 
       <!-- Управление и статус заполнения сетки -->
       <div class="bracket-controls">
-        <div class="bracket-status" id="bracket-status">
-          Участники сетки: <b id="bracket-count">8</b> / 8 команд
+        <div class="bracket-status-wrap">
+          <div class="bracket-status" id="bracket-status">
+            Участники сетки: <b id="bracket-count">8</b> / 8 команд
+          </div>
+          <div class="bracket-auto-indicator" id="bracket-auto-indicator" title="Результаты матчей сетки генерируются и обновляются автоматически">
+            <span class="live-pulse-dot" aria-hidden="true"></span>
+            <span class="auto-sim-text">Авто-генерация результатов: <strong class="live-badge-glow">LIVE</strong> (след. раунд через <b id="auto-sim-timer">20</b>с)</span>
+          </div>
         </div>
-        <button type="button" id="btn-simulate-bracket" class="btn-bracket-sim" title="Сгенерировать случайные результаты матчей и продвижение команд">
+        <button type="button" id="btn-simulate-bracket" class="btn-bracket-sim" title="Сгенерировать случайные результаты прямо сейчас не дожидаясь авто-таймера">
           <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
             <polyline points="23 4 23 10 17 10"></polyline>
             <polyline points="1 20 1 14 7 14"></polyline>
             <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
           </svg>
-          <span>Сгенерировать случайные результаты</span>
+          <span>Случайный пересчёт</span>
         </button>
       </div>
 
