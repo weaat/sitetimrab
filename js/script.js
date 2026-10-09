@@ -619,14 +619,49 @@ document.addEventListener('DOMContentLoaded', () => {
     if (progressPct)  progressPct.textContent  = `${pct}%`;
     if (progressBar)  progressBar.style.width  = `${pct}%`;
 
-    // Статус сетки и запуск симуляции
+    // Статус сетки и запуск пошаговой live-симуляции матчей
     if (bracketCount) bracketCount.textContent = '8';
-    runTournamentSimulation();
+    startTournamentLiveEngine();
   }
 
   // ============================================================
-  //  8. ДИНАМИЧЕСКАЯ СИМУЛЯЦИЯ ТУРНИРНОЙ СЕТКИ (DOUBLE ELIMINATION, 8 КОМАНД)
+  //  8. ПОШАГОВАЯ LIVE-СИМУЛЯЦИЯ ТУРНИРНОЙ СЕТКИ (DOUBLE ELIMINATION, 8 КОМАНД)
+  //  Матчи рассчитываются последовательно, один за другим,
+  //  с реальной сменой карт и переходом победителей по сетке.
   // ============================================================
+
+  const ALL_BRACKET_SLOTS = [
+    'U1-1a', 'U1-1b', 'U1-2a', 'U1-2b', 'U1-3a', 'U1-3b', 'U1-4a', 'U1-4b',
+    'L1-1a', 'L1-1b', 'L1-2a', 'L1-2b',
+    'U2-1a', 'U2-1b', 'U2-2a', 'U2-2b',
+    'L2-1a', 'L2-1b', 'L2-2a', 'L2-2b',
+    'L3-1a', 'L3-1b',
+    'UF-a', 'UF-b',
+    'LF-a', 'LF-b',
+    'GF-a', 'GF-b'
+  ];
+
+  const TOURNAMENT_MATCH_FLOW = [
+    { id: 'U1-1', title: 'Верхняя сетка · Четвертьфинал 1', slotA: 'U1-1a', slotB: 'U1-1b', winTo: 'U2-1a', loseTo: 'L1-1a', isBo5: false },
+    { id: 'U1-2', title: 'Верхняя сетка · Четвертьфинал 2', slotA: 'U1-2a', slotB: 'U1-2b', winTo: 'U2-1b', loseTo: 'L1-1b', isBo5: false },
+    { id: 'U1-3', title: 'Верхняя сетка · Четвертьфинал 3', slotA: 'U1-3a', slotB: 'U1-3b', winTo: 'U2-2a', loseTo: 'L1-2a', isBo5: false },
+    { id: 'U1-4', title: 'Верхняя сетка · Четвертьфинал 4', slotA: 'U1-4a', slotB: 'U1-4b', winTo: 'U2-2b', loseTo: 'L1-2b', isBo5: false },
+    { id: 'L1-1', title: 'Нижняя сетка · Раунд 1',          slotA: 'L1-1a', slotB: 'L1-1b', winTo: 'L2-1b', loseTo: null,    isBo5: false },
+    { id: 'L1-2', title: 'Нижняя сетка · Раунд 1',          slotA: 'L1-2a', slotB: 'L1-2b', winTo: 'L2-2b', loseTo: null,    isBo5: false },
+    { id: 'U2-1', title: 'Верхняя сетка · Полуфинал 1',     slotA: 'U2-1a', slotB: 'U2-1b', winTo: 'UF-a',  loseTo: 'L2-1a', isBo5: false },
+    { id: 'U2-2', title: 'Верхняя сетка · Полуфинал 2',     slotA: 'U2-2a', slotB: 'U2-2b', winTo: 'UF-b',  loseTo: 'L2-2a', isBo5: false },
+    { id: 'L2-1', title: 'Нижняя сетка · Раунд 2',          slotA: 'L2-1a', slotB: 'L2-1b', winTo: 'L3-1a', loseTo: null,    isBo5: false },
+    { id: 'L2-2', title: 'Нижняя сетка · Раунд 2',          slotA: 'L2-2a', slotB: 'L2-2b', winTo: 'L3-1b', loseTo: null,    isBo5: false },
+    { id: 'L3-1', title: 'Нижняя сетка · Полуфинал',        slotA: 'L3-1a', slotB: 'L3-1b', winTo: 'LF-b',  loseTo: null,    isBo5: false },
+    { id: 'UF',   title: 'Верхняя сетка · Финал',           slotA: 'UF-a',   slotB: 'UF-b',   winTo: 'GF-a',  loseTo: 'LF-a',  isBo5: false },
+    { id: 'LF',   title: 'Нижняя сетка · Финал',            slotA: 'LF-a',   slotB: 'LF-b',   winTo: 'GF-b',  loseTo: null,    isBo5: false },
+    { id: 'GF',   title: 'Гранд-финал чемпионата (BO5)',    slotA: 'GF-a',   slotB: 'GF-b',   winTo: null,    loseTo: null,    isBo5: true }
+  ];
+
+  const bracketSlotTeams = {};
+  let currentMatchFlowIndex = 0;
+  let tournamentSimTimeoutId = null;
+  let isTournamentActive = false;
 
   /** Рассчитывает исход матча и счёт */
   function simulateMatch(teamA, teamB, isBo5 = false) {
@@ -662,7 +697,7 @@ document.addEventListener('DOMContentLoaded', () => {
   function renderSlot(slotId, team, score = null, isWinner = false, isLoser = false) {
     const el = document.querySelector(`[data-slot="${slotId}"]`);
     if (!el) return;
-    el.classList.remove('bracket-team--winner', 'bracket-team--loser', 'filled');
+    el.classList.remove('bracket-team--winner', 'bracket-team--loser', 'filled', 'bracket-team--playing');
     if (!team || team.name === 'TBD') {
       el.innerHTML = '<span class="bracket-team__name">TBD</span>';
       el.onclick = null;
@@ -717,10 +752,22 @@ document.addEventListener('DOMContentLoaded', () => {
     }).join('');
   }
 
-  /** Полный расчёт турнирной сетки на 8 команд (Double Elimination) */
-  function runTournamentSimulation() {
+  /** Устанавливает текст статуса прямого эфира */
+  function setBracketLiveStatus(html) {
+    const label = document.getElementById('bracket-live-label');
+    if (label) {
+      label.innerHTML = html;
+    }
+  }
+
+  /** Сброс и запуск нового сезона турнира */
+  function initTournamentCycle() {
+    if (tournamentSimTimeoutId) {
+      clearTimeout(tournamentSimTimeoutId);
+      tournamentSimTimeoutId = null;
+    }
+
     const state = store.read();
-    // Объединяем зарегистрированные пользователем команды и стандартный топ-8
     const pool = [...state.registered];
     DEFAULT_BRACKET_TEAMS.forEach(dt => {
       if (pool.length < 8 && !pool.some(p => p.name === dt.name)) {
@@ -728,116 +775,142 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     });
 
-    // Случайный посев команд
+    // Случайная жеребьевка 8 сильнейших составов
     const shuffled = [...pool.slice(0, 8)].sort(() => Math.random() - 0.5);
 
-    // ВЕРХНЯЯ СЕТКА — РАУНД 1 (4 матча, 8 команд)
-    const mU1_1 = simulateMatch(shuffled[0], shuffled[1]);
-    const mU1_2 = simulateMatch(shuffled[2], shuffled[3]);
-    const mU1_3 = simulateMatch(shuffled[4], shuffled[5]);
-    const mU1_4 = simulateMatch(shuffled[6], shuffled[7]);
+    // Очистка всех слотов
+    ALL_BRACKET_SLOTS.forEach(slot => {
+      bracketSlotTeams[slot] = null;
+      renderSlot(slot, null);
+    });
 
-    renderSlot('U1-1a', shuffled[0], mU1_1.scoreA, mU1_1.aWins, !mU1_1.aWins);
-    renderSlot('U1-1b', shuffled[1], mU1_1.scoreB, !mU1_1.aWins, mU1_1.aWins);
-    renderSlot('U1-2a', shuffled[2], mU1_2.scoreA, mU1_2.aWins, !mU1_2.aWins);
-    renderSlot('U1-2b', shuffled[3], mU1_2.scoreB, !mU1_2.aWins, mU1_2.aWins);
-    renderSlot('U1-3a', shuffled[4], mU1_3.scoreA, mU1_3.aWins, !mU1_3.aWins);
-    renderSlot('U1-3b', shuffled[5], mU1_3.scoreB, !mU1_3.aWins, mU1_3.aWins);
-    renderSlot('U1-4a', shuffled[6], mU1_4.scoreA, mU1_4.aWins, !mU1_4.aWins);
-    renderSlot('U1-4b', shuffled[7], mU1_4.scoreB, !mU1_4.aWins, mU1_4.aWins);
+    // Очистка активных классов у матчей
+    document.querySelectorAll('.match.match--live').forEach(m => m.classList.remove('match--live'));
 
-    // НИЖНЯЯ СЕТКА — РАУНД 1 (падают 4 проигравших из U1)
-    const mL1_1 = simulateMatch(mU1_1.loser, mU1_2.loser);
-    const mL1_2 = simulateMatch(mU1_3.loser, mU1_4.loser);
+    // Заполнение стартовых слотов Верхней сетки Раунд 1
+    bracketSlotTeams['U1-1a'] = shuffled[0]; renderSlot('U1-1a', shuffled[0], 0);
+    bracketSlotTeams['U1-1b'] = shuffled[1]; renderSlot('U1-1b', shuffled[1], 0);
+    bracketSlotTeams['U1-2a'] = shuffled[2]; renderSlot('U1-2a', shuffled[2], 0);
+    bracketSlotTeams['U1-2b'] = shuffled[3]; renderSlot('U1-2b', shuffled[3], 0);
+    bracketSlotTeams['U1-3a'] = shuffled[4]; renderSlot('U1-3a', shuffled[4], 0);
+    bracketSlotTeams['U1-3b'] = shuffled[5]; renderSlot('U1-3b', shuffled[5], 0);
+    bracketSlotTeams['U1-4a'] = shuffled[6]; renderSlot('U1-4a', shuffled[6], 0);
+    bracketSlotTeams['U1-4b'] = shuffled[7]; renderSlot('U1-4b', shuffled[7], 0);
 
-    renderSlot('L1-1a', mU1_1.loser, mL1_1.scoreA, mL1_1.aWins, !mL1_1.aWins);
-    renderSlot('L1-1b', mU1_2.loser, mL1_1.scoreB, !mL1_1.aWins, mL1_1.aWins);
-    renderSlot('L1-2a', mU1_3.loser, mL1_2.scoreA, mL1_2.aWins, !mL1_2.aWins);
-    renderSlot('L1-2b', mU1_4.loser, mL1_2.scoreB, !mL1_2.aWins, mL1_2.aWins);
-
-    // ВЕРХНЯЯ СЕТКА — РАУНД 2 (полуфиналы)
-    const mU2_1 = simulateMatch(mU1_1.winner, mU1_2.winner);
-    const mU2_2 = simulateMatch(mU1_3.winner, mU1_4.winner);
-
-    renderSlot('U2-1a', mU1_1.winner, mU2_1.scoreA, mU2_1.aWins, !mU2_1.aWins);
-    renderSlot('U2-1b', mU1_2.winner, mU2_1.scoreB, !mU2_1.aWins, mU2_1.aWins);
-    renderSlot('U2-2a', mU1_3.winner, mU2_2.scoreA, mU2_2.aWins, !mU2_2.aWins);
-    renderSlot('U2-2b', mU1_4.winner, mU2_2.scoreB, !mU2_2.aWins, mU2_2.aWins);
-
-    // НИЖНЯЯ СЕТКА — РАУНД 2 (победители L1 играют с проигравшими из U2)
-    const mL2_1 = simulateMatch(mU2_1.loser, mL1_1.winner);
-    const mL2_2 = simulateMatch(mU2_2.loser, mL1_2.winner);
-
-    renderSlot('L2-1a', mU2_1.loser, mL2_1.scoreA, mL2_1.aWins, !mL2_1.aWins);
-    renderSlot('L2-1b', mL1_1.winner, mL2_1.scoreB, !mL2_1.aWins, mL2_1.aWins);
-    renderSlot('L2-2a', mU2_2.loser, mL2_2.scoreA, mL2_2.aWins, !mL2_2.aWins);
-    renderSlot('L2-2b', mL1_2.winner, mL2_2.scoreB, !mL2_2.aWins, mL2_2.aWins);
-
-    // НИЖНЯЯ СЕТКА — РАУНД 3
-    const mL3_1 = simulateMatch(mL2_1.winner, mL2_2.winner);
-    renderSlot('L3-1a', mL2_1.winner, mL3_1.scoreA, mL3_1.aWins, !mL3_1.aWins);
-    renderSlot('L3-1b', mL2_2.winner, mL3_1.scoreB, !mL3_1.aWins, mL3_1.aWins);
-
-    // ВЕРХНЯЯ СЕТКА — ФИНАЛ
-    const mUF = simulateMatch(mU2_1.winner, mU2_2.winner);
-    renderSlot('UF-a', mU2_1.winner, mUF.scoreA, mUF.aWins, !mUF.aWins);
-    renderSlot('UF-b', mU2_2.winner, mUF.scoreB, !mUF.aWins, mUF.aWins);
-
-    // НИЖНЯЯ СЕТКА — ФИНАЛ (проигравший UF против победителя L3)
-    const mLF = simulateMatch(mUF.loser, mL3_1.winner);
-    renderSlot('LF-a', mUF.loser, mLF.scoreA, mLF.aWins, !mLF.aWins);
-    renderSlot('LF-b', mL3_1.winner, mLF.scoreB, !mLF.aWins, mLF.aWins);
-
-    // ГРАНД-ФИНАЛ (BO5: победитель верхней vs победитель нижней)
-    const mGF = simulateMatch(mUF.winner, mLF.winner, true);
-    renderSlot('GF-a', mUF.winner, mGF.scoreA, mGF.aWins, !mGF.aWins);
-    renderSlot('GF-b', mLF.winner, mGF.scoreB, !mGF.aWins, mGF.aWins);
-
-    // Обновляем таблицу группового этапа
     updateGroupStageTable(shuffled);
 
-    // Обновляем счётчик
     const bCount = document.getElementById('bracket-count');
     if (bCount) bCount.textContent = '8';
+
+    currentMatchFlowIndex = 0;
+    isTournamentActive = true;
+
+    setBracketLiveStatus('Жеребьевка завершена! До старта первого матча 3 сек...');
+    tournamentSimTimeoutId = setTimeout(playNextTournamentMatch, 3000);
   }
 
-  // ============================================================
-  //  АВТОМАТИЧЕСКАЯ ГЕНЕРАЦИЯ РЕЗУЛЬТАТОВ МАТЧЕЙ (LIVE ТАЙМЕР)
-  //  Матчи генерируются автоматически сами без нажатия кнопки.
-  // ============================================================
-  const AUTO_SIM_INTERVAL_SEC = 20;
-  let autoSimCountdown = AUTO_SIM_INTERVAL_SEC;
-  const timerEl = document.getElementById('auto-sim-timer');
-
-  function triggerTournamentAutoSim() {
-    const bracketEl = document.querySelector('.tournament-bracket');
-    if (bracketEl) {
-      bracketEl.classList.add('bracket--updating');
-      setTimeout(() => bracketEl.classList.remove('bracket--updating'), 650);
+  /** Пошаговое воспроизведение одного матча в реальном времени */
+  function playNextTournamentMatch() {
+    if (currentMatchFlowIndex >= TOURNAMENT_MATCH_FLOW.length) {
+      // Турнир завершен
+      const champ = bracketSlotTeams['GF-a'] || bracketSlotTeams['GF-b'];
+      const champName = champ ? champ.name : 'gazbloki31.ru';
+      setBracketLiveStatus(`Турнир завершен! Чемпион: <b>${champName}</b>. Новый сезон через 12 сек...`);
+      tournamentSimTimeoutId = setTimeout(initTournamentCycle, 12000);
+      return;
     }
-    runTournamentSimulation();
-    autoSimCountdown = AUTO_SIM_INTERVAL_SEC;
-    if (timerEl) timerEl.textContent = autoSimCountdown;
+
+    const matchDef = TOURNAMENT_MATCH_FLOW[currentMatchFlowIndex];
+    const teamA = bracketSlotTeams[matchDef.slotA];
+    const teamB = bracketSlotTeams[matchDef.slotB];
+
+    if (!teamA || !teamB) {
+      currentMatchFlowIndex++;
+      playNextTournamentMatch();
+      return;
+    }
+
+    const elA = document.querySelector(`[data-slot="${matchDef.slotA}"]`);
+    const matchEl = elA ? elA.closest('.match') : null;
+    if (matchEl) matchEl.classList.add('match--live');
+
+    // Подсветка играющих команд
+    const elB = document.querySelector(`[data-slot="${matchDef.slotB}"]`);
+    if (elA) elA.classList.add('bracket-team--playing');
+    if (elB) elB.classList.add('bracket-team--playing');
+
+    // Расчет серии
+    const simResult = simulateMatch(teamA, teamB, matchDef.isBo5);
+
+    // Генерируем пошаговые счета карт (0:0 -> 1:0 -> 1:1 -> 2:1)
+    const frames = [];
+    let curA = 0, curB = 0;
+    frames.push({ a: 0, b: 0, note: 'Разминка, драфты героев...' });
+
+    while (curA < simResult.scoreA || curB < simResult.scoreB) {
+      if (curA < simResult.scoreA && (curB >= simResult.scoreB || Math.random() > 0.5)) {
+        curA++;
+      } else {
+        curB++;
+      }
+      const mapNum = curA + curB;
+      const isFinalMap = (curA === simResult.scoreA && curB === simResult.scoreB);
+      frames.push({
+        a: curA,
+        b: curB,
+        note: isFinalMap ? 'Решающие минуты...' : `Идет Карта ${mapNum + 1}...`
+      });
+    }
+
+    let frameIdx = 0;
+
+    function renderFrame() {
+      const f = frames[frameIdx];
+      renderSlot(matchDef.slotA, teamA, f.a);
+      renderSlot(matchDef.slotB, teamB, f.b);
+      setBracketLiveStatus(
+        `LIVE: <b>${teamA.name}</b> ${f.a} : ${f.b} <b>${teamB.name}</b> · ${matchDef.title} (${f.note})`
+      );
+
+      frameIdx++;
+      if (frameIdx < frames.length) {
+        tournamentSimTimeoutId = setTimeout(renderFrame, 2600);
+      } else {
+        tournamentSimTimeoutId = setTimeout(() => {
+          if (matchEl) matchEl.classList.remove('match--live');
+          if (elA) elA.classList.remove('bracket-team--playing');
+          if (elB) elB.classList.remove('bracket-team--playing');
+
+          renderSlot(matchDef.slotA, teamA, simResult.scoreA, simResult.aWins, !simResult.aWins);
+          renderSlot(matchDef.slotB, teamB, simResult.scoreB, !simResult.aWins, simResult.aWins);
+
+          if (matchDef.winTo) {
+            bracketSlotTeams[matchDef.winTo] = simResult.winner;
+            renderSlot(matchDef.winTo, simResult.winner, 0);
+          }
+
+          if (matchDef.loseTo) {
+            bracketSlotTeams[matchDef.loseTo] = simResult.loser;
+            renderSlot(matchDef.loseTo, simResult.loser, 0);
+          }
+
+          setBracketLiveStatus(
+            `Победа <b>${simResult.winner.name}</b> (${simResult.scoreA}:${simResult.scoreB})! Следующий матч через 3.5 сек...`
+          );
+
+          currentMatchFlowIndex++;
+          tournamentSimTimeoutId = setTimeout(playNextTournamentMatch, 3500);
+        }, 2200);
+      }
+    }
+
+    renderFrame();
   }
 
-  // Запуск фонового тикера автогенерации (каждую секунду)
-  setInterval(() => {
-    autoSimCountdown--;
-    if (autoSimCountdown <= 0) {
-      triggerTournamentAutoSim();
-    } else {
-      if (timerEl) timerEl.textContent = autoSimCountdown;
+  function startTournamentLiveEngine() {
+    if (!isTournamentActive) {
+      initTournamentCycle();
     }
-  }, 1000);
-
-  // Кнопка интерактивной пересимуляции сетки (позволяет пересчитать мгновенно)
-  const simBracketBtn = document.getElementById('btn-simulate-bracket');
-  if (simBracketBtn) {
-    simBracketBtn.addEventListener('click', () => {
-      triggerTournamentAutoSim();
-      simBracketBtn.style.transform = 'scale(0.95)';
-      setTimeout(() => { simBracketBtn.style.transform = ''; }, 160);
-    });
   }
 
   // Кнопка досье команды gazbloki31.ru из презентационного блока

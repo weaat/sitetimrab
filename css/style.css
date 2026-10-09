@@ -3546,13 +3546,13 @@ section .all-heroes-title::before {
 .bracket-auto-indicator {
   display: inline-flex;
   align-items: center;
-  gap: 0.55rem;
-  padding: .45rem 1rem;
+  gap: 0.65rem;
+  padding: .5rem 1.15rem;
   border-radius: 50px;
   background: rgba(14, 165, 233, 0.12);
   border: 1px solid rgba(56, 189, 248, 0.35);
-  font-size: 0.85rem;
-  color: var(--text-muted);
+  font-size: 0.88rem;
+  color: var(--text);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
   margin: 0 !important;
@@ -3560,13 +3560,13 @@ section .all-heroes-title::before {
 }
 
 .live-pulse-dot {
-  width: 9px;
-  height: 9px;
+  width: 10px;
+  height: 10px;
   border-radius: 50%;
   background: #38bdf8;
   box-shadow: 0 0 10px #38bdf8;
   display: inline-block;
-  animation: pulseLiveDot 1.6s infinite ease-in-out;
+  animation: pulseLiveDot 1.4s infinite ease-in-out;
   flex-shrink: 0;
 }
 
@@ -3574,26 +3574,22 @@ section .all-heroes-title::before {
   0%, 100% {
     opacity: 1;
     transform: scale(1);
-    box-shadow: 0 0 8px #38bdf8;
+    box-shadow: 0 0 10px #38bdf8;
   }
   50% {
-    opacity: 0.4;
-    transform: scale(0.85);
+    opacity: 0.35;
+    transform: scale(0.8);
     box-shadow: 0 0 3px #0ea5e9;
   }
 }
 
-.live-badge-glow {
-  color: #38bdf8;
-  font-weight: 800;
-  letter-spacing: 0.5px;
-  text-shadow: 0 0 8px rgba(56, 189, 248, 0.8);
+.auto-sim-text {
+  font-weight: 600;
+  color: #e0f2fe;
 }
 
-#auto-sim-timer {
-  color: #fff;
-  font-family: monospace;
-  font-size: 0.88rem;
+.auto-sim-text b {
+  color: #38bdf8;
 }
 
 .tournament-bracket.bracket--updating {
@@ -3613,36 +3609,45 @@ section .all-heroes-title::before {
   }
 }
 
-.btn-bracket-sim {
-  display: inline-flex;
-  align-items: center;
-  gap: .6rem;
-  padding: .65rem 1.35rem;
-  border-radius: 50px;
-  background: linear-gradient(135deg, rgba(14, 165, 233, 0.25) 0%, rgba(2, 132, 199, 0.45) 100%);
-  border: 1px solid rgba(56, 189, 248, 0.5);
-  color: #fff;
-  font-family: inherit;
-  font-size: .92rem;
-  font-weight: 700;
-  cursor: pointer;
-  box-shadow: 0 4px 18px rgba(14, 165, 233, 0.35);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  transition: all .22s ease;
-  user-select: none;
+/* Матч в процессе прямо сейчас (LIVE киберспорт) */
+.match.match--live {
+  border-color: #38bdf8 !important;
+  box-shadow: 0 0 20px rgba(56, 189, 248, 0.5) !important;
+  position: relative;
+  animation: matchLivePulse 1.8s infinite ease-in-out;
 }
 
-.btn-bracket-sim:hover {
-  background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
-  border-color: rgba(125, 211, 252, 0.9);
-  box-shadow: 0 6px 26px rgba(14, 165, 233, 0.6);
-  transform: translateY(-2px);
+@keyframes matchLivePulse {
+  0%, 100% {
+    box-shadow: 0 0 14px rgba(56, 189, 248, 0.4);
+    border-color: rgba(56, 189, 248, 0.75);
+  }
+  50% {
+    box-shadow: 0 0 26px rgba(56, 189, 248, 0.85);
+    border-color: #38bdf8;
+  }
 }
 
-.btn-bracket-sim svg {
-  display: block;
-  flex-shrink: 0;
+.match.match--live::before {
+  content: 'LIVE';
+  position: absolute;
+  top: -9px;
+  right: 8px;
+  background: #dc2626;
+  color: #ffffff;
+  font-size: 0.62rem;
+  font-weight: 900;
+  letter-spacing: 0.8px;
+  padding: 1px 6px;
+  border-radius: 4px;
+  box-shadow: 0 0 10px rgba(220, 38, 38, 0.9);
+  z-index: 3;
+  animation: pulseLiveBadge 1.2s infinite alternate;
+}
+
+@keyframes pulseLiveBadge {
+  0% { transform: scale(0.95); opacity: 0.85; }
+  100% { transform: scale(1.05); opacity: 1; }
 }
 
 /* Тултипы героев */

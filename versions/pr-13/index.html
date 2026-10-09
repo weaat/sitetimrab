@@ -1,0 +1,904 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DotaArena 2026 — Практика 13: Валидация форм и расчёт заявки</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+
+  <!-- Подключение скрипта перед закрытием head с атрибутом defer -->
+  <script src="js/script.js" defer></script>
+
+  <style>
+    /* ============================================================
+       ПРАКТИКА 13: ВАЛИДАЦИЯ ФОРМ, КАЛЬКУЛЯТОР ВЗНОСА И ТЕСТ-КЕЙСЫ
+       ============================================================ */
+
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    :root {
+      --bg-primary:          #030814;
+      --bg-secondary:        #081226;
+      --bg-card:             rgba(8, 20, 44, 0.72);
+      --bg-card-hover:       rgba(14, 30, 64, 0.86);
+      --accent:              #0ea5e9;
+      --accent-light:        #38bdf8;
+      --accent-glow:         rgba(14, 165, 233, 0.35);
+      --accent-glow-strong:  rgba(56, 189, 248, 0.65);
+      --text-primary:        #f0f6fc;
+      --text-muted:          #94a3b8;
+      --border:              rgba(125, 211, 252, 0.16);
+      --border-accent:       rgba(56, 189, 248, 0.5);
+      --success:             #22c55e;
+      --warning:             #f59e0b;
+      --danger:              #ef4444;
+      --radius:              18px;
+      --radius-sm:           10px;
+    }
+
+    body {
+      font-family: 'Inter', system-ui, -apple-system, sans-serif;
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      line-height: 1.6;
+      min-height: 100vh;
+      background-image:
+        radial-gradient(circle at 50% 0%, rgba(14, 165, 233, 0.2) 0%, transparent 60%),
+        radial-gradient(circle at 90% 80%, rgba(6, 182, 212, 0.12) 0%, transparent 50%),
+        radial-gradient(circle at 10% 40%, rgba(59, 130, 246, 0.1) 0%, transparent 50%);
+      background-attachment: fixed;
+    }
+
+    .container {
+      max-width: 1240px;
+      margin: 0 auto;
+      padding: 2rem 1.5rem 4rem;
+    }
+
+    /* Навигация */
+    .version-nav {
+      background: rgba(14, 165, 233, 0.08);
+      border: 1px solid var(--border);
+      border-radius: var(--radius-sm);
+      padding: 0.85rem 1.25rem;
+      margin-bottom: 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+
+    .version-nav__brand {
+      font-weight: 800;
+      font-size: 1rem;
+      color: var(--accent-light);
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .version-nav__links {
+      display: flex;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+
+    .version-link {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.85rem;
+      padding: 0.3rem 0.75rem;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.04);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      transition: all 0.2s ease;
+    }
+
+    .version-link:hover {
+      color: #fff;
+      background: rgba(14, 165, 233, 0.25);
+      border-color: var(--accent);
+    }
+
+    .version-link--active {
+      color: #fff;
+      background: var(--accent);
+      border-color: var(--accent-light);
+      font-weight: 700;
+    }
+
+    /* Шапка */
+    .header-banner {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 2.25rem;
+      margin-bottom: 2.5rem;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+      backdrop-filter: blur(12px);
+    }
+
+    .badge-sub {
+      display: inline-block;
+      font-size: 0.78rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--accent-light);
+      background: rgba(14, 165, 233, 0.15);
+      border: 1px solid rgba(56, 189, 248, 0.35);
+      padding: 0.3rem 0.85rem;
+      border-radius: 50px;
+      margin-bottom: 0.85rem;
+    }
+
+    h1 {
+      font-size: clamp(1.8rem, 4vw, 2.75rem);
+      font-weight: 900;
+      line-height: 1.2;
+      margin-bottom: 1rem;
+      background: linear-gradient(135deg, #ffffff 40%, var(--accent-light) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    /* Макет формы и карточки */
+    .form-layout {
+      display: grid;
+      grid-template-columns: 1.2fr 0.8fr;
+      gap: 2rem;
+      margin-bottom: 3.5rem;
+      align-items: start;
+    }
+
+    @media (max-width: 900px) {
+      .form-layout {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* Форма */
+    .reg-form-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 2.25rem;
+      backdrop-filter: blur(12px);
+    }
+
+    .reg-form-card h2 {
+      font-size: 1.5rem;
+      margin-bottom: 0.5rem;
+      color: #fff;
+    }
+
+    .reg-form-card p {
+      color: var(--text-muted);
+      font-size: 0.92rem;
+      margin-bottom: 1.75rem;
+    }
+
+    .form-group-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.25rem;
+    }
+
+    @media (max-width: 600px) {
+      .form-group-row {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .form-field {
+      margin-bottom: 1.4rem;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .field-label {
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 0.4rem;
+      display: flex;
+      justify-content: space-between;
+    }
+
+    .field-hint {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      font-weight: 400;
+    }
+
+    .field-input, .field-select {
+      background: rgba(4, 12, 28, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      border-radius: 8px;
+      padding: 0.75rem 1rem;
+      color: #fff;
+      font-family: inherit;
+      font-size: 0.95rem;
+      transition: all 0.2s ease;
+    }
+
+    .field-input:focus, .field-select:focus {
+      outline: none;
+      border-color: var(--accent-light);
+      box-shadow: 0 0 12px var(--accent-glow);
+      background: rgba(8, 20, 44, 0.95);
+    }
+
+    .field-input[aria-invalid="true"],
+    .field-select[aria-invalid="true"] {
+      border-color: var(--danger) !important;
+      background: rgba(239, 68, 68, 0.08) !important;
+      box-shadow: 0 0 10px rgba(239, 68, 68, 0.3) !important;
+    }
+
+    /* Сообщения об ошибках рядом с полями (Этап 5 методички) */
+    .field-error {
+      color: #fca5a5;
+      font-size: 0.82rem;
+      margin-top: 0.35rem;
+      font-weight: 600;
+      min-height: 1.2em;
+    }
+
+    .checkbox-group {
+      margin-bottom: 1.4rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      padding: 1rem;
+      background: rgba(255, 255, 255, 0.03);
+      border-radius: 10px;
+      border: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .checkbox-label {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+      font-size: 0.9rem;
+      color: #fff;
+      cursor: pointer;
+    }
+
+    .checkbox-label input[type="checkbox"] {
+      width: 18px;
+      height: 18px;
+      accent-color: var(--accent);
+      cursor: pointer;
+    }
+
+    .btn-submit {
+      width: 100%;
+      background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+      color: #fff;
+      border: 1px solid var(--accent-light);
+      padding: 0.95rem 1.5rem;
+      border-radius: 10px;
+      font-size: 1.05rem;
+      font-weight: 800;
+      font-family: inherit;
+      cursor: pointer;
+      box-shadow: 0 4px 18px rgba(14, 165, 233, 0.4);
+      transition: all 0.2s ease;
+      margin-top: 0.5rem;
+    }
+
+    .btn-submit:hover {
+      background: linear-gradient(135deg, #38bdf8 0%, #0ea5e9 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 6px 24px rgba(14, 165, 233, 0.6);
+    }
+
+    /* Итоговая карточка (Этап 1 и 7 методички: aria-live и tabindex) */
+    .result-card {
+      background: linear-gradient(135deg, rgba(8, 26, 60, 0.85) 0%, rgba(4, 14, 34, 0.95) 100%);
+      border: 2px solid var(--accent);
+      border-radius: var(--radius);
+      padding: 2.25rem;
+      box-shadow: 0 0 35px rgba(14, 165, 233, 0.35);
+      position: sticky;
+      top: 2rem;
+      backdrop-filter: blur(14px);
+      outline: none;
+    }
+
+    .result-card:focus {
+      outline: 2px solid var(--accent-light);
+      outline-offset: 4px;
+    }
+
+    .result-badge {
+      display: inline-block;
+      font-size: 0.75rem;
+      font-weight: 800;
+      color: #22c55e;
+      background: rgba(34, 197, 94, 0.15);
+      border: 1px solid rgba(34, 197, 94, 0.4);
+      padding: 0.25rem 0.75rem;
+      border-radius: 50px;
+      margin-bottom: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .result-title {
+      font-size: 1.6rem;
+      font-weight: 900;
+      color: #fff;
+      margin-bottom: 0.25rem;
+    }
+
+    .result-subtitle {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      margin-bottom: 1.5rem;
+    }
+
+    .result-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+      padding-bottom: 1.5rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+    }
+
+    .result-item {
+      display: flex;
+      flex-direction: column;
+      gap: 0.2rem;
+    }
+
+    .result-item__label {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+    }
+
+    .result-item__val {
+      font-size: 0.98rem;
+      color: #fff;
+    }
+
+    .result-item__val--seed {
+      color: #f59e0b;
+      font-weight: 800;
+      font-size: 1.1rem;
+    }
+
+    .result-calc-breakdown {
+      background: rgba(0, 0, 0, 0.3);
+      border-radius: 10px;
+      padding: 1.25rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .result-calc-breakdown h4 {
+      font-size: 0.85rem;
+      text-transform: uppercase;
+      color: var(--accent-light);
+      margin-bottom: 0.75rem;
+      letter-spacing: 0.5px;
+    }
+
+    .result-calc-breakdown ul {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      font-size: 0.88rem;
+    }
+
+    .result-calc-breakdown li {
+      display: flex;
+      justify-content: space-between;
+      color: var(--text-muted);
+    }
+
+    .result-calc-breakdown li span {
+      color: #fff;
+      font-weight: 600;
+    }
+
+    .result-calc-breakdown .calc-discount span {
+      color: var(--success);
+    }
+
+    .result-total {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 0.85rem;
+      padding-top: 0.85rem;
+      border-top: 1px dashed rgba(255, 255, 255, 0.15);
+      font-size: 1.15rem;
+    }
+
+    .result-total strong {
+      color: var(--accent-light);
+      font-size: 1.35rem;
+    }
+
+    .result-recommendation {
+      background: rgba(14, 165, 233, 0.1);
+      border-left: 3px solid var(--accent);
+      padding: 0.85rem 1rem;
+      border-radius: 0 8px 8px 0;
+      font-size: 0.88rem;
+    }
+
+    .result-recommendation strong {
+      color: var(--accent-light);
+      display: block;
+      margin-bottom: 0.25rem;
+    }
+
+    .result-recommendation p {
+      color: var(--text-primary);
+      margin: 0;
+    }
+
+    /* Таблица 5 тест-кейсов (Этап 8 методички) */
+    .tests-section {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 2.25rem;
+      margin-bottom: 3.5rem;
+      backdrop-filter: blur(12px);
+    }
+
+    .tests-section h2 {
+      font-size: 1.6rem;
+      margin-bottom: 0.5rem;
+      color: #fff;
+    }
+
+    .tests-section p {
+      color: var(--text-muted);
+      margin-bottom: 1.5rem;
+      font-size: 0.92rem;
+    }
+
+    .tests-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.88rem;
+    }
+
+    .tests-table th, .tests-table td {
+      padding: 0.85rem 1rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      text-align: left;
+    }
+
+    .tests-table th {
+      color: var(--accent-light);
+      font-weight: 700;
+      background: rgba(14, 165, 233, 0.08);
+    }
+
+    .tests-table tr:hover {
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .btn-test-fill {
+      background: rgba(14, 165, 233, 0.2);
+      border: 1px solid var(--accent);
+      color: var(--accent-light);
+      padding: 0.35rem 0.75rem;
+      border-radius: 6px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: inherit;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+
+    .btn-test-fill:hover {
+      background: var(--accent);
+      color: #fff;
+    }
+
+    .badge-test-type {
+      display: inline-block;
+      padding: 0.2rem 0.55rem;
+      border-radius: 4px;
+      font-size: 0.72rem;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    .badge-test-type--std  { background: rgba(56, 189, 248, 0.2); color: #38bdf8; }
+    .badge-test-type--min  { background: rgba(34, 197, 94, 0.2);  color: #4ade80; }
+    .badge-test-type--max  { background: rgba(245, 158, 11, 0.2); color: #fbbf24; }
+    .badge-test-type--err  { background: rgba(239, 68, 68, 0.2);  color: #f87171; }
+    .badge-test-type--bnd  { background: rgba(168, 85, 247, 0.2); color: #c084fc; }
+
+    /* Отчёт о выполнении */
+    .report-card {
+      background: var(--bg-secondary);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 2.25rem;
+    }
+
+    .report-card h2 {
+      font-size: 1.6rem;
+      margin-bottom: 1.25rem;
+      color: #fff;
+    }
+
+    .stages-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.92rem;
+      margin-top: 1rem;
+    }
+
+    .stages-table th, .stages-table td {
+      padding: 0.85rem 1rem;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      text-align: left;
+    }
+
+    .stages-table th {
+      color: var(--accent-light);
+      font-weight: 700;
+      background: rgba(14, 165, 233, 0.08);
+    }
+
+    .stages-table tr:hover {
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .status-done {
+      color: var(--success);
+      font-weight: 700;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+
+    <!-- Навигация по версиям практик -->
+    <nav class="version-nav" aria-label="Навигация по практическим работам">
+      <div class="version-nav__brand">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+          <polyline points="2 17 12 22 22 17"></polyline>
+          <polyline points="2 12 12 17 22 12"></polyline>
+        </svg>
+        <span>DotaArena 2026 — Практикум</span>
+      </div>
+      <div class="version-nav__links">
+        <a href="../../index.html" class="version-link">Главный проект</a>
+        <a href="../pr-10/index.html" class="version-link">ПР-10</a>
+        <a href="../pr-11/index.html" class="version-link">ПР-11</a>
+        <a href="../pr-12/index.html" class="version-link">ПР-12</a>
+        <a href="index.html" class="version-link version-link--active">ПР-13: Валидация и калькулятор</a>
+      </div>
+    </nav>
+
+    <!-- Шапка -->
+    <header class="header-banner">
+      <span class="badge-sub">Практическая работа 13 · Валидация форм и расчёты</span>
+      <h1>Регистрация команды и расчёт взноса</h1>
+      <p style="color: var(--text-muted); max-width: 800px;">
+        Комплексная валидация формы заявки на турнир DotaArena 2026: перехват <code>submit</code>,
+        нормализация через <code>FormData</code> и <code>Number.isFinite</code>, проверка 3 смысловых условий,
+        вывод ошибок через <code>aria-describedby</code> с переводом фокуса, калькулятор взноса и 5 тест-кейсов.
+      </p>
+    </header>
+
+    <!-- Основная секция: Форма и Итоговая карточка -->
+    <section class="form-layout" aria-label="Форма регистрации и результат">
+
+      <!-- Форма регистрации команды (Этап 1 методички) -->
+      <div class="reg-form-card">
+        <h2>Заявка состава на турнир</h2>
+        <p>Заполните параметры команды для проверки регламента и расчёта посевного рейтинга.</p>
+
+        <form id="team-reg-form" novalidate>
+
+          <div class="form-group-row">
+            <!-- 1. Название команды -->
+            <div class="form-field">
+              <label for="teamName" class="field-label">
+                Название команды
+                <span class="field-hint">от 3 до 30 симв.</span>
+              </label>
+              <input
+                type="text"
+                id="teamName"
+                name="teamName"
+                class="field-input"
+                placeholder="Например, gazbloki31.ru"
+                aria-describedby="error-teamName"
+                required
+              />
+              <span class="field-error" id="error-teamName" role="alert"></span>
+            </div>
+
+            <!-- 2. Тег команды -->
+            <div class="form-field">
+              <label for="teamTag" class="field-label">
+                Клан-тег
+                <span class="field-hint">2-5 латинских букв/цифр</span>
+              </label>
+              <input
+                type="text"
+                id="teamTag"
+                name="teamTag"
+                class="field-input"
+                placeholder="GZ31"
+                maxlength="5"
+                aria-describedby="error-teamTag"
+                required
+              />
+              <span class="field-error" id="error-teamTag" role="alert"></span>
+            </div>
+          </div>
+
+          <div class="form-group-row">
+            <!-- 3. Капитан -->
+            <div class="form-field">
+              <label for="captainName" class="field-label">Никнейм капитана</label>
+              <input
+                type="text"
+                id="captainName"
+                name="captainName"
+                class="field-input"
+                placeholder="Kirill 'gazobeton'"
+                aria-describedby="error-captainName"
+                required
+              />
+              <span class="field-error" id="error-captainName" role="alert"></span>
+            </div>
+
+            <!-- 4. Email капитана -->
+            <div class="form-field">
+              <label for="captainEmail" class="field-label">Контактный Email</label>
+              <input
+                type="email"
+                id="captainEmail"
+                name="captainEmail"
+                class="field-input"
+                placeholder="captain@gazbloki31.ru"
+                aria-describedby="error-captainEmail"
+                required
+              />
+              <span class="field-error" id="error-captainEmail" role="alert"></span>
+            </div>
+          </div>
+
+          <div class="form-group-row">
+            <!-- 5. Средний MMR (Смысловое условие 1: Диапазон и связь с дивизионом) -->
+            <div class="form-field">
+              <label for="avgMmr" class="field-label">
+                Средний MMR команды
+                <span class="field-hint">от 3 000 до 15 000</span>
+              </label>
+              <input
+                type="number"
+                id="avgMmr"
+                name="avgMmr"
+                class="field-input"
+                placeholder="11850"
+                min="3000"
+                max="15000"
+                step="50"
+                aria-describedby="error-avgMmr"
+                required
+              />
+              <span class="field-error" id="error-avgMmr" role="alert"></span>
+            </div>
+
+            <!-- 6. Количество игроков -->
+            <div class="form-field">
+              <label for="playersCount" class="field-label">
+                Количество игроков
+                <span class="field-hint">от 5 до 7</span>
+              </label>
+              <input
+                type="number"
+                id="playersCount"
+                name="playersCount"
+                class="field-input"
+                value="5"
+                min="5"
+                max="7"
+                aria-describedby="error-playersCount"
+                required
+              />
+              <span class="field-error" id="error-playersCount" role="alert"></span>
+            </div>
+          </div>
+
+          <div class="form-group-row">
+            <!-- 7. Дивизион (Смысловое условие 2: Связь с MMR) -->
+            <div class="form-field">
+              <label for="tier" class="field-label">Дивизион участия</label>
+              <select id="tier" name="tier" class="field-select">
+                <option value="pro">PRO Дивизион (MMR &ge; 10 000) — 12 000 RUB</option>
+                <option value="semipro">Semi-PRO (MMR &ge; 6 000) — 6 000 RUB</option>
+                <option value="amateur">Open Amateur (Любой MMR) — 2 500 RUB</option>
+              </select>
+              <span class="field-error" id="error-tier" role="alert"></span>
+            </div>
+
+            <!-- 8. Регион -->
+            <div class="form-field">
+              <label for="region" class="field-label">Серверный регион</label>
+              <select id="region" name="region" class="field-select">
+                <option value="cis">Восточная Европа (СНГ, Стокгольм)</option>
+                <option value="eu">Западная Европа (Франкфурт)</option>
+                <option value="mea">Ближний Восток (Дубай)</option>
+              </select>
+              <span class="field-error" id="error-region" role="alert"></span>
+            </div>
+          </div>
+
+          <!-- Опции взноса -->
+          <div class="checkbox-group">
+            <label class="checkbox-label">
+              <input type="checkbox" name="earlyBird" id="earlyBird" checked />
+              <span>Ранняя регистрация (скидка -15% на слот дивизиона)</span>
+            </label>
+            <label class="checkbox-label">
+              <input type="checkbox" name="wantsMerch" id="wantsMerch" />
+              <span>Фирменный мерч-пакет (белая оверсайз футболка gazbloki31.ru по 1 337 RUB на каждого игрока)</span>
+            </label>
+          </div>
+
+          <button type="submit" class="btn-submit" id="btn-submit-reg">Рассчитать заявку и отправить</button>
+        </form>
+      </div>
+
+      <!-- Контейнер итоговой карточки с aria-live="polite" и tabindex="-1" (Этап 1 и 7) -->
+      <aside
+        id="result-card"
+        class="result-card"
+        aria-live="polite"
+        tabindex="-1"
+        hidden
+      >
+        <!-- Заполняется динамически функцией displayResultCard() в script.js -->
+      </aside>
+
+    </section>
+
+    <!-- Секция 5 тест-кейсов (Этап 8 методички) -->
+    <section class="tests-section" aria-label="Секция тестирования формы">
+      <h2>План тестирования и 5 тест-кейсов (Этап 8)</h2>
+      <p>
+        В соответствии с методичкой реализованы 5 категорий тест-кейсов: обычный, минимальный, максимальный,
+        ошибочный и пограничный. Нажмите «Загрузить в форму» для мгновенного тестирования.
+      </p>
+
+      <div style="overflow-x: auto;">
+        <table class="tests-table">
+          <thead>
+            <tr>
+              <th>Категория</th>
+              <th>Входные данные</th>
+              <th>Ожидаемый результат</th>
+              <th>Фактический результат</th>
+              <th>Действие</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><span class="badge-test-type badge-test-type--std">1. Обычный</span></td>
+              <td>Team Spirit Academy, TSA, MMR 11500, PRO, 5 игр., Ранняя скидка</td>
+              <td>Успех: Базовый 12 000 RUB, скидка -15% (1 800 RUB), итого 10 200 RUB, фокус на результат.</td>
+              <td class="status-done">Соответствует ожидаемому</td>
+              <td><button type="button" class="btn-test-fill" data-load-test="standard">Загрузить в форму</button></td>
+            </tr>
+            <tr>
+              <td><span class="badge-test-type badge-test-type--min">2. Минимальный</span></td>
+              <td>Novice Squad, NSQ, MMR 3000, Open Amateur, 5 игр., без опций</td>
+              <td>Успех: Мин. допустимый MMR (3000), взнос 2 500 RUB, рекомендация о доборе запасного.</td>
+              <td class="status-done">Соответствует ожидаемому</td>
+              <td><button type="button" class="btn-test-fill" data-load-test="minimum">Загрузить в форму</button></td>
+            </tr>
+            <tr>
+              <td><span class="badge-test-type badge-test-type--max">3. Максимальный</span></td>
+              <td>gazbloki31.ru Mega Stack, GZ31, MMR 14800, PRO, 7 игр., мерч-пакет</td>
+              <td>Успех: Макс. MMR, 7 футболок по 1 337 RUB, 2 запасных слота, максимальный Seed Rating.</td>
+              <td class="status-done">Соответствует ожидаемому</td>
+              <td><button type="button" class="btn-test-fill" data-load-test="maximum">Загрузить в форму</button></td>
+            </tr>
+            <tr>
+              <td><span class="badge-test-type badge-test-type--err">4. Ошибочный</span></td>
+              <td>Имя 'X', тег 'TOOLONGTAG', MMR 2500, 4 игрока, невалидный email</td>
+              <td>Отказ: 5 сообщений об ошибках под полями, <code>aria-invalid</code>, фокус на первом поле.</td>
+              <td class="status-done">Соответствует ожидаемому</td>
+              <td><button type="button" class="btn-test-fill" data-load-test="invalid">Загрузить в форму</button></td>
+            </tr>
+            <tr>
+              <td><span class="badge-test-type badge-test-type--bnd">5. Пограничный</span></td>
+              <td>Borderline Pro, BPRO, MMR 9999 (ровно на 1 ниже минимума для PRO), PRO</td>
+              <td>Отказ: Смысловая связь полей PRO и MMR требует &ge; 10 000, ошибка под MMR, фокус на поле.</td>
+              <td class="status-done">Соответствует ожидаемому</td>
+              <td><button type="button" class="btn-test-fill" data-load-test="boundary">Загрузить в форму</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Отчёт о выполнении этапов практической работы 13 -->
+    <section class="report-card">
+      <h2>Отчёт о выполнении Практики 13</h2>
+      <table class="stages-table">
+        <thead>
+          <tr>
+            <th>Этап</th>
+            <th>Что сделано студентом</th>
+            <th>Статус</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1. Подготовка формы</td>
+            <td>Проверены <code>id</code>, <code>name</code>, добавлены контейнеры <code>.field-error</code> с <code>role="alert"</code>, итоговая карточка снабжена <code>aria-live="polite"</code> и <code>tabindex="-1"</code>.</td>
+            <td class="status-done">Выполнено</td>
+          </tr>
+          <tr>
+            <td>2. Перехват submit</td>
+            <td>Форма получена через <code>querySelector</code>, вызван <code>preventDefault()</code>, очищены предыдущие ошибки функцией <code>clearFormErrors</code>.</td>
+            <td class="status-done">Выполнено</td>
+          </tr>
+          <tr>
+            <td>3. Получение и нормализация</td>
+            <td>Использован <code>FormData</code>, строковые поля очищены от пробелов (<code>.trim()</code>), числа явно приведены через <code>Number</code> с проверкой <code>Number.isFinite</code>.</td>
+            <td class="status-done">Выполнено</td>
+          </tr>
+          <tr>
+            <td>4. Собственная валидация</td>
+            <td>Функция <code>validateRegistration</code> проверяет: 1) диапазоны MMR и состава, 2) связь дивизиона с MMR, 3) допустимость сочетания клан-тега.</td>
+            <td class="status-done">Выполнено</td>
+          </tr>
+          <tr>
+            <td>5. Отображение ошибок</td>
+            <td>Ошибки выводятся рядом с полями в связанных элементах через <code>aria-describedby</code>, проставляется <code>aria-invalid="true"</code>, фокус переводится на первое ошибочное поле.</td>
+            <td class="status-done">Выполнено</td>
+          </tr>
+          <tr>
+            <td>6. Выполнение расчёта</td>
+            <td>Функция <code>calculateTournamentEntry</code> рассчитывает взнос по <code>switch</code>-дивизиону, слотам замен, мерчу gazbloki31.ru (1 337 RUB) и формуле Seed Rating.</td>
+            <td class="status-done">Выполнено</td>
+          </tr>
+          <tr>
+            <td>7. Вывод итога</td>
+            <td>Формируется подробная карточка с параметрами команды, финансовой сметой, Seed-рейтингом и рекомендацией оргкомитета. Фокус переводится на <code>#result-card</code>.</td>
+            <td class="status-done">Выполнено</td>
+          </tr>
+          <tr>
+            <td>8. Проведение тестирования</td>
+            <td>Составлены и задокументированы 5 тест-кейсов (обычный, минимальный, максимальный, ошибочный, пограничный) с интерактивными кнопками быстрой проверки.</td>
+            <td class="status-done">Выполнено</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+  </div>
+
+</body>
+</html>
