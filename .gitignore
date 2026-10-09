@@ -21,3 +21,6 @@ screenshot.ps1
 *.rar
 *.7z
 
+# Submission build directories
+final_*
+scripts/prepare_final.ps1

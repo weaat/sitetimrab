@@ -11,7 +11,7 @@ if (Test-Path $localZip) {
 }
 
 Write-Host "Creating ZIP archive on Desktop..."
-Get-ChildItem -Path . -Exclude '.git', '*.zip' | Compress-Archive -DestinationPath $desktopZip -Force
+Get-ChildItem -Path . -Exclude '.git', '*.zip', 'final_*' | Compress-Archive -DestinationPath $desktopZip -Force
 
 Copy-Item $desktopZip $localZip -Force
 $size = (Get-Item $desktopZip).Length
