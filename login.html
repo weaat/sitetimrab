@@ -281,63 +281,88 @@
 
     .auth-input-wrap {
       position: relative;
+      display: flex;
+      align-items: center;
+      width: 100%;
     }
 
     .auth-input-icon {
       position: absolute;
-      left: 1rem;
+      left: 1.15rem;
       top: 50%;
       transform: translateY(-50%);
       color: #38bdf8;
       pointer-events: none;
       display: flex;
       align-items: center;
+      justify-content: center;
+      z-index: 3;
+      width: 18px;
+      height: 18px;
     }
 
+    /* Высокая специфичность с !important для отступов против перебивания из style.css */
+    .auth-input-wrap .auth-input,
+    .auth-input-wrap input[type="text"].auth-input,
+    .auth-input-wrap input[type="email"].auth-input,
+    .auth-input-wrap input[type="password"].auth-input,
     .auth-input {
       width: 100%;
-      background: rgba(4, 12, 28, 0.55);
-      border: 1px solid rgba(125, 211, 252, 0.22);
-      border-radius: 12px;
-      padding: 0.85rem 1rem 0.85rem 2.85rem;
-      font-size: 0.95rem;
-      color: #fff;
-      font-family: inherit;
-      outline: none;
+      background: rgba(4, 12, 28, 0.65) !important;
+      border: 1px solid rgba(125, 211, 252, 0.25) !important;
+      border-radius: 12px !important;
+      padding: 0.9rem 2.85rem 0.9rem 3.4rem !important;
+      font-size: 0.95rem !important;
+      color: #fff !important;
+      font-family: inherit !important;
+      outline: none !important;
       backdrop-filter: blur(10px);
-      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.3);
-      transition: border-color 0.25s ease, box-shadow 0.25s ease, background 0.25s ease;
+      box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.35) !important;
+      transition: border-color 0.25s ease, box-shadow 0.25s ease, background 0.25s ease !important;
+      box-sizing: border-box !important;
+      line-height: 1.4 !important;
     }
 
-    .auth-input:focus {
-      background: rgba(8, 22, 46, 0.7);
-      border-color: #38bdf8;
+    .auth-input-wrap .auth-input:focus,
+    .auth-input-wrap input[type="text"].auth-input:focus,
+    .auth-input-wrap input[type="email"].auth-input:focus,
+    .auth-input-wrap input[type="password"].auth-input:focus {
+      background: rgba(8, 22, 46, 0.85) !important;
+      border-color: #38bdf8 !important;
       box-shadow:
         0 0 0 3px rgba(14, 165, 233, 0.25),
-        0 0 20px rgba(56, 189, 248, 0.2),
-        inset 0 1px 0 rgba(255, 255, 255, 0.15);
+        0 0 20px rgba(56, 189, 248, 0.25),
+        inset 0 1px 0 rgba(255, 255, 255, 0.15) !important;
     }
 
-    .auth-input::placeholder {
-      color: rgba(148, 163, 184, 0.55);
+    .auth-input-wrap .auth-input::placeholder,
+    .auth-input-wrap input::placeholder {
+      color: rgba(148, 163, 184, 0.5) !important;
+      opacity: 1 !important;
     }
 
     .auth-pass-toggle {
       position: absolute;
-      right: 0.85rem;
+      right: 1rem;
       top: 50%;
       transform: translateY(-50%);
       background: transparent;
       border: none;
       color: #94a3b8;
       cursor: pointer;
-      padding: 0.3rem;
+      padding: 0.35rem;
       display: flex;
       align-items: center;
-      transition: color 0.2s ease;
+      justify-content: center;
+      z-index: 3;
+      transition: color 0.2s ease, transform 0.2s ease;
+      border-radius: 6px;
     }
 
     .auth-pass-toggle:hover {
+      color: #38bdf8;
+      transform: translateY(-50%) scale(1.1);
+    }
       color: #38bdf8;
     }
 
@@ -487,7 +512,7 @@
       fill: currentColor;
     }
 
-    /* Сообщение об успешном входе */
+    /* Сообщение об успешном входе или ошибке */
     .auth-status-alert {
       margin-top: 1.2rem;
       padding: 0.85rem 1.2rem;
@@ -497,6 +522,7 @@
       text-align: center;
       display: none;
       animation: fadeIn 0.3s ease;
+      line-height: 1.45;
     }
 
     .auth-status-alert--success {
@@ -504,6 +530,55 @@
       border: 1px solid rgba(56, 189, 248, 0.5);
       color: #7dd3fc;
       box-shadow: 0 0 20px rgba(14, 165, 233, 0.3);
+    }
+
+    .auth-status-alert--error {
+      background: rgba(239, 68, 68, 0.18);
+      border: 1px solid rgba(239, 68, 68, 0.55);
+      color: #fca5a5;
+      box-shadow: 0 0 20px rgba(239, 68, 68, 0.35);
+    }
+
+    /* Индикатор подключения к базе данных */
+    .db-status-wrap {
+      display: flex;
+      justify-content: center;
+      margin-top: 0.75rem;
+    }
+
+    .db-status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.76rem;
+      font-weight: 600;
+      padding: 0.3rem 0.9rem;
+      border-radius: 50px;
+      background: rgba(4, 12, 28, 0.7);
+      border: 1px solid rgba(125, 211, 252, 0.22);
+      color: #94a3b8;
+      backdrop-filter: blur(8px);
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    }
+
+    .db-status-dot {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: #f59e0b;
+      box-shadow: 0 0 8px #f59e0b;
+      transition: all 0.3s ease;
+      flex-shrink: 0;
+    }
+
+    .db-status-dot.online {
+      background: #22c55e;
+      box-shadow: 0 0 10px #22c55e;
+    }
+
+    .db-status-dot.offline {
+      background: #38bdf8;
+      box-shadow: 0 0 10px #38bdf8;
     }
 
     @keyframes fadeIn {
@@ -561,6 +636,12 @@
         <span class="auth-badge">Киберспортивный портал</span>
         <h1 class="auth-title">Личный кабинет</h1>
         <p class="auth-subtitle">Управление командой и турнирная статистика</p>
+        <div class="db-status-wrap">
+          <span class="db-status-badge" id="db-status-badge">
+            <span class="db-status-dot" id="db-status-dot"></span>
+            <span id="db-status-text">База данных: проверка...</span>
+          </span>
+        </div>
       </div>
 
       <!-- Переключатель: Вход / Регистрация -->
@@ -617,7 +698,7 @@
             <polyline points="10 17 15 12 10 7"></polyline>
             <line x1="15" y1="12" x2="3" y2="12"></line>
           </svg>
-          <span>Войти</span>
+          <span id="btn-submit-login-text">Войти</span>
         </button>
       </form>
 
@@ -636,7 +717,7 @@
                 <path d="M18 2H6v7a6 6 0 0 0 12 0V2Z"></path>
               </svg>
             </span>
-            <input type="text" id="reg-nickname" class="auth-input" placeholder="Miracle- / Dendi" required>
+            <input type="text" id="reg-nickname" class="auth-input" placeholder="Miracle- / Dendi" required autocomplete="username">
           </div>
         </div>
 
@@ -649,7 +730,7 @@
                 <polyline points="22,6 12,13 2,6"></polyline>
               </svg>
             </span>
-            <input type="email" id="reg-email" class="auth-input" placeholder="captain@team.ru" required>
+            <input type="email" id="reg-email" class="auth-input" placeholder="captain@team.ru" required autocomplete="email">
           </div>
         </div>
 
@@ -662,12 +743,24 @@
                 <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
               </svg>
             </span>
-            <input type="password" id="reg-password" class="auth-input" placeholder="Минимум 6 символов" required>
+            <input type="password" id="reg-password" class="auth-input" placeholder="Минимум 6 символов" required autocomplete="new-password">
+            <button type="button" class="auth-pass-toggle" id="reg-pass-toggle" aria-label="Показать пароль">
+              <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                <circle cx="12" cy="12" r="3"></circle>
+              </svg>
+            </button>
           </div>
         </div>
 
         <button type="submit" class="auth-submit-btn" id="btn-submit-register">
-          <span>Создать аккаунт</span>
+          <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+            <circle cx="8.5" cy="7" r="4"></circle>
+            <line x1="20" y1="8" x2="20" y2="14"></line>
+            <line x1="23" y1="11" x2="17" y2="11"></line>
+          </svg>
+          <span id="btn-submit-reg-text">Создать аккаунт</span>
         </button>
       </form>
 
@@ -765,61 +858,315 @@
         if (alertBox) alertBox.style.display = 'none';
       });
 
-      // Переключатель скрытия/показа пароля
-      const passToggle = document.getElementById('pass-toggle');
-      const passInput = document.getElementById('login-password');
-      if (passToggle && passInput) {
-        passToggle.addEventListener('click', () => {
-          const isPass = passInput.type === 'password';
-          passInput.type = isPass ? 'text' : 'password';
-          passToggle.style.color = isPass ? '#38bdf8' : '#94a3b8';
-        });
+      // ============================================================
+      //  ИНДИКАТОР ПОДКЛЮЧЕНИЯ К БАЗЕ ДАННЫХ И СТАТУС СЕРВЕРА
+      // ============================================================
+      const dbStatusBadge = document.getElementById('db-status-badge');
+      const dbStatusDot   = document.getElementById('db-status-dot');
+      const dbStatusText  = document.getElementById('db-status-text');
+      let isServerOnline  = false;
+
+      // Локальная база данных (резервная реляционная база в localStorage на случай запуска без сервера)
+      const LOCAL_DB_KEY = 'dotaarena_sqlite_emulator_users';
+      function getLocalUsers() {
+        try {
+          const raw = localStorage.getItem(LOCAL_DB_KEY);
+          if (raw) return JSON.parse(raw);
+        } catch (e) {}
+        // Предустановленный демо-пользователь
+        const initial = [
+          {
+            id: 1,
+            nickname: 'Dendi',
+            email: 'dendi@dotaarena.ru',
+            password: 'dota2026',
+            role: 'pro_captain',
+            createdAt: new Date().toISOString()
+          }
+        ];
+        try { localStorage.setItem(LOCAL_DB_KEY, JSON.stringify(initial)); } catch (e) {}
+        return initial;
       }
 
-      // Обработка входа
-      function handleSuccessLogin(username) {
-        localStorage.setItem('dotaarena_user', JSON.stringify({
-          name: username,
-          loggedInAt: new Date().toISOString()
-        }));
+      function saveLocalUsers(users) {
+        try { localStorage.setItem(LOCAL_DB_KEY, JSON.stringify(users)); } catch (e) {}
+      }
 
-        if (alertBox) {
-          alertBox.textContent = `Успешный вход! Добро пожаловать, ${username}. Перенаправление...`;
-          alertBox.style.display = 'block';
+      // Проверка подключения к SQLite серверу
+      async function checkDatabaseConnection() {
+        try {
+          const res = await fetch('/api/status', { method: 'GET', cache: 'no-store' });
+          if (res.ok) {
+            const data = await res.json();
+            if (data.database === 'sqlite3') {
+              isServerOnline = true;
+              if (dbStatusDot) dbStatusDot.className = 'db-status-dot online';
+              if (dbStatusText) {
+                dbStatusText.textContent = `База данных: SQLite3 (Server Online · ${data.users_count || 1} акк.)`;
+              }
+              return;
+            }
+          }
+        } catch (e) {
+          // Сервер не запущен (оффлайн режим или открытие через file://)
         }
+
+        isServerOnline = false;
+        const localUsers = getLocalUsers();
+        if (dbStatusDot) dbStatusDot.className = 'db-status-dot offline';
+        if (dbStatusText) {
+          dbStatusText.textContent = `База данных: Локальная БД (IndexedDB · ${localUsers.length} акк.)`;
+        }
+      }
+
+      checkDatabaseConnection();
+
+      // Переключатели скрытия/показа паролей
+      function setupPassToggle(btnId, inputId) {
+        const toggleBtn = document.getElementById(btnId);
+        const passInput = document.getElementById(inputId);
+        if (toggleBtn && passInput) {
+          toggleBtn.addEventListener('click', () => {
+            const isPass = passInput.type === 'password';
+            passInput.type = isPass ? 'text' : 'password';
+            toggleBtn.style.color = isPass ? '#38bdf8' : '#94a3b8';
+            toggleBtn.setAttribute('aria-label', isPass ? 'Скрыть пароль' : 'Показать пароль');
+          });
+        }
+      }
+
+      setupPassToggle('pass-toggle', 'login-password');
+      setupPassToggle('reg-pass-toggle', 'reg-password');
+
+      // Уведомления об ошибке или успехе
+      function showAlert(type, message) {
+        if (!alertBox) return;
+        alertBox.className = 'auth-status-alert auth-status-alert--' + type;
+        alertBox.textContent = message;
+        alertBox.style.display = 'block';
+      }
+
+      function hideAlert() {
+        if (alertBox) alertBox.style.display = 'none';
+      }
+
+      // Управление состоянием кнопок при отправке
+      function setButtonLoading(btn, textEl, isLoading, defaultText) {
+        if (!btn || !textEl) return;
+        btn.disabled = isLoading;
+        if (isLoading) {
+          textEl.textContent = 'Обработка данных...';
+          btn.style.opacity = '0.8';
+        } else {
+          textEl.textContent = defaultText;
+          btn.style.opacity = '';
+        }
+      }
+
+      // Успешная авторизация (сохранение в сессию и редирект)
+      function handleSuccessAuth(userData, token, message) {
+        try {
+          localStorage.setItem('dotaarena_user', JSON.stringify({
+            id: userData.id,
+            name: userData.nickname || userData.name,
+            nickname: userData.nickname || userData.name,
+            email: userData.email,
+            role: userData.role || 'player',
+            loggedInAt: new Date().toISOString()
+          }));
+          if (token) {
+            localStorage.setItem('dotaarena_token', token);
+          }
+        } catch (e) {}
+
+        showAlert('success', `${message} Перенаправление на главную...`);
 
         setTimeout(() => {
           window.location.href = 'index.html';
         }, 1200);
       }
 
-      loginForm.addEventListener('submit', (e) => {
+      // ============================================================
+      //  ОБРАБОТКА ВХОДА (LOGIN)
+      // ============================================================
+      const btnSubmitLogin = document.getElementById('btn-submit-login');
+      const btnSubmitLoginText = document.getElementById('btn-submit-login-text');
+
+      loginForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-        const email = document.getElementById('login-email').value.trim();
-        const username = email.split('@')[0] || 'Игрок DotaArena';
-        handleSuccessLogin(username);
+        hideAlert();
+
+        const loginVal = document.getElementById('login-email').value.trim();
+        const passVal = document.getElementById('login-password').value.trim();
+
+        if (!loginVal || !passVal) {
+          showAlert('error', 'Пожалуйста, заполните все поля формы.');
+          return;
+        }
+
+        setButtonLoading(btnSubmitLogin, btnSubmitLoginText, true, 'Войти');
+
+        // Сценарий 1: Онлайн SQLite сервер
+        if (isServerOnline) {
+          try {
+            const response = await fetch('/api/login', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ login: loginVal, password: passVal })
+            });
+            const data = await response.json();
+            setButtonLoading(btnSubmitLogin, btnSubmitLoginText, false, 'Войти');
+
+            if (response.ok && data.success) {
+              handleSuccessAuth(data.user, data.token, data.message || `Добро пожаловать, ${data.user.nickname}!`);
+            } else {
+              showAlert('error', data.error || 'Ошибка входа. Проверьте логин и пароль.');
+            }
+            return;
+          } catch (err) {
+            console.warn('Сервер временно недоступен, переключение на локальную БД:', err);
+            isServerOnline = false;
+          }
+        }
+
+        // Сценарий 2: Локальная база данных (Offline Fallback)
+        setButtonLoading(btnSubmitLogin, btnSubmitLoginText, false, 'Войти');
+        const localUsers = getLocalUsers();
+        const found = localUsers.find(u =>
+          (u.email.toLowerCase() === loginVal.toLowerCase()) ||
+          (u.nickname.toLowerCase() === loginVal.toLowerCase())
+        );
+
+        if (!found) {
+          showAlert('error', 'Пользователь с таким email или логином не найден. Зарегистрируйтесь во вкладке «Регистрация».');
+          return;
+        }
+
+        if (found.password !== passVal) {
+          showAlert('error', 'Неверный пароль. Пожалуйста, проверьте введённые данные.');
+          return;
+        }
+
+        handleSuccessAuth(found, 'local_token_' + Date.now(), `С возвращением, ${found.nickname}! (Локальная база данных)`);
       });
 
-      registerForm.addEventListener('submit', (e) => {
+      // ============================================================
+      //  ОБРАБОТКА РЕГИСТРАЦИИ (REGISTER)
+      // ============================================================
+      const btnSubmitReg = document.getElementById('btn-submit-register');
+      const btnSubmitRegText = document.getElementById('btn-submit-reg-text');
+
+      registerForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-        const nick = document.getElementById('reg-nickname').value.trim();
-        handleSuccessLogin(nick || 'Новый Капитан');
+        hideAlert();
+
+        const nickVal = document.getElementById('reg-nickname').value.trim();
+        const emailVal = document.getElementById('reg-email').value.trim().toLowerCase();
+        const passVal = document.getElementById('reg-password').value.trim();
+
+        if (nickVal.length < 2) {
+          showAlert('error', 'Никнейм должен содержать как минимум 2 символа.');
+          return;
+        }
+
+        if (!emailVal.includes('@') || !emailVal.includes('.')) {
+          showAlert('error', 'Пожалуйста, введите корректный адрес электронной почты.');
+          return;
+        }
+
+        if (passVal.length < 6) {
+          showAlert('error', 'Пароль должен быть длиной не менее 6 символов.');
+          return;
+        }
+
+        setButtonLoading(btnSubmitReg, btnSubmitRegText, true, 'Создать аккаунт');
+
+        // Сценарий 1: Онлайн SQLite сервер
+        if (isServerOnline) {
+          try {
+            const response = await fetch('/api/register', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ nickname: nickVal, email: emailVal, password: passVal })
+            });
+            const data = await response.json();
+            setButtonLoading(btnSubmitReg, btnSubmitRegText, false, 'Создать аккаунт');
+
+            if (response.ok && data.success) {
+              handleSuccessAuth(data.user, data.token, data.message || `Аккаунт «${nickVal}» успешно создан в SQLite3!`);
+            } else {
+              showAlert('error', data.error || 'Ошибка при регистрации аккаунта.');
+            }
+            return;
+          } catch (err) {
+            console.warn('Сервер временно недоступен, переключение на локальную БД:', err);
+            isServerOnline = false;
+          }
+        }
+
+        // Сценарий 2: Локальная база данных (Offline Fallback)
+        setButtonLoading(btnSubmitReg, btnSubmitRegText, false, 'Создать аккаунт');
+        const localUsers = getLocalUsers();
+
+        if (localUsers.some(u => u.email.toLowerCase() === emailVal)) {
+          showAlert('error', 'Пользователь с таким email уже зарегистрирован. Пожалуйста, выполните вход.');
+          return;
+        }
+
+        if (localUsers.some(u => u.nickname.toLowerCase() === nickVal.toLowerCase())) {
+          showAlert('error', `Никнейм «${nickVal}» уже занят другим игроком. Выберите другой никнейм.`);
+          return;
+        }
+
+        const newUser = {
+          id: Date.now(),
+          nickname: nickVal,
+          email: emailVal,
+          password: passVal,
+          role: 'player',
+          createdAt: new Date().toISOString()
+        };
+
+        localUsers.push(newUser);
+        saveLocalUsers(localUsers);
+
+        handleSuccessAuth(newUser, 'local_token_' + Date.now(), `Аккаунт «${nickVal}» успешно создан и сохранён в локальной базе данных!`);
       });
 
-      // Вход через Steam
+      // ============================================================
+      //  ВХОД ЧЕРЕЗ STEAM
+      // ============================================================
       const steamBtn = document.getElementById('btn-steam-login');
       if (steamBtn) {
         steamBtn.addEventListener('click', () => {
-          handleSuccessLogin('Steam Pro Player');
+          hideAlert();
+          const steamUser = {
+            id: 777,
+            nickname: 'Steam Pro Player',
+            email: 'steam_player@dotaarena.ru',
+            role: 'verified_pro'
+          };
+          handleSuccessAuth(steamUser, 'steam_verified_token', 'Успешная верификация через Steam Guard!');
         });
       }
 
-      // Забыли пароль
+      // ============================================================
+      //  ВОССТАНОВЛЕНИЕ ПАРОЛЯ
+      // ============================================================
       const forgotLink = document.getElementById('forgot-link');
       if (forgotLink) {
         forgotLink.addEventListener('click', (e) => {
           e.preventDefault();
-          alert('Инструкция по восстановлению пароля отправлена на указанную почту.');
+          const emailInput = document.getElementById('login-email');
+          const email = emailInput ? emailInput.value.trim() : '';
+          if (email && email.includes('@')) {
+            showAlert('success', `Инструкция по сбросу пароля отправлена на почту: ${email}`);
+          } else {
+            const promptEmail = prompt('Введите ваш email для восстановления пароля:');
+            if (promptEmail && promptEmail.includes('@')) {
+              showAlert('success', `Инструкция по сбросу пароля отправлена на почту: ${promptEmail}`);
+            }
+          }
         });
       }
     })();

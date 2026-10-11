@@ -15,6 +15,10 @@ check_img.ps1
 test_dom.ps1
 screenshot.ps1
 
+# Python cache
+__pycache__/
+*.pyc
+
 # Archives (do not commit zip to github)
 *.zip
 *.tar.gz
